@@ -41,4 +41,30 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+    /**
+     * Named state: Irwin Hutajulu (Admin)
+     */
+    public function irwin(): static
+    {
+        return $this->state(fn () => [
+            'name' => 'Irwin Hutajulu',
+            'email' => 'irwinhutajulu@gmail.com',
+            'password' => Hash::make('julu2985'),
+            'email_verified_at' => now(),
+        ]);
+    }
+
+    /**
+     * Named state: Adi (Cashier)
+     */
+    public function adi(): static
+    {
+        return $this->state(fn () => [
+            'name' => 'Adi',
+            'email' => 'adi@nirmala.love',
+            'password' => Hash::make('julu2985'),
+            'email_verified_at' => now(),
+        ]);
+    }
 }

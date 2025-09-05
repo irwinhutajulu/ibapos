@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $title ?? 'IBAPOS' }}</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>[x-cloak]{display:none!important}</style>
 </head>
@@ -19,30 +20,44 @@
                 <a href="/" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 font-medium text-gray-700">
                     <span>🏠</span> <span>Dashboard</span>
                 </a>
-                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                @can('sales.create')
+                <a href="{{ route('pos.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                     <span>🧾</span> <span>POS</span>
                 </a>
+                @endcan
                 <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                     <span>📦</span> <span>Products</span>
                 </a>
-                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                @can('sales.read')
+                <a href="{{ route('sales.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                     <span>🛒</span> <span>Sales</span>
                 </a>
-                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                @endcan
+                @can('purchases.read')
+                <a href="{{ route('purchases.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                     <span>📥</span> <span>Purchases</span>
                 </a>
-                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
-                    <span>🏷️</span> <span>Stocks</span>
+                @endcan
+                @can('stocks.read')
+                <a href="{{ route('stock-adjustments.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                    <span>🏷️</span> <span>Stock Adjustments</span>
                 </a>
+                @endcan
+                @can('stock_mutations.request')
+                <a href="{{ route('stock-mutations.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                    <span>🔁</span> <span>Stock Mutations</span>
+                </a>
+                @endcan
                 <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                     <span>📈</span> <span>Reports</span>
                 </a>
+                @can('admin.users')
                 <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                     <span>⚙️</span> <span>Settings</span>
                 </a>
+                @endcan
             </nav>
         </div>
-
         <!-- Main -->
         <div class="flex-1 flex flex-col min-w-0">
             <!-- Topbar -->
@@ -58,7 +73,27 @@
                 </div>
                 <div class="flex items-center gap-4">
                     <input type="text" placeholder="Search..." class="hidden md:block w-64 px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring" />
-                    <div class="w-8 h-8 rounded-full bg-gray-200"></div>
+                    @auth
+                    <form method="POST" action="{{ route('active-location.set') }}" class="flex items-center gap-2">
+                        @csrf
+                        <label class="text-xs text-gray-500">Lokasi:</label>
+                        <select name="location_id" class="px-2 py-1 border rounded-md text-sm" onchange="this.form.submit()">
+                            @php($activeId = session('active_location_id'))
+                            @foreach(auth()->user()->locations as $loc)
+                                <option value="{{ $loc->id }}" @selected($activeId == $loc->id)>{{ $loc->name }}</option>
+                            @endforeach
+                        </select>
+                    </form>
+                                        @endauth
+                                        @guest
+                                            <a href="{{ route('login') }}" class="text-sm px-3 py-2 border rounded-md">Login</a>
+                                        @else
+                                            <form method="POST" action="{{ route('logout') }}">
+                                                @csrf
+                                                <button class="text-sm px-3 py-2 border rounded-md">Logout</button>
+                                            </form>
+                                        @endguest
+                                        <div class="w-8 h-8 rounded-full bg-gray-200"></div>
                 </div>
             </header>
 

@@ -8,11 +8,12 @@ use Illuminate\Http\Request;
 
 class StockMutationsController extends Controller
 {
-    public function __construct()
+    public function index()
     {
-        $this->middleware(['active.location', 'permission:stock_mutations.confirm'])->only('confirm');
-        $this->middleware(['active.location', 'permission:stock_mutations.reject'])->only('reject');
+        $mutations = \App\Models\StockMutation::latest('date')->paginate(20);
+        return view('mutations.index', compact('mutations'));
     }
+    // Route-level middleware is applied in routes/web.php
 
     public function confirm(Request $request, StockMutation $mutation, MutationService $service)
     {

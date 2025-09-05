@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name', 191);
-            $table->unsignedBigInteger('category_id');
+            $table->unsignedBigInteger('category_id')->nullable();
             $table->string('barcode', 64)->nullable()->unique();
             $table->decimal('price', 18, 2)->unsigned()->default(0);
             $table->decimal('weight', 10, 3)->unsigned()->nullable();
@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('category_id')->references('id')->on('categories')->restrictOnDelete();
+            $table->foreign('category_id')->references('id')->on('categories')->nullOnDelete();
             $table->index('category_id');
         });
     }

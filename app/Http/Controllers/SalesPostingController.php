@@ -8,11 +8,7 @@ use Illuminate\Http\Request;
 
 class SalesPostingController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware(['active.location', 'permission:sales.post'])->only('post');
-        $this->middleware(['active.location', 'permission:sales.void'])->only('void');
-    }
+    // Route-level middleware is applied in routes/web.php
 
     public function post(Request $request, Sale $sale, SalesPostingService $service)
     {

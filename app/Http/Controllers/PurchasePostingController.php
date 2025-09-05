@@ -8,12 +8,12 @@ use Illuminate\Http\Request;
 
 class PurchasePostingController extends Controller
 {
-    public function __construct()
+    public function index()
     {
-        $this->middleware(['active.location', 'permission:purchases.receive'])->only('receive');
-        $this->middleware(['active.location', 'permission:purchases.post'])->only('post');
-        $this->middleware(['active.location', 'permission:purchases.void'])->only('void');
+        $purchases = \App\Models\Purchase::with('supplier')->latest('date')->paginate(20);
+        return view('purchases.index', compact('purchases'));
     }
+    // Route-level middleware is applied in routes/web.php
 
     public function receive(Request $request, Purchase $purchase, PurchasePostingService $service)
     {
