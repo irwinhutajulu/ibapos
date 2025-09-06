@@ -11,7 +11,7 @@ class Product extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'name','category_id','barcode','price','weight','unit'
+    'name','category_id','barcode','price','weight','unit','image_path'
     ];
 
     protected $casts = [
@@ -22,5 +22,10 @@ class Product extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function getImageUrlAttribute(): ?string
+    {
+        return $this->image_path ? asset('storage/'.$this->image_path) : null;
     }
 }

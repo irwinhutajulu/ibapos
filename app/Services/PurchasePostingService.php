@@ -9,6 +9,38 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class PurchasePostingService
 {
+    public function calculateLandedCost(Purchase $purchase): array
+    {
+        // simple proportional allocation by item subtotal
+        $freight = (float)($purchase->freight_cost ?? 0);
+        if ($freight <= 0) {
+            return [];
+        }
+        $totalSubtotal = (float)$purchase->items->sum(fn($i) => (float)$i->subtotal);
+        if ($totalSubtotal <= 0) {
+            return [];
+        }
+        $map = [];
+        foreach ($purchase->items as $item) {
+            $portion = ((float)$item->subtotal / $totalSubtotal) * $freight;
+            $map[$item->id] = round($portion, 2);
+        }
+        return $map;
+    }
+
+    public function allocateFreightCost(Purchase $purchase): void
+    {
+        $allocation = $this->calculateLandedCost($purchase);
+        if (!$allocation) return;
+        foreach ($purchase->items as $item) {
+            $extra = $allocation[$item->id] ?? 0.0;
+            if ($extra > 0) {
+                $perUnit = $extra / max(1e-9, (float)$item->qty);
+                // Adjust effective price used for avg_cost calculation by adding per-unit freight
+                $item->price = (string) round(((float)$item->price) + $perUnit, 4);
+            }
+        }
+    }
     public function markAsReceived(Purchase $purchase, int $userId): void
     {
         if ($purchase->status !== 'draft') {
@@ -24,6 +56,8 @@ class PurchasePostingService
         }
 
         DB::transaction(function () use ($purchase, $userId) {
+            // Adjust item prices for landed cost
+            $this->allocateFreightCost($purchase);
             foreach ($purchase->items as $item) {
                 $stock = Stock::where('product_id', $item->product_id)
                     ->where('location_id', $purchase->location_id)
@@ -31,7 +65,7 @@ class PurchasePostingService
                     ->first();
 
                 $qtyAdd = (float)$item->qty;
-                $unitCost = (float)$item->price; // simple; freight allocation can be added later
+                $unitCost = (float)$item->price;
 
                 if (!$stock) {
                     $stock = Stock::create([

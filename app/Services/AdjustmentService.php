@@ -9,6 +9,29 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class AdjustmentService
 {
+    public function create(int $locationId, array $items, ?string $reason, ?string $note, int $userId): StockAdjustment
+    {
+        return DB::transaction(function () use ($locationId, $items, $reason, $note, $userId) {
+            $adj = StockAdjustment::create([
+                'code' => null,
+                'date' => now(),
+                'location_id' => $locationId,
+                'user_id' => $userId,
+                'reason' => $reason,
+                'note' => $note,
+                'status' => 'draft',
+            ]);
+            foreach ($items as $it) {
+                $adj->items()->create([
+                    'product_id' => $it['product_id'],
+                    'qty_change' => $it['qty_change'],
+                    'unit_cost' => $it['unit_cost'] ?? null,
+                    'note' => $it['note'] ?? null,
+                ]);
+            }
+            return $adj;
+        });
+    }
     public function post(StockAdjustment $adj, int $userId): void
     {
         if ($adj->status !== 'draft') {

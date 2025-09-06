@@ -17,4 +17,6 @@ class StockAdjustmentItem extends Model
         'qty_change' => 'decimal:3',
         'unit_cost' => 'decimal:4',
     ];
+
+    public function product() { return $this->belongsTo(Product::class); }
 }

@@ -25,9 +25,16 @@
                     <span>🧾</span> <span>POS</span>
                 </a>
                 @endcan
-                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                @can('products.read')
+                <a href="{{ route('products.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                     <span>📦</span> <span>Products</span>
                 </a>
+                @endcan
+                @can('categories.read')
+                <a href="{{ route('categories.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                    <span>🏷️</span> <span>Categories</span>
+                </a>
+                @endcan
                 @can('sales.read')
                 <a href="{{ route('sales.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                     <span>🛒</span> <span>Sales</span>
@@ -39,6 +46,9 @@
                 </a>
                 @endcan
                 @can('stocks.read')
+                <a href="{{ route('stocks.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                    <span>📦</span> <span>Stocks</span>
+                </a>
                 <a href="{{ route('stock-adjustments.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                     <span>🏷️</span> <span>Stock Adjustments</span>
                 </a>
@@ -48,12 +58,22 @@
                     <span>🔁</span> <span>Stock Mutations</span>
                 </a>
                 @endcan
+                @can('stocks.read')
+                <a href="{{ route('reservations.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                    <span>⏸️</span> <span>Reservations</span>
+                </a>
+                @endcan
                 <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                     <span>📈</span> <span>Reports</span>
                 </a>
                 @can('admin.users')
                 <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                     <span>⚙️</span> <span>Settings</span>
+                </a>
+                @endcan
+                @can('admin.permissions')
+                <a href="{{ route('admin.notifications.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                    <span>🔔</span> <span>Notifications</span>
                 </a>
                 @endcan
             </nav>
@@ -97,10 +117,33 @@
                 </div>
             </header>
 
-            <main class="p-4 lg:p-6">
+                        <main class="p-4 lg:p-6">
                 {{ $slot ?? '' }}
                 @yield('content')
             </main>
+                        @auth
+                        <script>
+                            window.appActiveLocationId = {{ (int) session('active_location_id') }};
+                        </script>
+                        @endauth
+                        @stack('scripts')
+            
+                                    <!-- Toast notifications -->
+                                    <div x-data="{ toasts: [], add(t){ this.toasts.push({...t, id: Date.now()+Math.random()}); setTimeout(()=>this.remove(t.id), t.ttl ?? 3500); }, remove(id){ this.toasts = this.toasts.filter(x=>x.id!==id) } }"
+                                             x-init="window.notify = (msg, type='info', ttl=3500) => this.add({msg, type, ttl}); window.addEventListener('notify', e => this.add(e.detail));"
+                                             class="fixed top-4 right-4 z-50 space-y-2">
+                                            <template x-for="t in toasts" :key="t.id">
+                                                    <div class="max-w-xs shadow-lg rounded-md px-4 py-3 text-sm text-white"
+                                                             :class="{
+                                                                 'bg-gray-800': t.type==='info',
+                                                                 'bg-green-600': t.type==='success',
+                                                                 'bg-yellow-600': t.type==='warning',
+                                                                 'bg-red-600': t.type==='error',
+                                                             }">
+                                                            <div x-text="t.msg"></div>
+                                                    </div>
+                                            </template>
+                                    </div>
         </div>
     </div>
 </body>

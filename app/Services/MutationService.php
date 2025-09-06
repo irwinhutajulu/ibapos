@@ -9,6 +9,22 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class MutationService
 {
+    public function create(int $productId, int $fromLocationId, int $toLocationId, string $qty, int $userId, ?string $note = null): \App\Models\StockMutation
+    {
+        if ($fromLocationId === $toLocationId) {
+            throw new BadRequestHttpException('from and to location must differ');
+        }
+        return \App\Models\StockMutation::create([
+            'product_id' => $productId,
+            'from_location_id' => $fromLocationId,
+            'to_location_id' => $toLocationId,
+            'qty' => $qty,
+            'date' => now()->toDateString(),
+            'note' => $note,
+            'status' => 'pending',
+            'requested_by' => $userId,
+        ]);
+    }
     public function confirm(StockMutation $mutation, int $userId): void
     {
         if ($mutation->status !== 'pending') {

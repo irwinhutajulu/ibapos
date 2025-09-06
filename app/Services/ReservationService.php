@@ -55,4 +55,18 @@ class ReservationService
         }
         $reservation->update(['status' => 'consumed', 'consumed_at' => now(), 'consumed_by' => $userId]);
     }
+
+    public function cleanupExpired(): int
+    {
+        $expired = StockReservation::where('status','active')
+            ->whereNotNull('expires_at')
+            ->where('expires_at','<', now())
+            ->get();
+        $count = 0;
+        foreach ($expired as $res) {
+            $res->update(['status' => 'expired', 'released_at' => now(), 'released_by' => null]);
+            $count++;
+        }
+        return $count;
+    }
 }

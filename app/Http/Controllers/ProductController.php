@@ -12,8 +12,8 @@ class ProductController extends Controller
         $q = trim((string)$request->string('q'));
         $products = Product::query()
             ->when($q, fn($b) => $b->where('name', 'like', "%$q%")
-                                    ->orWhere('sku', 'like', "%$q%"))
-            ->select('id','name','sku')
+                                    ->orWhere('barcode', 'like', "%$q%"))
+            ->select('id','name','barcode')
             ->orderBy('name')
             ->paginate(20);
         return response()->json($products);

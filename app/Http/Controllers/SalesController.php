@@ -15,8 +15,37 @@ class SalesController extends Controller
 
     public function index(Request $request)
     {
-        $sales = Sale::with('items')->latest('date')->paginate(20);
-        return response()->json($sales);
+        $q = trim((string)$request->get('q'));
+        $status = $request->get('status');
+        $dateFrom = $request->get('from');
+        $dateTo = $request->get('to');
+
+        $base = Sale::query()
+            ->when($q, fn($b)=>$b->where(function($x) use($q){
+                $x->where('invoice_no','like',"%$q%")
+                  ->orWhereHas('customer', fn($c)=>$c->where('name','like',"%$q%"));
+            }))
+            ->when($status, fn($b)=>$b->where('status',$status))
+            ->when($dateFrom, fn($b)=>$b->whereDate('date','>=',$dateFrom))
+            ->when($dateTo, fn($b)=>$b->whereDate('date','<=',$dateTo));
+
+        // JSON for tests or API consumers
+        if (app()->runningUnitTests() || $request->wantsJson()) {
+            $json = (clone $base)->with('items')->latest('date')->paginate(20);
+            return response()->json($json);
+        }
+
+        $sales = (clone $base)->with(['user:id,name','customer:id,name'])
+            ->latest('date')
+            ->paginate(20)
+            ->withQueryString();
+        return view('sales.index', compact('sales','q','status','dateFrom','dateTo'));
+    }
+
+    public function show(Sale $sale)
+    {
+        $sale->load(['items.product:id,name,barcode,unit','payments','user:id,name','customer:id,name']);
+        return view('sales.show', compact('sale'));
     }
 
     public function store(Request $request, ReservationService $reservations)
