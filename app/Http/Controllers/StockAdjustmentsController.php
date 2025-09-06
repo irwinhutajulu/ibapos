@@ -69,14 +69,16 @@ class StockAdjustmentsController extends Controller
 
     public function post(Request $request, StockAdjustment $adjustment, AdjustmentService $service)
     {
-        $service->post($adjustment, (int)auth()->id());
-        return response()->json(['status' => 'ok', 'adjustment' => $adjustment->fresh('items')]);
+    $this->authorize('post', $adjustment);
+    $service->post($adjustment, (int)auth()->id());
+    return response()->json(['status' => 'ok', 'adjustment' => $adjustment->fresh('items')]);
     }
 
     public function void(Request $request, StockAdjustment $adjustment, AdjustmentService $service)
     {
-        $service->void($adjustment, (int)auth()->id());
-        return response()->json(['status' => 'ok', 'adjustment' => $adjustment->fresh('items')]);
+    $this->authorize('void', $adjustment);
+    $service->void($adjustment, (int)auth()->id());
+    return response()->json(['status' => 'ok', 'adjustment' => $adjustment->fresh('items')]);
     }
 
     public function show(StockAdjustment $adjustment)

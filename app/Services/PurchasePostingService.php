@@ -96,7 +96,23 @@ class PurchasePostingService
                 );
             }
 
-            $purchase->update(['status' => 'posted','posted_at' => now(),'posted_by' => $userId]);
+                $purchase->update(['status' => 'posted','posted_at' => now(),'posted_by' => $userId]);
+                event(new \App\Events\PurchasePosted($purchase));
+                // Kirim notifikasi ke admin
+                $admin = \App\Models\User::role('super-admin')->first();
+                if ($admin) {
+                    app(\App\Services\NotificationService::class)->sendToUser(
+                        $admin,
+                        'purchase.posted',
+                        [
+                            'invoice_no' => $purchase->invoice_no,
+                            'location_id' => $purchase->location_id,
+                            'supplier_id' => $purchase->supplier_id,
+                            'total' => $purchase->total,
+                            'id' => $purchase->id,
+                        ]
+                    );
+                }
         });
     }
 
@@ -107,5 +123,21 @@ class PurchasePostingService
         }
         // Policy: business-specific; keep avg_cost consistency in mind.
         $purchase->update(['status' => 'void','voided_at' => now(),'voided_by' => $userId]);
+        event(new \App\Events\PurchaseVoided($purchase));
+        // Kirim notifikasi ke admin
+        $admin = \App\Models\User::role('super-admin')->first();
+        if ($admin) {
+            app(\App\Services\NotificationService::class)->sendToUser(
+                $admin,
+                'purchase.voided',
+                [
+                    'invoice_no' => $purchase->invoice_no,
+                    'location_id' => $purchase->location_id,
+                    'supplier_id' => $purchase->supplier_id,
+                    'total' => $purchase->total,
+                    'id' => $purchase->id,
+                ]
+            );
+        }
     }
 }

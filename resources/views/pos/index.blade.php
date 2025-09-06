@@ -3,24 +3,75 @@
 @section('content')
 <div x-data="pos()" class="grid grid-cols-1 lg:grid-cols-3 gap-4">
   <div class="lg:col-span-2 space-y-3">
-    <div class="p-3 bg-white border rounded-md flex items-center gap-2">
-      <input x-model="keyword" @keydown.enter.prevent="search()" type="text" placeholder="Cari produk..." class="flex-1 px-3 py-2 border rounded-md">
-      <button @click="search()" class="px-3 py-2 bg-gray-900 text-white rounded-md text-sm">Cari</button>
-    </div>
-    <div class="p-3 bg-white border rounded-md">
-      <template x-if="results.length === 0"><div class="text-sm text-gray-500">Belum ada hasil.</div></template>
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-3" x-show="results.length">
-        <template x-for="p in results" :key="p.id">
-          <button @click="addToCart(p)" class="p-3 border rounded-md text-left hover:bg-gray-50">
-            <div class="font-medium" x-text="p.name"></div>
-            <div class="text-xs text-gray-500" x-text="'SKU: ' + (p.sku || '-')"></div>
-          </button>
-        </template>
+    <div class="p-3 bg-white border rounded-md flex flex-col gap-2 relative" x-data="{show:false}" @click.away="show=false">
+      <div class="flex items-center gap-2">
+        <input x-model="keyword" @input.debounce.300ms="search();show=true" @focus="show=true" type="text" placeholder="Cari produk..." class="flex-1 px-3 py-2 border rounded-md">
+        <button @click="search();show=true" class="px-3 py-2 bg-gray-900 text-white rounded-md text-sm">Cari</button>
       </div>
+      <template x-if="show && results.length">
+  <ul class="absolute z-10 bg-white border rounded shadow mt-1 max-h-60 overflow-auto" style="width:100%">
+          <template x-for="p in results" :key="p.id">
+            <li @click="addToCart(p);show=false" class="px-3 py-2 cursor-pointer hover:bg-blue-50">
+              <div class="font-medium" x-text="p.name"></div>
+              <div class="text-xs text-gray-500" x-text="'SKU: ' + (p.sku || '-')"></div>
+            </li>
+          </template>
+        </ul>
+      </template>
+      <template x-if="show && keyword && results.length === 0"><div class="text-sm text-gray-500 mt-1">Tidak ada hasil.</div></template>
     </div>
   </div>
   <div class="space-y-3">
     <div class="p-3 bg-white border rounded-md">
+      <div class="mb-2">
+        <label class="text-sm text-gray-600">Customer</label>
+        <div x-data="{q:'',results:[],selected:null,show:false}" @click.away="show=false">
+          <input type="text" class="w-full px-3 py-2 border rounded mb-1" placeholder="Cari customer..." x-model="q" @input.debounce.300ms="fetch('/api/customers?q='+encodeURIComponent(q)).then(r=>r.json()).then(data=>{results=data;show=true})">
+          <template x-if="show && results.length">
+            <ul class="bg-white border rounded shadow mt-1 max-h-40 overflow-auto" style="width:100%">
+              <template x-for="item in results" :key="item.id">
+                <li @click="selected=item;show=false" class="px-3 py-2 cursor-pointer hover:bg-blue-50" x-text="item.name"></li>
+              </template>
+            </ul>
+          </template>
+          <template x-if="show && q && results.length === 0">
+            <div class="text-sm text-gray-500 mt-1 flex items-center gap-2">
+              Tidak ditemukan. <button type="button" class="px-2 py-1 bg-blue-600 text-white rounded text-xs" @click="showModal=true">Tambah Customer Baru</button>
+            </div>
+          </template>
+          <input type="hidden" name="customer_id" :value="selected?.id">
+          <template x-if="selected"><div class="text-xs text-gray-500">Terpilih: <span x-text="selected.name"></span></div></template>
+
+          <!-- Modal input customer baru -->
+          <div x-show="showModal" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+            <div class="bg-white rounded shadow-lg p-6 w-80">
+              <div class="text-lg font-semibold mb-2">Tambah Customer Baru</div>
+              <div class="mb-2"><input type="text" class="w-full px-3 py-2 border rounded" placeholder="Nama" x-model="newCustomer.name"></div>
+              <div class="mb-2"><input type="text" class="w-full px-3 py-2 border rounded" placeholder="Telepon" x-model="newCustomer.phone"></div>
+              <div class="mb-2"><input type="text" class="w-full px-3 py-2 border rounded" placeholder="Alamat" x-model="newCustomer.address"></div>
+              <div class="flex gap-2 justify-end mt-2">
+                <button type="button" class="px-3 py-1 border rounded text-gray-600" @click="showModal=false">Batal</button>
+                <button type="button" class="px-3 py-1 border rounded bg-blue-600 text-white" @click="
+                  fetch('/customers', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'X-CSRF-TOKEN': document.querySelector('meta[name=\'csrf-token\']').content
+                    },
+                    body: JSON.stringify(newCustomer)
+                  })
+                  .then(r => r.json())
+                  .then(data => {
+                    if(data.id){ selected = data; showModal=false; q=data.name; results=[]; window.notify('Customer ditambahkan','success'); }
+                    else { window.notify('Gagal tambah customer','error'); }
+                  })
+                  .catch(()=>window.notify('Gagal tambah customer','error'))
+                ">Simpan</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="font-semibold mb-2">Keranjang</div>
       <template x-if="cart.length === 0"><div class="text-sm text-gray-500">Kosong</div></template>
       <div class="space-y-2">
@@ -34,7 +85,7 @@
                   <input type="number" step="0.001" class="w-20 border rounded px-2 py-1" x-model.number="it.qty">
                 </label>
                 <label class="flex items-center gap-1">Harga
-                  <input type="number" step="0.01" class="w-24 border rounded px-2 py-1" x-model.number="it.price">
+                  <span class="w-24 px-2 py-1 border rounded bg-gray-100 text-gray-700 inline-block" x-text="new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(it.price)"></span>
                 </label>
                 <label class="flex items-center gap-1">Diskon
                   <input type="number" step="0.01" class="w-20 border rounded px-2 py-1" x-model.number="it.discount">
@@ -49,7 +100,7 @@
                 </select>
               </div>
             </div>
-            <div class="text-right text-sm w-24" x-text="format(itemSubtotal(it))"></div>
+            <div class="text-right text-sm w-24">@component('components.currency', ['value' => 0])@endcomponent</div>
             <button class="text-xs text-red-600" @click="cart.splice(idx,1)">Hapus</button>
           </div>
         </template>
@@ -58,7 +109,7 @@
     <div class="p-3 bg-white border rounded-md space-y-2">
       <div class="flex items-center justify-between">
         <div class="text-sm text-gray-500">Total</div>
-        <div class="font-semibold" x-text="format(total())"></div>
+  <div class="font-semibold">@component('components.currency', ['value' => 0])@endcomponent</div>
       </div>
       <div class="border-t pt-2 mt-2">
         <div class="text-sm font-medium mb-1">Pembayaran</div>
@@ -78,11 +129,11 @@
         <button class="text-xs text-blue-700" @click="payments.push({type:'cash',amount:0,reference:''})">+ Tambah Pembayaran</button>
         <div class="flex items-center justify-between text-sm mt-2">
           <div class="text-gray-500">Dibayar</div>
-          <div class="font-medium" x-text="format(payTotal())"></div>
+          <div class="font-medium">@component('components.currency', ['value' => 0])@endcomponent</div>
         </div>
         <div class="flex items-center justify-between text-sm">
           <div class="text-gray-500">Kembali</div>
-          <div class="font-medium" x-text="format(Math.max(0, payTotal() - total()))"></div>
+          <div class="font-medium">@component('components.currency', ['value' => 0])@endcomponent</div>
         </div>
       </div>
       <button @click="checkout()" class="w-full py-2 bg-emerald-600 text-white rounded-md">Simpan Draft</button>
@@ -103,10 +154,10 @@ function pos() {
       if (this.keyword) url.searchParams.set('q', this.keyword);
       const r = await fetch(url);
       const data = await r.json();
-      this.results = data.data || [];
+  this.results = data || [];
     },
     addToCart(p) {
-      this.cart.push({ id: p.id, name: p.name, qty: 1, price: 0, discount: 0, source_location_id: null });
+      this.cart.push({ id: p.id, name: p.name, qty: 1, price: Number(p.price) || 0, discount: 0, source_location_id: null });
     },
   itemSubtotal(it){ return (Number(it.price) - Number(it.discount || 0)) * Number(it.qty || 0); },
   total() { return this.cart.reduce((a, c) => a + this.itemSubtotal(c), 0); },

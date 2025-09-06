@@ -12,13 +12,15 @@ class SalesPostingController extends Controller
 
     public function post(Request $request, Sale $sale, SalesPostingService $service)
     {
-        $service->post($sale, (int)auth()->id());
-        return response()->json(['status' => 'ok', 'sale' => $sale->fresh('items')]);
+    $this->authorize('post', $sale);
+    $service->post($sale, (int)auth()->id());
+    return response()->json(['status' => 'ok', 'sale' => $sale->fresh('items')]);
     }
 
     public function void(Request $request, Sale $sale, SalesPostingService $service)
     {
-        $service->void($sale, (int)auth()->id());
-        return response()->json(['status' => 'ok', 'sale' => $sale->fresh('items')]);
+    $this->authorize('void', $sale);
+    $service->void($sale, (int)auth()->id());
+    return response()->json(['status' => 'ok', 'sale' => $sale->fresh('items')]);
     }
 }

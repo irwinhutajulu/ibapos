@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full" x-data="{ sidebarOpen: false }" x-cloak>
+<html lang="en" class="h-full" x-data="{ sidebarOpen: false, darkMode: localStorage.getItem('darkMode') === 'true' }" x-init="if(darkMode) $el.classList.add('dark'); else $el.classList.remove('dark')" x-cloak>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,13 +15,14 @@
         };
     </script>
 </head>
-<body class="h-full bg-gray-50 text-gray-900">
+<body :class="darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'" class="h-full">
     <div class="min-h-screen flex">
         <!-- Sidebar -->
         <div :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
              class="fixed inset-y-0 z-40 w-64 transform bg-white border-r border-gray-200 transition-transform duration-200 lg:static lg:inset-auto">
             <div class="h-16 flex items-center px-4 border-b">
                 <span class="font-semibold text-lg">IBAPOS</span>
+                <button @click="darkMode = !darkMode; localStorage.setItem('darkMode', darkMode); if(darkMode) $root.classList.toggle('dark', darkMode)" class="ml-auto px-2 py-1 rounded text-xs bg-gray-200 dark:bg-gray-800 dark:text-gray-100">🌓 Dark Mode</button>
             </div>
             <nav class="p-4 space-y-1 text-sm">
                 <a href="/" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 font-medium text-gray-700">
@@ -42,6 +43,16 @@
                     <span>🏷️</span> <span>Categories</span>
                 </a>
                 @endcan
+                    @can('customers.read')
+                    <a href="{{ route('customers.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                        <span>👤</span> <span>Customers</span>
+                    </a>
+                    @endcan
+                    @can('suppliers.read')
+                    <a href="{{ route('suppliers.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                        <span>🏢</span> <span>Suppliers</span>
+                    </a>
+                    @endcan
                 @can('sales.read')
                 <a href="{{ route('sales.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                     <span>🛒</span> <span>Sales</span>
@@ -125,6 +136,10 @@
             </header>
 
                         <main class="p-4 lg:p-6">
+                @isset($breadcrumbs)
+                    <x-breadcrumbs :items="$breadcrumbs['items'] ?? []" :title="$breadcrumbs['title'] ?? ($title ?? null)" />
+                @endisset
+                <h1 class="text-xl font-bold mb-4">{{ $title ?? 'Dashboard' }}</h1>
                 {{ $slot ?? '' }}
                 @yield('content')
             </main>

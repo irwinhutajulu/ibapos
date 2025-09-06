@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class ProductController extends Controller
 {
@@ -13,9 +14,10 @@ class ProductController extends Controller
         $products = Product::query()
             ->when($q, fn($b) => $b->where('name', 'like', "%$q%")
                                     ->orWhere('barcode', 'like', "%$q%"))
-            ->select('id','name','barcode')
+            ->select('id','name','barcode','price')
             ->orderBy('name')
-            ->paginate(20);
+            ->limit(20)
+            ->get();
         return response()->json($products);
     }
 }

@@ -12,14 +12,61 @@
       <label class="text-sm text-gray-600">Date</label>
       <input type="datetime-local" name="date" class="w-full px-3 py-2 border rounded" required>
     </div>
-    <div class="md:col-span-2">
-      <label class="text-sm text-gray-600">Supplier</label>
-      <select name="supplier_id" class="w-full px-3 py-2 border rounded" required>
-        <option value="">-- Select --</option>
-        @foreach($suppliers as $s)
-          <option value="{{ $s->id }}">{{ $s->name }}</option>
+    <div>
+      <label class="text-sm text-gray-600">Lokasi</label>
+      <select name="location_id" class="w-full px-3 py-2 border rounded" required>
+        <option value="">-- Pilih Lokasi --</option>
+        @foreach($locations as $loc)
+          <option value="{{ $loc->id }}">{{ $loc->name }}</option>
         @endforeach
       </select>
+    </div>
+    <div x-data="{q:'',results:[],selected:null,show:false}" @click.away="show=false">
+      <label class="text-sm text-gray-600">Supplier</label>
+      <input type="text" class="w-full px-3 py-2 border rounded mb-1" placeholder="Cari supplier..." x-model="q" @input.debounce.300ms="fetch('/api/suppliers?q='+encodeURIComponent(q)).then(r=>r.json()).then(data=>{results=data;show=true})">
+      <template x-if="show && results.length">
+        <ul class="bg-white border rounded shadow mt-1 max-h-40 overflow-auto">
+          <template x-for="item in results" :key="item.id">
+            <li @click="selected=item;show=false" class="px-3 py-2 cursor-pointer hover:bg-blue-50" x-text="item.name"></li>
+          </template>
+        </ul>
+      </template>
+      <template x-if="show && q && results.length === 0">
+        <div class="text-sm text-gray-500 mt-1 flex items-center gap-2">
+          Tidak ditemukan. <button type="button" class="px-2 py-1 bg-blue-600 text-white rounded text-xs" @click="showModal=true">Tambah Supplier Baru</button>
+        </div>
+      </template>
+      <input type="hidden" name="supplier_id" :value="selected?.id">
+      <template x-if="selected"><div class="text-xs text-gray-500">Terpilih: <span x-text="selected.name"></span></div></template>
+
+      <!-- Modal input supplier baru -->
+      <div x-show="showModal" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+        <div class="bg-white rounded shadow-lg p-6 w-80">
+          <div class="text-lg font-semibold mb-2">Tambah Supplier Baru</div>
+          <div class="mb-2"><input type="text" class="w-full px-3 py-2 border rounded" placeholder="Nama" x-model="newSupplier.name"></div>
+          <div class="mb-2"><input type="text" class="w-full px-3 py-2 border rounded" placeholder="Telepon" x-model="newSupplier.phone"></div>
+          <div class="mb-2"><input type="text" class="w-full px-3 py-2 border rounded" placeholder="Alamat" x-model="newSupplier.address"></div>
+          <div class="flex gap-2 justify-end mt-2">
+            <button type="button" class="px-3 py-1 border rounded text-gray-600" @click="showModal=false">Batal</button>
+            <button type="button" class="px-3 py-1 border rounded bg-blue-600 text-white" @click="
+              fetch('/suppliers', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRF-TOKEN': document.querySelector('meta[name=\'csrf-token\']').content
+                },
+                body: JSON.stringify(newSupplier)
+              })
+              .then(r => r.json())
+              .then(data => {
+                if(data.id){ selected = data; showModal=false; q=data.name; results=[]; window.notify('Supplier ditambahkan','success'); }
+                else { window.notify('Gagal tambah supplier','error'); }
+              })
+              .catch(()=>window.notify('Gagal tambah supplier','error'))
+            ">Simpan</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 

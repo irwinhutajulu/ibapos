@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Purchase;
 use App\Services\PurchasePostingService;
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class PurchasePostingController extends Controller
 {
+    use AuthorizesRequests;
     public function index(Request $request)
     {
         $q = trim((string)$request->get('q'));
@@ -45,6 +47,7 @@ class PurchasePostingController extends Controller
 
     public function receive(Request $request, Purchase $purchase, PurchasePostingService $service)
     {
+        $this->authorize('receive', $purchase);
         $service->markAsReceived($purchase, (int)auth()->id());
         if ($request->wantsJson()) {
             return response()->json(['status' => 'ok', 'purchase' => $purchase->fresh('items')]);
@@ -54,19 +57,21 @@ class PurchasePostingController extends Controller
 
     public function post(Request $request, Purchase $purchase, PurchasePostingService $service)
     {
+        $this->authorize('post', $purchase);
         $service->post($purchase, (int)auth()->id());
         if ($request->wantsJson()) {
             return response()->json(['status' => 'ok', 'purchase' => $purchase->fresh('items')]);
         }
-    return redirect()->back()->with('ok', 'Purchase posted.');
+        return redirect()->back()->with('ok', 'Purchase posted.');
     }
 
     public function void(Request $request, Purchase $purchase, PurchasePostingService $service)
     {
+        $this->authorize('void', $purchase);
         $service->void($purchase, (int)auth()->id());
         if ($request->wantsJson()) {
             return response()->json(['status' => 'ok', 'purchase' => $purchase->fresh('items')]);
         }
-    return redirect()->back()->with('ok', 'Purchase voided.');
+        return redirect()->back()->with('ok', 'Purchase voided.');
     }
 }

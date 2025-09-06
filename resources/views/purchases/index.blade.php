@@ -124,6 +124,12 @@ function purchasesRealtime(){
       ch.listen('.stock.updated', (e)=>{
         window.notify(`Stock updated product ${e.product_id} qty ${e.qty}`, 'info');
       });
+      ch.listen('.purchase.posted', (e)=>{
+        window.notify(`Purchase ${e.purchase.invoice_no} posted!`, 'success');
+      });
+      ch.listen('.purchase.voided', (e)=>{
+        window.notify(`Purchase ${e.purchase.invoice_no} voided!`, 'warning');
+      });
     }
   }
 }

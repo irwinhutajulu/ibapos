@@ -20,7 +20,23 @@ Route::middleware(['web','auth'])->group(function () {
     Route::put('/categories/{category}', [\App\Http\Controllers\CategoryController::class, 'update'])->middleware('permission:categories.update')->name('categories.update');
     Route::delete('/categories/{category}', [\App\Http\Controllers\CategoryController::class, 'destroy'])->middleware('permission:categories.delete')->name('categories.destroy');
 
-    // Products
+    // API Supplier/Customer search (for dropdown)
+    Route::get('/api/suppliers', [\App\Http\Controllers\Api\SupplierCustomerController::class, 'suppliers'])->middleware('auth');
+    Route::get('/api/customers', [\App\Http\Controllers\Api\SupplierCustomerController::class, 'customers'])->middleware('auth');
+    Route::get('/customers', [\App\Http\Controllers\CustomerController::class, 'index'])->middleware('permission:customers.read')->name('customers.index');
+    Route::get('/customers/create', [\App\Http\Controllers\CustomerController::class, 'create'])->middleware('permission:customers.create')->name('customers.create');
+    Route::post('/customers', [\App\Http\Controllers\CustomerController::class, 'store'])->middleware('permission:customers.create')->name('customers.store');
+    Route::get('/customers/{customer}/edit', [\App\Http\Controllers\CustomerController::class, 'edit'])->middleware('permission:customers.update')->name('customers.edit');
+    Route::put('/customers/{customer}', [\App\Http\Controllers\CustomerController::class, 'update'])->middleware('permission:customers.update')->name('customers.update');
+    Route::delete('/customers/{customer}', [\App\Http\Controllers\CustomerController::class, 'destroy'])->middleware('permission:customers.delete')->name('customers.destroy');
+    Route::post('/customers/{id}/restore', [\App\Http\Controllers\CustomerController::class, 'restore'])->middleware('permission:customers.delete')->name('customers.restore');
+    Route::get('/suppliers', [\App\Http\Controllers\SupplierController::class, 'index'])->middleware('permission:suppliers.read')->name('suppliers.index');
+    Route::get('/suppliers/create', [\App\Http\Controllers\SupplierController::class, 'create'])->middleware('permission:suppliers.create')->name('suppliers.create');
+    Route::post('/suppliers', [\App\Http\Controllers\SupplierController::class, 'store'])->middleware('permission:suppliers.create')->name('suppliers.store');
+    Route::get('/suppliers/{supplier}/edit', [\App\Http\Controllers\SupplierController::class, 'edit'])->middleware('permission:suppliers.update')->name('suppliers.edit');
+    Route::put('/suppliers/{supplier}', [\App\Http\Controllers\SupplierController::class, 'update'])->middleware('permission:suppliers.update')->name('suppliers.update');
+    Route::delete('/suppliers/{supplier}', [\App\Http\Controllers\SupplierController::class, 'destroy'])->middleware('permission:suppliers.delete')->name('suppliers.destroy');
+    Route::post('/suppliers/{id}/restore', [\App\Http\Controllers\SupplierController::class, 'restore'])->middleware('permission:suppliers.delete')->name('suppliers.restore');
     Route::get('/products', [\App\Http\Controllers\ProductsController::class, 'index'])->middleware('permission:products.read')->name('products.index');
     Route::get('/products/create', [\App\Http\Controllers\ProductsController::class, 'create'])->middleware('permission:products.create')->name('products.create');
     Route::post('/products', [\App\Http\Controllers\ProductsController::class, 'store'])->middleware('permission:products.create')->name('products.store');
@@ -76,7 +92,7 @@ Route::middleware(['web','auth'])->group(function () {
         return $user->locations()->select('id','name')->orderBy('name')->get();
     })->name('api.locations');
 
-    Route::get('/api/products', [\App\Http\Controllers\ProductController::class, 'index'])->name('api.products');
+    Route::get('/api/products', [\App\Http\Controllers\Api\ProductController::class, 'index'])->name('api.products');
     Route::get('/api/stock/available', [\App\Http\Controllers\StockApiController::class, 'available'])->name('api.stock.available');
     Route::post('/api/stock/available-batch', [\App\Http\Controllers\StockApiController::class, 'availableBatch'])->name('api.stock.available-batch');
 

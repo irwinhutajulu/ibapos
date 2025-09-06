@@ -16,7 +16,8 @@ class PurchasesController extends Controller
     {
         $suppliers = Supplier::orderBy('name')->get(['id','name']);
         $products = Product::orderBy('name')->get(['id','name','weight']);
-        return view('purchases.create', compact('suppliers','products'));
+        $locations = \App\Models\Location::orderBy('name')->get(['id','name']);
+        return view('purchases.create', compact('suppliers','products','locations'));
     }
 
     public function store(Request $request)
@@ -25,6 +26,7 @@ class PurchasesController extends Controller
             'invoice_no' => 'required|string|max:50',
             'date' => 'required|date',
             'supplier_id' => 'required|integer|exists:suppliers,id',
+            'location_id' => 'required|integer|exists:locations,id',
             'freight_cost' => 'nullable|numeric',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|integer|exists:products,id',
@@ -32,7 +34,7 @@ class PurchasesController extends Controller
             'items.*.price' => 'required|numeric|min:0',
         ]);
 
-        $locationId = (int) session('active_location_id');
+        $locationId = (int) $data['location_id'];
 
         $purchase = DB::transaction(function () use ($data, $locationId) {
             // compute totals
