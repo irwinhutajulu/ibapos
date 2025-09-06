@@ -2,115 +2,179 @@
 
 @section('content')
 <div x-data="purchasesRealtime()" x-init="init()">
-  <div class="flex items-center justify-between mb-4">
-    <form method="get" class="flex flex-wrap items-end gap-2">
-      <div class="flex flex-col">
-        <label class="text-xs text-gray-600">Search</label>
-        <input name="q" value="{{ $q ?? '' }}" placeholder="Invoice or supplier" class="px-3 py-2 border rounded-md text-sm"/>
-      </div>
-      <div class="flex flex-col">
-        <label class="text-xs text-gray-600">Status</label>
-        <select name="status" class="px-2 py-2 border rounded-md text-sm">
-          <option value="">All</option>
-          @foreach(['draft','received','posted','void'] as $st)
-            <option value="{{ $st }}" @selected(($status ?? '')===$st)>{{ ucfirst($st) }}</option>
-          @endforeach
-        </select>
-      </div>
-      <div class="flex flex-col">
-        <label class="text-xs text-gray-600">From</label>
-        <input type="date" name="from" value="{{ $dateFrom ?? '' }}" class="px-3 py-2 border rounded-md text-sm"/>
-      </div>
-      <div class="flex flex-col">
-        <label class="text-xs text-gray-600">To</label>
-        <input type="date" name="to" value="{{ $dateTo ?? '' }}" class="px-3 py-2 border rounded-md text-sm"/>
-      </div>
-      <button class="px-3 py-2 bg-gray-800 text-white rounded-md text-sm">Filter</button>
-    </form>
-    @can('purchases.create')
-      <a href="{{ route('purchases.create') }}" class="px-3 py-2 bg-blue-600 text-white rounded-md text-sm">New Purchase</a>
-    @endcan
-  </div>
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Purchases</h2>
+            <p class="text-gray-600 dark:text-gray-400">Manage your purchase transactions</p>
+        </div>
+        
+        @can('purchases.create')
+        <a href="{{ route('purchases.create') }}" class="btn-primary">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            New Purchase
+        </a>
+        @endcan
+    </div>
 
-  @if(session('ok'))
-    <script>window.notify(@json(session('ok')), 'success')</script>
-  @endif
+    <!-- Filters Card -->
+    <div class="card mb-6">
+        <div class="card-body">
+            <form method="get" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                <div>
+                    <label class="form-label">Search</label>
+                    <input name="q" 
+                           value="{{ $q ?? '' }}" 
+                           placeholder="Invoice or supplier" 
+                           class="form-input"/>
+                </div>
+                
+                <div>
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="">All</option>
+                        @foreach(['draft','received','posted','void'] as $st)
+                            <option value="{{ $st }}" @selected(($status ?? '')===$st)>{{ ucfirst($st) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="form-label">From</label>
+                    <input type="date" 
+                           name="from" 
+                           value="{{ $dateFrom ?? '' }}" 
+                           class="form-input"/>
+                </div>
+                
+                <div>
+                    <label class="form-label">To</label>
+                    <input type="date" 
+                           name="to" 
+                           value="{{ $dateTo ?? '' }}" 
+                           class="form-input"/>
+                </div>
+                
+                <div>
+                    <button type="submit" class="btn-primary w-full">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"></path>
+                        </svg>
+                        Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-  <div class="overflow-x-auto bg-white border rounded-md">
-    <table class="min-w-full text-sm">
-      <thead class="bg-gray-50">
-        <tr>
-          <th class="text-left px-3 py-2">Date</th>
-          <th class="text-left px-3 py-2">Invoice</th>
-          <th class="text-left px-3 py-2">Supplier</th>
-          <th class="text-right px-3 py-2">Total</th>
-          <th class="text-left px-3 py-2">Status</th>
-          <th class="px-3 py-2 text-right">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        @forelse($purchases as $p)
-        <tr class="border-t">
-          <td class="px-3 py-2">{{ $p->date?->format('Y-m-d') }}</td>
-          <td class="px-3 py-2"><a class="underline" href="{{ route('purchases.show', $p) }}">{{ $p->invoice_no }}</a></td>
-          <td class="px-3 py-2">{{ $p->supplier->name ?? '-' }}</td>
-          <td class="px-3 py-2 text-right">{{ number_format($p->total ?? 0,2) }}</td>
-          <td class="px-3 py-2">{{ ucfirst($p->status) }}</td>
-          <td class="px-3 py-2 text-right">
-            @if($p->status === 'draft')
-              @can('purchases.receive')
-                <form action="{{ route('purchases.receive', $p) }}" method="post" class="inline" onsubmit="return confirm('Mark as received?')">
-                  @csrf
-                  <button class="text-amber-700 hover:underline">Receive</button>
-                </form>
-              @endcan
-              @can('purchases.post')
-                <form action="{{ route('purchases.post', $p) }}" method="post" class="inline ml-2" onsubmit="return confirm('Post this purchase?')">
-                  @csrf
-                  <button class="text-green-700 hover:underline">Post</button>
-                </form>
-              @endcan
-              @can('purchases.void')
-                <form action="{{ route('purchases.void', $p) }}" method="post" class="inline ml-2" onsubmit="return confirm('Void this purchase?')">
-                  @csrf
-                  <button class="text-red-700 hover:underline">Void</button>
-                </form>
-              @endcan
-            @elseif($p->status === 'received')
-              @can('purchases.post')
-                <form action="{{ route('purchases.post', $p) }}" method="post" class="inline" onsubmit="return confirm('Post this purchase?')">
-                  @csrf
-                  <button class="text-green-700 hover:underline">Post</button>
-                </form>
-              @endcan
-              @can('purchases.void')
-                <form action="{{ route('purchases.void', $p) }}" method="post" class="inline ml-2" onsubmit="return confirm('Void this purchase?')">
-                  @csrf
-                  <button class="text-red-700 hover:underline">Void</button>
-                </form>
-              @endcan
-            @elseif($p->status === 'posted')
-              @can('purchases.void')
-                <form action="{{ route('purchases.void', $p) }}" method="post" class="inline" onsubmit="return confirm('Void this purchase?')">
-                  @csrf
-                  <button class="text-red-700 hover:underline">Void</button>
-                </form>
-              @endcan
-            @else
-              <span class="text-gray-500">No actions</span>
-            @endif
-          </td>
-        </tr>
-        @empty
-        <tr>
-          <td colspan="6" class="px-3 py-6 text-center text-gray-500">No purchases found</td>
-        </tr>
-        @endforelse
-      </tbody>
-    </table>
-  </div>
+    <!-- Success Message -->
+    @if(session('ok'))
+    <div class="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200 rounded-xl">
+        <div class="flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            {{ session('ok') }}
+        </div>
+    </div>
+    @endif
 
-  <div class="mt-4">{{ $purchases->links() }}</div>
+    <!-- Purchases Table -->
+    @php
+    $tableHeaders = ['Date', 'Invoice', 'Supplier', 'Total', 'Status'];
+    $tableRows = $purchases->map(function($p) {
+        return [
+            'cells' => [
+                [
+                    'type' => 'date',
+                    'value' => $p->date,
+                    'formatted' => $p->date?->format('Y-m-d')
+                ],
+                [
+                    'type' => 'link',
+                    'url' => route('purchases.show', $p),
+                    'text' => $p->invoice_no
+                ],
+                $p->supplier->name ?? '-',
+                [
+                    'type' => 'currency',
+                    'value' => $p->total ?? 0,
+                    'formatted' => 'Rp ' . number_format($p->total ?? 0, 0, ',', '.')
+                ],
+                [
+                    'type' => 'badge',
+                    'text' => ucfirst($p->status),
+                    'style' => $p->status === 'posted' ? 'success' : ($p->status === 'void' ? 'danger' : ($p->status === 'received' ? 'warning' : 'secondary'))
+                ]
+            ],
+            'actions' => collect([
+                $p->status === 'draft' && auth()->user()->can('purchases.receive') ? [
+                    'type' => 'button',
+                    'label' => 'Receive',
+                    'style' => 'warning',
+                    'onclick' => "event.preventDefault(); if(confirm('Mark as received?')) { document.getElementById('receive-form-{$p->id}').submit(); }",
+                    'icon' => '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>'
+                ] : null,
+                ($p->status === 'draft' || $p->status === 'received') && auth()->user()->can('purchases.post') ? [
+                    'type' => 'button',
+                    'label' => 'Post',
+                    'style' => 'success',
+                    'onclick' => "event.preventDefault(); if(confirm('Post this purchase?')) { document.getElementById('post-form-{$p->id}').submit(); }",
+                    'icon' => '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>'
+                ] : null,
+                ($p->status === 'draft' || $p->status === 'received' || $p->status === 'posted') && auth()->user()->can('purchases.void') ? [
+                    'type' => 'button',
+                    'label' => 'Void',
+                    'style' => 'danger',
+                    'onclick' => "event.preventDefault(); if(confirm('Void this purchase?')) { document.getElementById('void-form-{$p->id}').submit(); }",
+                    'icon' => '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>'
+                ] : null
+            ])->filter()->values()->toArray()
+        ];
+    })->toArray();
+    @endphp
+
+    <x-table 
+        :headers="$tableHeaders"
+        :rows="$tableRows"
+        :pagination="$purchases"
+        empty-message="No purchases found"
+        empty-description="Start building your purchase history by creating your first purchase."
+    >
+        <x-slot name="empty-action">
+            @can('purchases.create')
+            <a href="{{ route('purchases.create') }}" class="btn-primary">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Create Your First Purchase
+            </a>
+            @endcan
+        </x-slot>
+    </x-table>
+
+    <!-- Hidden Forms for Actions -->
+    @foreach($purchases as $p)
+        @if($p->status === 'draft' && auth()->user()->can('purchases.receive'))
+        <form id="receive-form-{{ $p->id }}" action="{{ route('purchases.receive', $p) }}" method="POST" style="display: none;">
+            @csrf
+        </form>
+        @endif
+        
+        @if(($p->status === 'draft' || $p->status === 'received') && auth()->user()->can('purchases.post'))
+        <form id="post-form-{{ $p->id }}" action="{{ route('purchases.post', $p) }}" method="POST" style="display: none;">
+            @csrf
+        </form>
+        @endif
+        
+        @if(($p->status === 'draft' || $p->status === 'received' || $p->status === 'posted') && auth()->user()->can('purchases.void'))
+        <form id="void-form-{{ $p->id }}" action="{{ route('purchases.void', $p) }}" method="POST" style="display: none;">
+            @csrf
+        </form>
+        @endif
+    @endforeach
 </div>
 @endsection
 

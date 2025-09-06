@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .image-box { border: 1px solid #ccc; padding: 10px; margin: 10px 0; display: inline-block; }
+        img { width: 64px; height: 64px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <h2>Product Image Test</h2>
+    <div class="image-box">
+        <h4>Default SVG:</h4>
+        <img src="/images/default-product.svg" alt="Default Product SVG">
+    </div>
+    <div class="image-box">
+        <h4>Missing Image (should fallback):</h4>
+        <img src="/images/nonexistent.png" alt="Missing Image" onerror="this.src='/images/default-product.svg'">
+    </div>
+</body>
+</html>

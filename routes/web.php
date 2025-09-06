@@ -2,8 +2,27 @@
 
 use Illuminate\Support\Facades\Route;
 
+// Test routes for development (no auth required)
+Route::get('/test/products', function() {
+    $products = \App\Models\Product::with('category')->paginate(15);
+    $categories = \App\Models\Category::pluck('name', 'id');
+    return view('products.index', [
+        'products' => $products,
+        'categories' => $categories,
+        'q' => '',
+        'categoryId' => '',
+        'trashed' => false
+    ]);
+})->name('test.products');
+
+Route::get('/test/api/products/search', [\App\Http\Controllers\Api\ProductController::class, 'search'])->name('test.api.products.search');
+Route::get('/test/api/debug', [\App\Http\Controllers\Api\TestController::class, 'test'])->name('test.api.debug');
+
 Route::get('/', function () { return view('dashboard'); })->middleware('auth');
 Route::get('/dashboard', function () { return view('dashboard'); })->middleware('auth')->name('dashboard');
+
+// Test dropdown components
+Route::get('/dropdown-test', function () { return view('dropdown-demo'); })->middleware('auth')->name('dropdown.test');
 
 // Auth
 Route::get('/login', [\App\Http\Controllers\AuthController::class, 'showLogin'])->name('login')->middleware('guest');
@@ -93,6 +112,7 @@ Route::middleware(['web','auth'])->group(function () {
     })->name('api.locations');
 
     Route::get('/api/products', [\App\Http\Controllers\Api\ProductController::class, 'index'])->name('api.products');
+    Route::get('/api/products/search', [\App\Http\Controllers\Api\ProductController::class, 'search'])->name('api.products.search');
     Route::get('/api/stock/available', [\App\Http\Controllers\StockApiController::class, 'available'])->name('api.stock.available');
     Route::post('/api/stock/available-batch', [\App\Http\Controllers\StockApiController::class, 'availableBatch'])->name('api.stock.available-batch');
 
