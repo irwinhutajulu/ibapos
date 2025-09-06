@@ -7,6 +7,13 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>[x-cloak]{display:none!important}</style>
+    <script>
+        // Safe stub: queue notifications fired before Alpine toast component is ready
+        window._notifyQueue = window._notifyQueue || [];
+        window.notify = window.notify || function (msg, type = 'info', ttl = 3500) {
+            window._notifyQueue.push({ msg, type, ttl });
+        };
+    </script>
 </head>
 <body class="h-full bg-gray-50 text-gray-900">
     <div class="min-h-screen flex">
@@ -129,8 +136,8 @@
                         @stack('scripts')
             
                                     <!-- Toast notifications -->
-                                    <div x-data="{ toasts: [], add(t){ this.toasts.push({...t, id: Date.now()+Math.random()}); setTimeout(()=>this.remove(t.id), t.ttl ?? 3500); }, remove(id){ this.toasts = this.toasts.filter(x=>x.id!==id) } }"
-                                             x-init="window.notify = (msg, type='info', ttl=3500) => this.add({msg, type, ttl}); window.addEventListener('notify', e => this.add(e.detail));"
+                                    <div x-data="{ toasts: [], add(t){ const id = Date.now()+Math.random(); this.toasts.push({ ...t, id }); setTimeout(()=>this.remove(id), t.ttl ?? 3500); }, remove(id){ this.toasts = this.toasts.filter(x=>x.id!==id) } }"
+                                             x-init="const api = $data; window.notify = (msg, type='info', ttl=3500) => api.add({msg, type, ttl}); window.addEventListener('notify', e => api.add(e.detail)); if (window._notifyQueue && window._notifyQueue.length) { window._notifyQueue.splice(0).forEach(d => api.add(d)); }"
                                              class="fixed top-4 right-4 z-50 space-y-2">
                                             <template x-for="t in toasts" :key="t.id">
                                                     <div class="max-w-xs shadow-lg rounded-md px-4 py-3 text-sm text-white"

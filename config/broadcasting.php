@@ -1,7 +1,13 @@
 <?php
 
+$default = env('BROADCAST_CONNECTION', 'log');
+$pusherConfigured = !empty(env('PUSHER_APP_KEY')) && !empty(env('PUSHER_APP_SECRET')) && !empty(env('PUSHER_APP_ID'));
+if ($default === 'pusher' && !$pusherConfigured) {
+    $default = 'log';
+}
+
 return [
-    'default' => env('BROADCAST_CONNECTION', 'log'),
+    'default' => $default,
 
     'connections' => [
         'pusher' => [
