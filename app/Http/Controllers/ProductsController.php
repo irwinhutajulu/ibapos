@@ -11,23 +11,47 @@ class ProductsController extends Controller
 {
     public function index(Request $request)
     {
-        $q = trim((string) $request->get('q'));
+        $search = trim((string) $request->get('search'));
+        $q = trim((string) $request->get('q')); // Legacy support
+        $search = $search ?: $q; // Use search if available, fallback to q
+        
         $categoryId = $request->input('category_id');
         $trashed = $request->boolean('trashed');
+        
         $query = Product::query();
-        if ($trashed) { $query->withTrashed(); }
+        
+        if ($trashed) { 
+            $query->withTrashed(); 
+        }
+        
         $products = $query
-            ->when($q, fn($b) => $b->where(function($x) use ($q){
-                $x->where('name','like',"%$q%")
-                  ->orWhere('barcode','like',"%$q%");
+            ->when($search, fn($b) => $b->where(function($x) use ($search){
+                $x->where('name','like',"%$search%")
+                  ->orWhere('barcode','like',"%$search%")
+                  ->orWhere('sku','like',"%$search%");
             }))
             ->when($categoryId, fn($b) => $b->where('category_id', $categoryId))
             ->with('category:id,name')
             ->orderBy('name')
             ->paginate(20)
             ->withQueryString();
+        
         $categories = Category::orderBy('name')->pluck('name','id');
-        return view('products.index', compact('products','q','trashed','categories','categoryId'));
+        
+        // If this is an AJAX request, return JSON
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'products' => $products,
+                'categories' => $categories,
+                'filters' => [
+                    'search' => $search,
+                    'categoryId' => $categoryId,
+                    'trashed' => $trashed
+                ]
+            ]);
+        }
+        
+        return view('products.index', compact('products','search','trashed','categories','categoryId'));
     }
 
     public function create(Request $request)

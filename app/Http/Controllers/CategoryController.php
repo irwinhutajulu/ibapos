@@ -13,20 +13,35 @@ class CategoryController extends Controller
         return view('categories.index', compact('categories'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
+        if ($request->has('modal')) {
+            return view('categories.create-modal');
+        }
         return view('categories.create');
     }
 
     public function store(Request $request)
     {
         $data = $request->validate(['name' => 'required|string|max:150|unique:categories,name']);
-        Category::create($data);
-        return redirect()->route('categories.index')->with('ok', 'Category created');
+        $category = Category::create($data);
+        
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Category created successfully!',
+                'category' => $category
+            ]);
+        }
+        
+        return redirect()->route('categories.index')->with('success', 'Category created successfully!');
     }
 
-    public function edit(Category $category)
+    public function edit(Category $category, Request $request)
     {
+        if ($request->has('modal')) {
+            return view('categories.edit-modal', compact('category'));
+        }
         return view('categories.edit', compact('category'));
     }
 
@@ -34,12 +49,30 @@ class CategoryController extends Controller
     {
         $data = $request->validate(['name' => 'required|string|max:150|unique:categories,name,'.$category->id]);
         $category->update($data);
-        return redirect()->route('categories.index')->with('ok', 'Category updated');
+        
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Category updated successfully!',
+                'category' => $category
+            ]);
+        }
+        
+        return redirect()->route('categories.index')->with('success', 'Category updated successfully!');
     }
 
-    public function destroy(Category $category)
+    public function destroy(Request $request, Category $category)
     {
+        $categoryName = $category->name;
         $category->delete();
-        return redirect()->route('categories.index')->with('ok', 'Category deleted');
+        
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Category '{$categoryName}' deleted successfully!"
+            ]);
+        }
+        
+        return redirect()->route('categories.index')->with('success', "Category '{$categoryName}' deleted successfully!");
     }
 }

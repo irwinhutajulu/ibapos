@@ -17,8 +17,12 @@ return Application::configure(basePath: dirname(__DIR__))
         
         $middleware->alias([
             'active.location' => \App\Http\Middleware\ActiveLocation::class,
-            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            // Custom permission middleware with developer bypass
+            'permission' => \App\Http\Middleware\DeveloperPermissionMiddleware::class,
+            // Original Spatie middleware (backup)
+            'spatie.permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

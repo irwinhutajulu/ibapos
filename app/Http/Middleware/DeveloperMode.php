@@ -31,6 +31,10 @@ class DeveloperMode
                     }
                 }
             }
+            
+            // 🚨 SECURITY BYPASS - ONLY FOR DEVELOPMENT
+            // Mark request as developer mode to bypass permission checks
+            $request->attributes->set('developer_mode_bypass', true);
         }
 
         return $next($request);

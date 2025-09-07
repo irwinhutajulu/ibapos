@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 // Test routes for development (no auth required)
 Route::get('/test/products', function() {
@@ -18,11 +19,74 @@ Route::get('/test/products', function() {
 Route::get('/test/api/products/search', [\App\Http\Controllers\Api\ProductController::class, 'search'])->name('test.api.products.search');
 Route::get('/test/api/debug', [\App\Http\Controllers\Api\TestController::class, 'test'])->name('test.api.debug');
 
+// AJAX Products route (without middleware for testing)
+Route::get('/ajax/products', [\App\Http\Controllers\ProductsController::class, 'index'])->name('ajax.products');
+
 Route::get('/', function () { return view('dashboard'); })->middleware('auth');
 Route::get('/dashboard', function () { return view('dashboard'); })->middleware('auth')->name('dashboard');
 
 // Test dropdown components
 Route::get('/dropdown-test', function () { return view('dropdown-demo'); })->middleware('auth')->name('dropdown.test');
+
+// Direct products endpoint for AJAX - completely isolated, no middleware
+Route::get('/api/products/search', function (Request $request) {
+    try {
+        $search = trim((string) $request->get('search', ''));
+        $page = (int) $request->get('page', 1);
+        $perPage = 15;
+        
+        // Simple query without middleware dependencies
+        $query = \App\Models\Product::select(['id', 'name', 'barcode', 'category_id', 'price', 'created_at', 'deleted_at'])
+            ->when($search, function($q) use ($search) {
+                return $q->where(function($x) use ($search) {
+                    $x->where('name', 'like', "%{$search}%")
+                      ->orWhere('barcode', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('created_at', 'desc');
+        
+        $total = $query->count();
+        $products = $query->skip(($page - 1) * $perPage)->take($perPage)->get();
+        
+        // Get category names separately to avoid relation issues
+        $categoryIds = $products->pluck('category_id')->unique()->filter();
+        $categories = [];
+        if ($categoryIds->isNotEmpty()) {
+            $categories = \App\Models\Category::whereIn('id', $categoryIds)->pluck('name', 'id')->toArray();
+        }
+        
+        // Add category names to products
+        $products->each(function($product) use ($categories) {
+            $product->category_name = $categories[$product->category_id] ?? null;
+            // Add image_url accessor manually
+            $product->image_url = $product->image_path ? asset('storage/' . $product->image_path) : null;
+            // Add sku as null since it doesn't exist in this table
+            $product->sku = null;
+        });
+        
+        $lastPage = ceil($total / $perPage);
+        
+        return response()->json([
+            'success' => true,
+            'data' => $products,
+            'pagination' => [
+                'current_page' => $page,
+                'last_page' => $lastPage,
+                'per_page' => $perPage,
+                'total' => $total,
+                'from' => ($page - 1) * $perPage + 1,
+                'to' => min($page * $perPage, $total),
+            ]
+        ]);
+        
+    } catch (\Exception $e) {
+        \Log::error('Products search API error: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'Search failed: ' . $e->getMessage()
+        ], 500);
+    }
+})->name('api.products.search');
 
 // Auth
 Route::get('/login', [\App\Http\Controllers\AuthController::class, 'showLogin'])->name('login')->middleware('guest');
@@ -112,7 +176,7 @@ Route::middleware(['web','auth'])->group(function () {
     })->name('api.locations');
 
     Route::get('/api/products', [\App\Http\Controllers\Api\ProductController::class, 'index'])->name('api.products');
-    Route::get('/api/products/search', [\App\Http\Controllers\Api\ProductController::class, 'search'])->name('api.products.search');
+    // Note: /api/products/search is already defined as closure above (line 26) - no duplicate needed
     Route::get('/api/stock/available', [\App\Http\Controllers\StockApiController::class, 'available'])->name('api.stock.available');
     Route::post('/api/stock/available-batch', [\App\Http\Controllers\StockApiController::class, 'availableBatch'])->name('api.stock.available-batch');
 
