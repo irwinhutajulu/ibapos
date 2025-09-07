@@ -30,6 +30,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Developer Mode
+    |--------------------------------------------------------------------------
+    |
+    | When enabled in local environment, this will automatically login users
+    | without requiring authentication. This is useful during development.
+    |
+    */
+
+    'developer_mode' => env('DEVELOPER_MODE', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Debug Mode
     |--------------------------------------------------------------------------
     |

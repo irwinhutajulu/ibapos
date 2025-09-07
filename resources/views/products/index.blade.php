@@ -460,15 +460,17 @@ document.addEventListener('submit', function(e) {
                     // Close modal
                     closeModal('product-modal');
                     
-                    // Show floating success message
+                    // Show floating success message without immediate reload
                     if (data.message) {
                         showFloatingSuccess(data.message);
-                    }
-                    
-                    // Reload page to show updated data
-                    setTimeout(() => {
+                        
+                        // Reload page after success message is shown
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500); // Give time for user to see success message
+                    } else {
                         location.reload();
-                    }, 500); // Small delay to show success message
+                    }
                 });
             } else {
                 return response.text().then(text => {

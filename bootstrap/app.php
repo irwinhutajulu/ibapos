@@ -12,6 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withBroadcasting(__DIR__.'/../routes/channels.php', ['middleware' => ['web','auth']])
     ->withMiddleware(function (Middleware $middleware): void {
+        // Global middleware for developer mode (auto-login in development)
+        $middleware->prepend(\App\Http\Middleware\DeveloperMode::class);
+        
         $middleware->alias([
             'active.location' => \App\Http\Middleware\ActiveLocation::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,

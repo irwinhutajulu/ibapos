@@ -14,63 +14,19 @@ $positionClasses = [
 $positionClass = $positionClasses[$position] ?? $positionClasses['top-center'];
 @endphp
 
-<div x-data="{ 
-    show: {{ session('ok') ? 'true' : 'false' }},
-    message: {!! session('ok') ? json_encode(session('ok')) : "''" !!},
-    autoHide: true,
-    timer: null,
-    
-    showMessage(text, autoHide = true) {
-        this.message = text;
-        this.autoHide = autoHide;
-        this.show = true;
-        
-        if (autoHide) {
-            // Clear existing timer
-            if (this.timer) {
-                clearTimeout(this.timer);
-            }
-            
-            // Set new timer
-            this.timer = setTimeout(() => {
-                this.hideMessage();
-            }, {{ $duration }});
-        }
-    },
-    
-    hideMessage() {
-        this.show = false;
-        if (this.timer) {
-            clearTimeout(this.timer);
-            this.timer = null;
-        }
-    }
-}" 
-x-init="
-    @if(session('ok'))
-        console.log('Floating success initialized with session message:', message);
-        // Auto-hide after duration if there's a session message
-        if (autoHide && show) {
-            timer = setTimeout(() => hideMessage(), {{ $duration }});
-        }
-    @else
-        console.log('Floating success initialized - no session message');
-    @endif
-"
+<div x-data="floatingSuccessComponent()" 
 x-show="show"
-x-transition:enter="transform ease-out duration-300"
-x-transition:enter-start="-translate-y-full opacity-0"
-x-transition:enter-end="translate-y-0 opacity-100"
-x-transition:leave="transform ease-in duration-200"
-x-transition:leave-start="translate-y-0 opacity-100"
-x-transition:leave-end="-translate-y-full opacity-0"
-class="{{ $positionClass }} z-50"
+x-transition:enter="transform ease-out duration-800"
+x-transition:enter-start="-translate-y-full opacity-50"
+x-transition:enter-end="translate-y-0 opacity-50"
+x-transition:leave="transform ease-in duration-800 delay-500"
+x-transition:leave-start="translate-y-0 opacity-50"
+x-transition:leave-end="-translate-y-full opacity-50"
+class="{{ $positionClass }} z-30"
 x-cloak
-id="floating-success"
->
+id="floating-success">
     <!-- Success Message Card -->
-    <div class="bg-green-600 dark:bg-green-700 text-white px-6 py-4 rounded-xl shadow-2xl border border-green-500 dark:border-green-600 max-w-md"
-         style="box-shadow: 0 20px 25px -5px rgba(16, 185, 129, 0.3), 0 10px 10px -5px rgba(16, 185, 129, 0.2);">
+    <div class="bg-green-600 dark:bg-green-700 text-white px-2 py-1 rounded-xl border border-green-500 dark:border-green-600 max-w-md">
         
         <div class="flex items-center">
             <!-- Success Icon -->
@@ -82,38 +38,94 @@ id="floating-success"
             
             <!-- Message Text -->
             <div class="ml-3 flex-1">
-                <p class="text-sm font-medium" x-text="message">
+                <p class="text-sm font-normal" x-text="message">
                     {{ $message }}
                 </p>
             </div>
-            
-            <!-- Close Button -->
-            <div class="ml-4 flex-shrink-0">
-                <button @click="hideMessage()" 
-                        class="bg-green-700 dark:bg-green-800 rounded-md p-1 inline-flex items-center justify-center text-green-200 hover:text-white hover:bg-green-600 dark:hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-green-500 transition-colors">
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
+                        
         </div>
     </div>
 </div>
 
 <script>
-// Global function to show floating success message
-window.showFloatingSuccess = function(message, duration = 3000) {
-    const successComponent = document.getElementById('floating-success');
-    if (successComponent && successComponent._x_dataStack) {
-        successComponent._x_dataStack[0].showMessage(message, true);
+// Alpine.js component function
+function floatingSuccessComponent() {
+    return {
+        show: false,
+        message: '',
+        timer: null,
+        
+        init() {
+            console.log('Floating success component initialized');
+            
+            // Check for session message
+            @if(session('ok'))
+                this.message = {!! json_encode(session('ok')) !!};
+                this.show = true;
+                console.log('Session message found:', this.message);
+                this.startAutoHide();
+            @endif
+            
+            // Register global functions
+            window.showFloatingSuccess = (msg) => this.showMessage(msg);
+            window.hideFloatingSuccess = () => this.hideMessage();
+        },
+        
+        showMessage(text) {
+            console.log('showMessage called with:', text);
+            this.message = text;
+            this.show = true;
+            this.startAutoHide();
+        },
+        
+        hideMessage() {
+            this.show = false;
+            if (this.timer) {
+                clearTimeout(this.timer);
+                this.timer = null;
+            }
+        },
+        
+        startAutoHide() {
+            if (this.timer) {
+                clearTimeout(this.timer);
+            }
+            this.timer = setTimeout(() => {
+                this.hideMessage();
+            }, {{ $duration }});
+        }
     }
-};
+}
 
-// Global function to hide floating success message
-window.hideFloatingSuccess = function() {
-    const successComponent = document.getElementById('floating-success');
-    if (successComponent && successComponent._x_dataStack) {
-        successComponent._x_dataStack[0].hideMessage();
+// Backup global function (in case Alpine isn't ready)
+window.showFloatingSuccess = window.showFloatingSuccess || function(message) {
+    console.log('Backup showFloatingSuccess called:', message);
+    
+    // Try to find Alpine component
+    const component = document.getElementById('floating-success');
+    if (component && component._x_dataStack && component._x_dataStack[0]) {
+        component._x_dataStack[0].showMessage(message);
+        return;
     }
+    
+    // Fallback: create a simple notification
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-8 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-4 rounded-xl shadow-2xl z-50 max-w-md';
+    notification.innerHTML = `
+        <div class="flex items-center">
+            <svg class="h-6 w-6 text-white mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span class="text-sm font-medium">${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 3000);
 };
 </script>

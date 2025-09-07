@@ -54,8 +54,18 @@
                         <span class="text-white font-bold text-lg">IB</span>
                     </div>
                     <div>
-                        <h1 class="font-bold text-xl text-gray-900 dark:text-white">IBAPOS</h1>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Point of Sale</p>
+                        <div class="flex items-center space-x-2">
+                            <h1 class="font-bold text-xl text-gray-900 dark:text-white">IBAPOS</h1>
+                            @if(app()->environment('local') && config('app.developer_mode'))
+                                <span class="bg-orange-500 text-white text-xs px-2 py-1 rounded-full font-semibold">DEV</span>
+                            @endif
+                        </div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                            Point of Sale
+                            @if(app()->environment('local') && config('app.developer_mode'))
+                                <span class="text-orange-500"> • Developer Mode</span>
+                            @endif
+                        </p>
                     </div>
                 </div>
             </div>
@@ -303,6 +313,16 @@
                         </select>
                     </form>
                     @endauth
+
+                    <!-- Developer Mode Indicator -->
+                    @if(app()->environment('local') && config('app.developer_mode'))
+                    <div class="flex items-center space-x-2 px-3 py-2 bg-orange-100 dark:bg-orange-900/20 text-orange-800 dark:text-orange-300 rounded-xl border border-orange-200 dark:border-orange-800">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                        </svg>
+                        <span class="text-sm font-medium">Developer Mode</span>
+                    </div>
+                    @endif
 
                     <!-- Notifications Button -->
                     <button class="relative p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
