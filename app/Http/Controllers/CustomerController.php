@@ -11,11 +11,15 @@ class CustomerController extends Controller
     public function index(Request $request)
     {
         $q = $request->input('q');
-        $customers = Customer::query()
+        $trashed = $request->boolean('trashed');
+        $query = Customer::query();
+        if ($trashed) { $query->withTrashed(); }
+        $customers = $query
             ->when($q, fn($qr) => $qr->where('name', 'like', "%$q%"))
             ->orderBy('name')
-            ->paginate(20);
-        return view('customers.index', compact('customers', 'q'));
+            ->paginate(20)
+            ->withQueryString();
+        return view('customers.index', compact('customers', 'q', 'trashed'));
     }
 
     public function create()

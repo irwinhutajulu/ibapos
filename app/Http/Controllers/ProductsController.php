@@ -30,9 +30,15 @@ class ProductsController extends Controller
         return view('products.index', compact('products','q','trashed','categories','categoryId'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $categories = Category::orderBy('name')->pluck('name','id');
+        
+        // If this is a modal request, return only the form
+        if ($request->get('modal') === '1') {
+            return view('products.partials.create-form', compact('categories'));
+        }
+        
         return view('products.create', compact('categories'));
     }
 
@@ -40,6 +46,7 @@ class ProductsController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:191',
+            'sku' => 'nullable|string|max:100|unique:products,sku',
             'category_id' => 'nullable|exists:categories,id',
             'barcode' => 'nullable|string|max:64|unique:products,barcode',
             'price' => 'nullable|numeric|min:0',
@@ -54,12 +61,24 @@ class ProductsController extends Controller
         }
 
         Product::create($data);
-        return redirect()->route('products.index')->with('ok','Product created');
+        
+        // If this is an AJAX request, return JSON response
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => "Product '{$data['name']}' created successfully"]);
+        }
+        
+        return redirect()->route('products.index')->with('ok', "Product '{$data['name']}' created successfully");
     }
 
-    public function edit(Product $product)
+    public function edit(Request $request, Product $product)
     {
         $categories = Category::orderBy('name')->pluck('name','id');
+        
+        // If this is a modal request, return only the form
+        if ($request->get('modal') === '1') {
+            return view('products.partials.edit-form', compact('product', 'categories'));
+        }
+        
         return view('products.edit', compact('product','categories'));
     }
 
@@ -67,6 +86,7 @@ class ProductsController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:191',
+            'sku' => 'nullable|string|max:100|unique:products,sku,'.$product->id,
             'category_id' => 'nullable|exists:categories,id',
             'barcode' => 'nullable|string|max:64|unique:products,barcode,'.$product->id,
             'price' => 'nullable|numeric|min:0',
@@ -90,35 +110,50 @@ class ProductsController extends Controller
         }
 
         $product->update($data);
-        return redirect()->route('products.index')->with('ok','Product updated');
+        
+        // If this is an AJAX request, return JSON response
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => "Product '{$data['name']}' updated successfully"]);
+        }
+        
+        return redirect()->route('products.index')->with('ok', "Product '{$data['name']}' updated successfully");
     }
 
     public function destroy(Product $product)
     {
+        $productName = $product->name;
         $product->delete();
-        return redirect()->route('products.index')->with('ok','Product deleted');
+        return redirect()->route('products.index')->with('ok', "Product '{$productName}' deleted successfully");
     }
 
-    public function show(Product $product)
+    public function show(Request $request, Product $product)
     {
         $product->load('category:id,name');
+        
+        // If this is a modal request, return only the form
+        if ($request->get('modal') === '1') {
+            return view('products.partials.show-form', compact('product'));
+        }
+        
         return view('products.show', compact('product'));
     }
 
     public function restore(int $id)
     {
         $product = Product::withTrashed()->findOrFail($id);
+        $productName = $product->name;
         $product->restore();
-        return redirect()->route('products.index', ['trashed' => 1])->with('ok','Product restored');
+        return redirect()->route('products.index', ['trashed' => 1])->with('ok', "Product '{$productName}' restored successfully");
     }
 
     public function forceDelete(int $id)
     {
         $product = Product::withTrashed()->findOrFail($id);
+        $productName = $product->name;
         if ($product->image_path) {
             Storage::disk('public')->delete($product->image_path);
         }
         $product->forceDelete();
-        return redirect()->route('products.index', ['trashed' => 1])->with('ok','Product permanently deleted');
+        return redirect()->route('products.index', ['trashed' => 1])->with('ok', "Product '{$productName}' permanently deleted");
     }
 }

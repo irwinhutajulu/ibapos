@@ -426,5 +426,9 @@
                                             </div>
                                         </template>
                                     </div>
+    </div>
+
+    <!-- Floating Success Message Component -->
+    <x-floating-success />
 </body>
 </html>

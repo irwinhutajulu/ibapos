@@ -18,6 +18,53 @@
 
 @import 'tailwindcss';
 
+/* Modal Floating Style */
+.modal-floating {
+    backdrop-filter: blur(2px);
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid rgba(229, 231, 235, 0.8);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 
+                0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+.dark .modal-floating {
+    background: rgba(31, 41, 55, 0.98);
+    border: 1px solid rgba(75, 85, 99, 0.8);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 
+                0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+/* Animation for floating modal */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.animate-slide-in-right {
+    animation: slideInRight 0.3s ease-out;
+}
+
+.animate-slide-out-right {
+    animation: slideOutRight 0.3s ease-in;
+}
+
 /* Custom Animations */
 @keyframes fade-in {
     from { opacity: 0; }
@@ -287,5 +334,15 @@
     
     .mobile-spacing {
         margin-bottom: 1rem;
+    }
+    
+    /* Mobile modal adjustments */
+    .modal-mobile {
+        position: fixed !important;
+        top: 1rem !important;
+        right: 1rem !important;
+        left: 1rem !important;
+        max-width: none !important;
+        width: auto !important;
     }
 }
