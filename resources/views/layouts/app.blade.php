@@ -449,6 +449,45 @@
     </div>
 
     <!-- Floating Success Message Component -->
+    <script>
+        // Provide a global fallback for product form validation so modal-loaded HTML
+        // (inserted via innerHTML) can call validateProductForm() even when inline
+        // <script> blocks inside the loaded HTML are not executed.
+        window.validateProductForm = window.validateProductForm || function() {
+            try {
+                const nameEl = document.getElementById('name');
+                const categoryEl = document.getElementById('category_id');
+                const priceEl = document.getElementById('price');
+
+                const name = nameEl ? nameEl.value.trim() : '';
+                const category = categoryEl ? categoryEl.value : '';
+                const price = priceEl ? parseFloat(priceEl.value) : NaN;
+
+                if (!name) {
+                    alert('Product name is required');
+                    return false;
+                }
+
+                if (!category) {
+                    alert('Category is required');
+                    return false;
+                }
+
+                if (isNaN(price) || price < 0) {
+                    alert('Valid price is required');
+                    return false;
+                }
+
+                return true;
+            } catch (err) {
+                // If anything unexpected happens, allow the form to submit so server-side
+                // validation can handle it. Log to console for debugging.
+                console.error('validateProductForm error:', err);
+                return true;
+            }
+        };
+    </script>
+
     <x-floating-success />
 </body>
 </html>

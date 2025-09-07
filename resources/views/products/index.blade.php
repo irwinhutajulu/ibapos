@@ -672,8 +672,8 @@ document.addEventListener('submit', function(e) {
                     
                     // Show floating success message without immediate reload
                     if (data.message) {
-                        showFloatingSuccess(data.message);
-                        
+                        window.notify(data.message, 'success');
+
                         // Reload page after success message is shown
                         setTimeout(() => {
                             location.reload();

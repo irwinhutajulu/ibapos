@@ -222,38 +222,4 @@ $disabled = $isShow ? 'disabled' : '';
     @endif
 </form>
 
-<script>
-function previewImage(input) {
-    const preview = document.getElementById('image-preview');
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            preview.src = e.target.result;
-        };
-        reader.readAsDataURL(input.files[0]);
-    }
-}
-
-function validateProductForm() {
-    const name = document.getElementById('name').value.trim();
-    const category = document.getElementById('category_id').value;
-    const price = document.getElementById('price').value;
-    
-    if (!name) {
-        alert('Product name is required');
-        return false;
-    }
-    
-    if (!category) {
-        alert('Category is required');
-        return false;
-    }
-    
-    if (!price || price < 0) {
-        alert('Valid price is required');
-        return false;
-    }
-    
-    return true;
-}
-</script>
+<!-- Product form helper functions moved to resources/js/app-helpers.js and bundled in app.js -->

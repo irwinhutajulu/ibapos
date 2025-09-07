@@ -22,7 +22,7 @@ x-transition:enter-end="translate-y-0 opacity-50"
 x-transition:leave="transform ease-in duration-800 delay-500"
 x-transition:leave-start="translate-y-0 opacity-50"
 x-transition:leave-end="-translate-y-full opacity-50"
-class="{{ $positionClass }} z-30"
+class="{{ $positionClass }} z-50"
 x-cloak
 id="floating-success">
     <!-- Success Message Card -->
