@@ -78,10 +78,10 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center space-x-3">
                                     <div x-show="row.cells[0]?.type === 'avatar'" class="flex-shrink-0">
-                                        <img :src="row.cells[0]?.image || '/images/default-product.svg'" 
+                                        <img :src="row.cells[0]?.image || '{{ asset('images/default-product.svg') }}'" 
                                              :alt="row.cells[0]?.name"
                                              class="w-10 h-10 rounded-lg object-cover bg-gray-100 dark:bg-gray-700"
-                                             onerror="this.src='/images/default-product.svg'">
+                                             onerror="this.src='{{ asset('images/default-product.svg') }}'">
                                     </div>
                                     <div>
                                         <div class="text-sm font-medium text-gray-900 dark:text-white" x-text="row.cells[0]?.name"></div>

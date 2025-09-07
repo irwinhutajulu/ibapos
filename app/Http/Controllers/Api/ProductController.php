@@ -49,7 +49,7 @@ class ProductController extends Controller
                 'cells' => [
                     [
                         'type' => 'avatar',
-                        'image' => $p->image_url ?? '/images/default-product.svg',
+                        'image' => $p->image_url ?? asset('images/default-product.svg'),
                         'name' => $p->name,
                         'subtitle' => $p->deleted_at ? 'Deleted' : ($p->barcode ?? 'No Barcode')
                     ],
