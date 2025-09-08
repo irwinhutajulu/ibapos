@@ -275,13 +275,7 @@
                         </svg>
                     </button>
 
-                    <!-- Page Title -->
-                    <div>
-                        <h1 class="text-xl font-semibold text-gray-900 dark:text-white">{{ $title ?? 'Dashboard' }}</h1>
-                        @isset($subtitle)
-                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $subtitle }}</p>
-                        @endisset
-                    </div>
+                    
                 </div>
 
                 <div class="flex items-center space-x-4">

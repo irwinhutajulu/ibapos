@@ -57,7 +57,7 @@
     <!-- Table -->
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <!-- Table -->
-        <div class="overflow-x-auto">
+            <div class="overflow-x-auto" x-show="isDesktop" x-cloak>
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <!-- Table Headers -->
                 <thead class="bg-gray-50 dark:bg-gray-700/50">
@@ -137,6 +137,68 @@
             </table>
         </div>
         
+    <!-- Mobile Card View (hidden on desktop) -->
+    <div class="lg:hidden space-y-4 p-4" x-show="!isDesktop" x-cloak>
+            <template x-for="(row, index) in rows" :key="row.id || index">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+                    <div class="flex items-start space-x-4">
+                        <!-- Image -->
+                        <div class="flex-shrink-0">
+                            <img :src="row.cells[0]?.image || '{{ asset('images/default-product.svg') }}'"
+                                 :alt="row.cells[0]?.name"
+                                 class="w-16 h-16 rounded-lg object-cover bg-gray-100 dark:bg-gray-700"
+                                 onerror="this.src='{{ asset('images/default-product.svg') }}'">
+                        </div>
+
+                        <!-- Content -->
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-900 dark:text-white truncate" x-text="row.cells[0]?.name"></h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400" x-text="row.cells[0]?.subtitle"></p>
+                                </div>
+
+                                <div class="text-right">
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Qty</p>
+                                    <p class="text-lg font-semibold text-gray-900 dark:text-white" x-text="row.cells[1]"></p>
+                                </div>
+                            </div>
+
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Avg Cost</p>
+                                <p class="text-md font-medium text-gray-900 dark:text-white" x-text="row.cells[2]"></p>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Valuation</p>
+                                <p class="text-md font-semibold text-gray-900 dark:text-white" x-text="row.cells[3]"></p>
+                            </div>
+
+                            <!-- Mobile Actions -->
+                            <div class="mt-4 flex flex-wrap gap-2">
+                                <template x-for="action in row.actions" :key="action.label">
+                                    <div>
+                                                     <!-- If action provides a url use a normal link on mobile for full-page navigation -->
+                                                     <a x-show="action.url"
+                                                         :href="action.url"
+                                           class="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg text-gray-700 dark:text-gray-200 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors">
+                                            <span x-html="action.icon" class="mr-1"></span>
+                                            <span x-text="action.label"></span>
+                                        </a>
+
+                                                     <!-- Fallback: if no url provided, execute JS handler (button or link without url) -->
+                                                     <button x-show="!action.url"
+                                                                @click="executeAction(action)"
+                                                class="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg text-gray-700 dark:text-gray-200 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors">
+                                            <span x-html="action.icon" class="mr-1"></span>
+                                            <span x-text="action.label"></span>
+                                        </button>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+
         <!-- Empty State -->
         <div x-show="!loading && rows.length === 0" class="text-center py-12">
             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -179,6 +241,8 @@
 <script>
 function liveSearchTable(config) {
     return {
+        // runtime responsive flag: true on desktop (lg and up)
+        isDesktop: true,
         searchQuery: '',
         loading: false,
         rows: config.initialRows || [],
@@ -190,11 +254,17 @@ function liveSearchTable(config) {
             // Set initial search query from URL params if exists
             const urlParams = new URLSearchParams(window.location.search);
             this.searchQuery = urlParams.get('q') || '';
-            
+            // initialize responsive flag and attach resize listener
+            this.isDesktop = window.innerWidth >= 1024;
+            window.addEventListener('resize', () => {
+                this.isDesktop = window.innerWidth >= 1024;
+            });
+
             console.log('Live search table initialized', {
                 searchUrl: config.searchUrl,
                 searchParams: this.searchParams,
-                initialRows: this.rows.length
+                initialRows: this.rows.length,
+                isDesktop: this.isDesktop
             });
         },
         

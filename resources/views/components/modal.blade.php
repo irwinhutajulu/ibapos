@@ -25,31 +25,22 @@ $sizeClasses = [
 $sizeClass = $sizeClasses[$size] ?? $sizeClasses['sidebar'];
 @endphp
 
-<div x-data="{ 
-    open: false,
-    openModal() {
-        this.open = true;
-        // Don't prevent scrolling on main page
-    },
-    closeModal() {
-        this.open = false;
-    }
-}" 
-x-show="open" 
-x-transition:enter="ease-out duration-300"
-x-transition:enter-start="opacity-0 scale-95"
-x-transition:enter-end="opacity-100 scale-100"
-x-transition:leave="ease-in duration-200"
-x-transition:leave-start="opacity-100 scale-100"
-x-transition:leave-end="opacity-0 scale-95"
-x-transition:leave-end="opacity-0 scale-95"
-class="fixed inset-0 z-50 flex items-center justify-center p-4"
-x-cloak
-id="{{ $id }}"
-@if($keyboard)
-@keydown.escape.window="closeModal()"
-@endif
->
+<template x-teleport="body">
+    <div x-data="modalComponent()"
+        x-show="open"
+        x-transition:enter="ease-out duration-300"
+        x-transition:enter-start="opacity-0 scale-95"
+        x-transition:enter-end="opacity-100 scale-100"
+        x-transition:leave="ease-in duration-200"
+        x-transition:leave-start="opacity-100 scale-100"
+        x-transition:leave-end="opacity-0 scale-95"
+        class="fixed inset-0 z-50 flex {{ $maxHeight ? 'items-center' : 'items-start overflow-auto' }} justify-center p-4"
+        x-cloak
+        id="{{ $id }}"
+        @if($keyboard)
+        @keydown.escape.window="closeModal()"
+        @endif
+    >
     <!-- Modal Content (Center Middle) -->
     <div class="relative transform overflow-hidden rounded-xl bg-gray-800 dark:bg-gray-800 shadow-2xl border border-gray-700 dark:border-gray-600 w-full {{ $sizeClass }}"
          @click.stop
@@ -62,7 +53,7 @@ id="{{ $id }}"
             
             <!-- Modal Header -->
             <div class="flex items-center justify-between p-4 border-b border-gray-600 dark:border-gray-600 bg-gray-700 dark:bg-gray-700">
-                <h3 class="text-lg font-semibold text-white dark:text-white">
+                <h3 class="text-lg font-semibold text-white dark:text-white" data-modal-title>
                     {{ $title }}
                 </h3>
                 @if($closeButton)
@@ -77,7 +68,8 @@ id="{{ $id }}"
             </div>
             
             <!-- Modal Body -->
-            <div class="p-4 @if($maxHeight) max-h-[80vh] overflow-y-auto custom-scrollbar @endif bg-gray-800 dark:bg-gray-800 text-white">
+            <div class="p-4 bg-gray-800 dark:bg-gray-800 text-white" data-modal-body
+                 :class="{ 'max-h-[80vh] overflow-y-auto custom-scrollbar': {{ $maxHeight ? 'true' : 'false' }} }">
                 {{ $slot }}
             </div>
             
@@ -89,7 +81,71 @@ id="{{ $id }}"
             @endif
         </div>
     </div>
-</div>
+    </div>
+</template>
+
+<script>
+function modalComponent() {
+    return {
+        open: false,
+        openModal() {
+            this.open = true;
+            try { document.documentElement.classList.add('overflow-hidden'); } catch(e){}
+        },
+        closeModal() {
+            this.open = false;
+            try { document.documentElement.classList.remove('overflow-hidden'); } catch(e){}
+        }
+    }
+}
+
+// Global function to open modal
+window.openModal = function(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal && modal._x_dataStack) {
+        modal._x_dataStack[0].openModal();
+    }
+};
+
+// Global function to close modal
+window.closeModal = function(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal && modal._x_dataStack) {
+        modal._x_dataStack[0].closeModal();
+    }
+};
+
+// Open a modal and load remote HTML into its body. Useful for view-ledger modals.
+window.openRemoteModal = async function(modalId, url, title = null) {
+    const modal = document.getElementById(modalId);
+    if (!modal || !modal._x_dataStack) return;
+
+    const bodyEl = modal.querySelector('[data-modal-body]');
+    const titleEl = modal.querySelector('[data-modal-title]');
+
+    try {
+        // Show loading skeleton
+        if (bodyEl) bodyEl.innerHTML = '<div class="py-8 text-center">Loading...</div>';
+        if (titleEl && title) titleEl.textContent = title;
+
+        modal._x_dataStack[0].openModal();
+
+        const resp = await fetch(url, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'text/html' },
+            credentials: 'same-origin'
+        });
+
+        if (!resp.ok) throw new Error('Failed to load content: ' + resp.status);
+
+        const html = await resp.text();
+
+        if (bodyEl) bodyEl.innerHTML = html;
+    } catch (err) {
+        console.error('openRemoteModal error', err);
+        if (bodyEl) bodyEl.innerHTML = '<div class="py-8 text-center text-red-400">Failed to load content</div>';
+    }
+};
+</script>
 
 <script>
 // Global function to open modal
@@ -105,6 +161,37 @@ window.closeModal = function(modalId) {
     const modal = document.getElementById(modalId);
     if (modal && modal._x_dataStack) {
         modal._x_dataStack[0].closeModal();
+    }
+};
+
+// Open a modal and load remote HTML into its body. Useful for view-ledger modals.
+window.openRemoteModal = async function(modalId, url, title = null) {
+    const modal = document.getElementById(modalId);
+    if (!modal || !modal._x_dataStack) return;
+
+    const bodyEl = modal.querySelector('[data-modal-body]');
+    const titleEl = modal.querySelector('[data-modal-title]');
+
+    try {
+        // Show loading skeleton
+        if (bodyEl) bodyEl.innerHTML = '<div class="py-8 text-center">Loading...</div>';
+        if (titleEl && title) titleEl.textContent = title;
+
+        modal._x_dataStack[0].openModal();
+
+        const resp = await fetch(url, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'text/html' },
+            credentials: 'same-origin'
+        });
+
+        if (!resp.ok) throw new Error('Failed to load content: ' + resp.status);
+
+        const html = await resp.text();
+
+        if (bodyEl) bodyEl.innerHTML = html;
+    } catch (err) {
+        console.error('openRemoteModal error', err);
+        if (bodyEl) bodyEl.innerHTML = '<div class="py-8 text-center text-red-400">Failed to load content</div>';
     }
 };
 </script>
