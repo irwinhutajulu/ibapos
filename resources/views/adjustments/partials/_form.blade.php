@@ -1,6 +1,5 @@
-@extends('layouts.app', ['title' => isset($adjustment) ? 'Edit Adjustment' : 'New Adjustment'])
-
-@section('content')
+@extends('')
+{{-- Partial: adjustments form --}}
 <div class="max-w-3xl mx-auto">
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
         <h2 class="text-xl font-bold text-gray-900">{{ isset($adjustment) ? 'Edit Adjustment' : 'New Adjustment' }}</h2>
@@ -19,7 +18,7 @@
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm text-gray-600">Date</label>
-                    <input type="datetime-local" name="date" class="w-full mt-1 form-input" value="{{ isset($adjustment) && $adjustment->date ? $adjustment->date->format('Y-m-d\TH:i') : now()->format('Y-m-d\TH:i') }}">
+                    <input type="datetime-local" name="date" class="w-full mt-1 form-input" value="{{ isset($adjustment) && $adjustment->date ? $adjustment->date->format('Y-m-d\\TH:i') : now()->format('Y-m-d\\TH:i') }}">
                 </div>
 
                 <div>
@@ -99,8 +98,6 @@
     </form>
 </div>
 
-@endsection
-
 @push('scripts')
 <script>
     (function(){
@@ -152,3 +149,8 @@
     })();
 </script>
 @endpush
+@php
+// Partial: adjustments form
+// ...existing code...
+@endphp
+@includeWhen(true, 'adjustments.form')

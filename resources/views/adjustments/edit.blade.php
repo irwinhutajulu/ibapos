@@ -18,78 +18,7 @@
         </ul>
       </div>
     @endif
-    <form method="POST" action="{{ route('stock-adjustments.update', $adjustment) }}" x-data="editAdjForm({{ $adjustment->toJson() }})">
-      @csrf
-      @method('PUT')
-      <div class="grid md:grid-cols-2 gap-3">
-        <div>
-          <label class="block text-sm">Reason</label>
-          <input type="text" name="reason" x-model="reason" class="w-full border rounded p-2" />
-        </div>
-        <div>
-          <label class="block text-sm">Note</label>
-          <input type="text" name="note" x-model="note" class="w-full border rounded p-2" />
-        </div>
-      </div>
-
-      <div class="mt-4">
-        <div class="flex items-center justify-between mb-2">
-          <div class="font-medium">Items</div>
-          <button type="button" class="px-3 py-1 border rounded" @click="addRow()">+ Add Row</button>
-        </div>
-        <div class="overflow-auto">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="text-left border-b">
-                <th style="width: 40%">Product</th>
-                <th>Qty +/-</th>
-                <th>Unit Cost</th>
-                <th>Note</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <template x-for="(row, idx) in rows" :key="idx">
-                <tr class="border-b" :class="rowError(idx) ? 'bg-red-50' : ''">
-                  <td class="align-top">
-                    <div class="space-y-1">
-                      <input type="hidden" :name="`items[${idx}][product_id]`" :value="row.product_id">
-                      <input type="text" class="w-full border rounded p-1" placeholder="Search name/barcode" @input.debounce.300ms="searchProduct(idx, $event.target.value)" :value="row.product_name ?? ''">
-                      <div class="border rounded max-h-40 overflow-auto" x-show="suggest[idx] && suggest[idx].length">
-                        <template x-for="p in suggest[idx]">
-                          <div class="px-2 py-1 hover:bg-gray-100 cursor-pointer" @click="selectProduct(idx, p)">
-                            <span x-text="p.name"></span>
-                            <span class="text-gray-500" x-text="p.barcode ? ' • '+p.barcode : ''"></span>
-                          </div>
-                        </template>
-                      </div>
-                      <div class="text-xs text-red-600" x-show="!row.product_id">Required</div>
-                    </div>
-                  </td>
-                  <td class="align-top">
-                    <input type="number" step="0.001" :name="`items[${idx}][qty_change]`" x-model="row.qty_change" class="w-full border rounded p-1" :class="!row.qty_change || row.qty_change == 0 ? 'border-red-400' : ''" />
-                    <div class="text-xs text-red-600" x-show="!row.qty_change || row.qty_change == 0">Non-zero</div>
-                  </td>
-                  <td class="align-top">
-                    <input type="number" step="0.0001" :name="`items[${idx}][unit_cost]`" x-model="row.unit_cost" class="w-full border rounded p-1" />
-                  </td>
-                  <td class="align-top">
-                    <input type="text" :name="`items[${idx}][note]`" x-model="row.note" class="w-full border rounded p-1" />
-                  </td>
-                  <td class="align-top">
-                    <button type="button" class="px-2 py-1 text-red-600" @click="removeRow(idx)">Remove</button>
-                  </td>
-                </tr>
-              </template>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="mt-4 flex items-center justify-end gap-2">
-        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Save</button>
-      </div>
-    </form>
+  @include('adjustments.partials._form')
   </div>
 </div>
 
