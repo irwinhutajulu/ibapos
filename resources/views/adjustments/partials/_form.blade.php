@@ -1,11 +1,15 @@
 {{-- Partial: adjustments form (styled like components/product-form) --}}
 <div class="max-w-3xl mx-auto">
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-        <h2 class="text-xl font-bold text-gray-900">{{ isset($adjustment) ? 'Edit Adjustment' : 'New Adjustment' }}</h2>
-        <p class="text-gray-600">Use this form to create or update a stock adjustment.</p>
-    </div>
+    <div class="relative transform overflow-hidden rounded-xl bg-gray-800 dark:bg-gray-800 shadow-2xl border border-gray-700 dark:border-gray-600 w-full">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between p-4 border-b border-gray-600 dark:border-gray-600 bg-gray-700 dark:bg-gray-700">
+            <h3 class="text-lg font-semibold text-white" data-modal-title>{{ isset($adjustment) ? 'Edit Adjustment' : 'New Adjustment' }}</h3>
+            <p class="text-sm text-gray-300">Use this form to create or update a stock adjustment.</p>
+        </div>
 
-    <form method="POST" action="{{ isset($adjustment) ? route('stock-adjustments.update', $adjustment->id) : route('stock-adjustments.store') }}" class="space-y-6">
+        <!-- Modal Body -->
+        <div class="p-4 bg-gray-800 dark:bg-gray-800 text-white" data-modal-body>
+            <form method="POST" action="{{ isset($adjustment) ? route('stock-adjustments.update', $adjustment->id) : route('stock-adjustments.store') }}" class="space-y-6">
         @csrf
         @if(isset($adjustment)) @method('PUT') @endif
         <div class="grid grid-cols-1 gap-4">
@@ -97,8 +101,14 @@
                 <a href="{{ route('stock-adjustments.index') }}" class="px-4 py-2 text-sm font-medium text-gray-300 dark:text-gray-300 bg-gray-700 dark:bg-gray-700 border border-gray-600 dark:border-gray-600 rounded-lg hover:bg-gray-600">Cancel</a>
                 <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg">{{ isset($adjustment) ? 'Save Changes' : 'Create Adjustment' }}</button>
             </div>
+            </form>
         </div>
-    </form>
+
+        <!-- Modal Footer -->
+        <div class="flex items-center justify-end space-x-3 p-4 border-t border-gray-600 dark:border-gray-600 bg-gray-700 dark:bg-gray-700">
+            <!-- additional footer area if needed -->
+        </div>
+    </div>
 </div>
 
 @push('scripts')
