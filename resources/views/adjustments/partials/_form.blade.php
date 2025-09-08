@@ -21,15 +21,15 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm text-gray-600">Location</label>
-                    <x-select-dropdown name="location_id" :items="$locations" :selected="isset($adjustment)?$adjustment->location_id:null" display="name" value="id" placeholder="-- Select Location --" />
+                        <label class="block text-sm font-medium text-gray-300 dark:text-gray-300 mb-2">Location</label>
+                        <x-select name="location_id" :options="$locations->map(fn($l) => ['value' => data_get($l,'id'), 'label' => data_get($l,'name')])->toArray()" :value="isset($adjustment) ? $adjustment->location_id : null" placeholder="-- Select Location --" />
                 </div>
             </div>
 
             <div>
                 <label class="block text-sm text-gray-600">Reason</label>
                 @php $reasons = [''=>'-- Select Reason --','cycle_count'=>'Cycle count','damage'=>'Damage','spoilage'=>'Spoilage','theft'=>'Theft','other'=>'Other']; @endphp
-                <x-select-dropdown name="reason" :items="$reasons" :selected="isset($adjustment)?$adjustment->reason:null" />
+                <x-select name="reason" :options="collect($reasons)->map(fn($label,$key) => ['value' => $key, 'label' => $label])->toArray()" :value="isset($adjustment) ? $adjustment->reason : null" placeholder="-- Select Reason --" />
             </div>
 
             <div>
@@ -57,7 +57,7 @@
                         <div class="grid grid-cols-6 gap-3 items-center item-row">
                             <div class="col-span-2">
                                 <label class="block text-sm font-medium text-gray-300 dark:text-gray-300 mb-2">Product</label>
-                                <x-select-dropdown name="items[{{ $idx }}][product_id]" :items="$products" :selected="isset($it['product_id'])?$it['product_id']:null" display="name" value="id" placeholder="-- Select Product --" />
+                                <x-select name="items[{{ $idx }}][product_id]" :options="$products->map(fn($p) => ['value' => data_get($p,'id'), 'label' => data_get($p,'name')])->toArray()" :value="isset($it['product_id']) ? $it['product_id'] : null" placeholder="-- Select Product --" />
                             </div>
 
                             <div>
