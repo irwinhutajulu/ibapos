@@ -22,7 +22,9 @@
 
                 <div>
                         <label class="block text-sm font-medium text-gray-300 dark:text-gray-300 mb-2">Location</label>
-                        <x-select name="location_id" :options="$locations->map(fn($l) => ['value' => data_get($l,'id'), 'label' => data_get($l,'name')])->toArray()" :value="isset($adjustment) ? $adjustment->location_id : null" placeholder="-- Select Location --" />
+                        <x-select name="location_id" :options="collect(
+                            $locations ?? []
+                        )->map(fn($l) => ['value' => data_get($l,'id'), 'label' => data_get($l,'name')])->toArray()" :value="isset($adjustment) ? $adjustment->location_id : null" placeholder="-- Select Location --" />
                 </div>
             </div>
 
@@ -57,7 +59,9 @@
                         <div class="grid grid-cols-6 gap-3 items-center item-row">
                             <div class="col-span-2">
                                 <label class="block text-sm font-medium text-gray-300 dark:text-gray-300 mb-2">Product</label>
-                                <x-select name="items[{{ $idx }}][product_id]" :options="$products->map(fn($p) => ['value' => data_get($p,'id'), 'label' => data_get($p,'name')])->toArray()" :value="isset($it['product_id']) ? $it['product_id'] : null" placeholder="-- Select Product --" />
+                                <x-select name="items[{{ $idx }}][product_id]" :options="collect(
+                                    $products ?? []
+                                )->map(fn($p) => ['value' => data_get($p,'id'), 'label' => data_get($p,'name')])->toArray()" :value="isset($it['product_id']) ? $it['product_id'] : null" placeholder="-- Select Product --" />
                             </div>
 
                             <div>
@@ -110,7 +114,7 @@
                     <label class="block text-sm text-gray-600">Product</label>
                             <select name="items[${index}][product_id]" required class="w-full px-3 py-2 border border-gray-600 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-700 dark:bg-gray-700 text-white mt-1">
                                 <option value="">-- Select Product --</option>
-                                @foreach($products as $p)
+                                @foreach(collect($products ?? []) as $p)
                                     <option value="{{ data_get($p,'id') }}">{{ data_get($p,'name') }}@if(data_get($p,'code')) ({{ data_get($p,'code') }})@endif</option>
                                 @endforeach
                             </select>
