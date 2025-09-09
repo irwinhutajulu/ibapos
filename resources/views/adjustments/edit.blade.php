@@ -1,26 +1,25 @@
 @extends('layouts.app')
 @section('content')
-<div class="bg-white border rounded-md">
-  <div class="p-3 border-b flex items-center justify-between">
-    <div class="font-semibold">Edit Adjustment #{{ $adjustment->id }}</div>
-    <a href="{{ route('stock-adjustments.show', $adjustment) }}" class="text-sm underline">Back</a>
-  </div>
+@if(session('error') || $errors->any())
+<div class="border rounded-md">
   <div class="p-3">
     @if(session('error'))
-      <div class="mb-2 text-red-600 text-sm">{{ session('error') }}</div>
+    <div class="mb-2 text-red-600 text-sm">{{ session('error') }}</div>
     @endif
     @if($errors->any())
-      <div class="mb-3 text-red-600 text-sm">
+    <div class="mb-3 text-red-600 text-sm">
         <ul class="list-disc pl-5">
           @foreach($errors->all() as $e)
             <li>{{ $e }}</li>
           @endforeach
         </ul>
-      </div>
+    </div>
     @endif
-  @include('adjustments.partials._form')
   </div>
 </div>
+@endif
+
+@include('adjustments.partials._form')
 
 <script>
 function editAdjForm(adj) {
