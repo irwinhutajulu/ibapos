@@ -1,0 +1,19 @@
+﻿ M app/Http/Controllers/ActiveLocationController.php
+ M app/Http/Controllers/LocationController.php
+ M database/migrations/2025_09_06_020000_add_image_path_to_products_table.php
+ M database/migrations/2025_09_07_203957_add_image_path_to_products_table.php
+ M resources/views/components/confirmation-modal.blade.php
+ M resources/views/layouts/app.blade.php
+ M resources/views/locations/create.blade.php
+ M resources/views/locations/edit.blade.php
+ M resources/views/locations/index.blade.php
+ M resources/views/locations/show.blade.php
+?? "Catatan Project/"
+?? diagnostics_20250910_140528.zip
+?? diagnostics_20250910_140528/
+?? diagnostics_20250910_140812/
+?? resources/views/components/location-selector.blade.php
+?? resources/views/locations/_flash_notify.blade.php
+?? scripts/
+?? tests/Feature/AjaxDeleteLocationTest.php
+?? tests/Feature/ApiLocationsTest.php

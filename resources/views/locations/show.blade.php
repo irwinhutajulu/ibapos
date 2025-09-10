@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+@include('locations._flash_notify')
 <div class="p-6">
     <div class="mb-6">
         <div class="flex items-center gap-2 mb-4">
@@ -138,55 +139,13 @@
     </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
-<div id="deleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white dark:bg-gray-800">
-        <div class="mt-3 text-center">
-            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900">
-                <svg class="h-6 w-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                </svg>
-            </div>
-            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mt-2">Delete Location</h3>
-            <div class="mt-2 px-7 py-3">
-                <p class="text-sm text-gray-500 dark:text-gray-400">
-                    Are you sure you want to delete "<span id="locationName"></span>"? This action cannot be undone.
-                </p>
-            </div>
-            <div class="items-center px-4 py-3 flex gap-2 justify-center">
-                <button id="cancelDelete" 
-                        class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
-                    Cancel
-                </button>
-                <form id="deleteForm" method="POST" class="inline">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" 
-                            class="px-4 py-2 bg-red-600 text-white text-base font-medium rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
-                        Delete
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Reusable confirmation modal -->
+<x-confirmation-modal modalId="locationDeleteModal" title="Delete Location" :message="'Are you sure you want to delete <span class=\'confirm-target-name\'></span>?'" />
 
 <script>
 function deleteLocation(id, name) {
-    document.getElementById('locationName').textContent = name;
-    document.getElementById('deleteForm').action = '/locations/' + id;
-    document.getElementById('deleteModal').classList.remove('hidden');
+    const action = window.location.origin + '/locations/' + id;
+    window.openConfirmationModal('locationDeleteModal', action, name, { rowId: id });
 }
-
-document.getElementById('cancelDelete').addEventListener('click', function() {
-    document.getElementById('deleteModal').classList.add('hidden');
-});
-
-// Close modal when clicking outside
-document.getElementById('deleteModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        this.classList.add('hidden');
-    }
-});
 </script>
 @endsection

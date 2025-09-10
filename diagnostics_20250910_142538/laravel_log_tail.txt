@@ -1,0 +1,500 @@
+﻿    "location_id": 1,
+    "qty": 10,
+    "avg_cost": 2000,
+    "ref_type": "purchase",
+    "ref_id": 1,
+    "socket": null
+}  
+[2025-09-10 13:53:06] testing.INFO: Broadcasting [purchase.posted] on channels [private-location.1] with payload:
+{
+    "purchase": {
+        "id": 1,
+        "invoice_no": "P1",
+        "date": "2025-09-10T05:53:06.000000Z",
+        "user_id": 1,
+        "location_id": 1,
+        "supplier_id": 1,
+        "total": "0.00",
+        "total_weight": "0.000",
+        "freight_cost": "0.00",
+        "status": "posted",
+        "received_at": null,
+        "received_by": null,
+        "posted_at": "2025-09-10T05:53:06.000000Z",
+        "posted_by": 1,
+        "voided_at": null,
+        "voided_by": null,
+        "created_at": "2025-09-10T05:53:06.000000Z",
+        "updated_at": "2025-09-10T05:53:06.000000Z",
+        "items": [
+            {
+                "id": 1,
+                "purchase_id": 1,
+                "product_id": 1,
+                "qty": "10.000",
+                "price": "2000.00",
+                "subtotal": "20000.00",
+                "created_at": "2025-09-10T05:53:06.000000Z",
+                "updated_at": "2025-09-10T05:53:06.000000Z"
+            }
+        ]
+    },
+    "socket": null
+}  
+[2025-09-10 13:53:06] testing.INFO: Broadcasting [stock.updated] on channels [private-location.1] with payload:
+{
+    "product_id": 1,
+    "location_id": 1,
+    "qty": -2,
+    "avg_cost": 1000,
+    "ref_type": "sale",
+    "ref_id": 1,
+    "socket": null
+}  
+[2025-09-10 13:53:06] testing.INFO: Broadcasting [stock.updated] on channels [private-location.1] with payload:
+{
+    "product_id": 1,
+    "location_id": 1,
+    "qty": -2,
+    "avg_cost": 1000,
+    "ref_type": "sale",
+    "ref_id": 1,
+    "socket": null
+}  
+[2025-09-10 13:53:06] testing.INFO: Broadcasting [sale.posted] on channels [private-location.1] with payload:
+{
+    "id": 1,
+    "invoice": "T1",
+    "total": 0,
+    "status": "posted",
+    "location_id": 1,
+    "posted_at": "2025-09-10T05:53:06.000000Z",
+    "socket": null
+}  
+[2025-09-10 13:53:06] testing.INFO: Broadcasting [stock.updated] on channels [private-location.1] with payload:
+{
+    "product_id": 1,
+    "location_id": 1,
+    "qty": 5,
+    "avg_cost": 1200,
+    "ref_type": "adjustment",
+    "ref_id": 1,
+    "socket": null
+}  
+[2025-09-10 13:53:07] testing.INFO: Broadcasting [stock.updated] on channels [private-location.1] with payload:
+{
+    "product_id": 1,
+    "location_id": 1,
+    "qty": -3,
+    "avg_cost": 1000,
+    "ref_type": "mutation",
+    "ref_id": 1,
+    "socket": null
+}  
+[2025-09-10 13:53:07] testing.INFO: Broadcasting [stock.updated] on channels [private-location.2] with payload:
+{
+    "product_id": 1,
+    "location_id": 2,
+    "qty": 3,
+    "avg_cost": 1000,
+    "ref_type": "mutation",
+    "ref_id": 1,
+    "socket": null
+}  
+[2025-09-10 14:00:15] local.WARNING: ðŸš¨ DEVELOPER MODE: Permission check bypassed {"permission":"admin.locations","user":8,"route":"locations.index","ip":"::1"} 
+[2025-09-10 14:00:20] local.WARNING: ðŸš¨ DEVELOPER MODE: Permission check bypassed {"permission":"products.read","user":8,"route":"products.index","ip":"::1"} 
+[2025-09-10 14:00:29] local.WARNING: ðŸš¨ DEVELOPER MODE: Permission check bypassed {"permission":"products.read","user":8,"route":"products.show","ip":"::1"} 
+[2025-09-10 14:00:43] local.WARNING: ðŸš¨ DEVELOPER MODE: Permission check bypassed {"permission":"stocks.read","user":8,"route":"stocks.index","ip":"::1"} 
+[2025-09-10 14:05:35] testing.INFO: Broadcasting [purchase.posted] on channels [private-location.1] with payload:
+{
+    "purchase": {
+        "id": 1,
+        "invoice_no": "P1",
+        "date": "2025-09-10T06:05:35.000000Z",
+        "user_id": 1,
+        "location_id": 1,
+        "supplier_id": 1,
+        "total": "0.00",
+        "total_weight": "0.000",
+        "freight_cost": "0.00",
+        "status": "posted",
+        "received_at": null,
+        "received_by": null,
+        "posted_at": "2025-09-10T06:05:35.000000Z",
+        "posted_by": 1,
+        "voided_at": null,
+        "voided_by": null,
+        "created_at": "2025-09-10T06:05:35.000000Z",
+        "updated_at": "2025-09-10T06:05:35.000000Z",
+        "items": []
+    },
+    "socket": null
+}  
+[2025-09-10 14:05:36] testing.INFO: Broadcasting [stock.updated] on channels [private-location.1] with payload:
+{
+    "product_id": 1,
+    "location_id": 1,
+    "qty": 10,
+    "avg_cost": 2000,
+    "ref_type": "purchase",
+    "ref_id": 1,
+    "socket": null
+}  
+[2025-09-10 14:05:36] testing.INFO: Broadcasting [purchase.posted] on channels [private-location.1] with payload:
+{
+    "purchase": {
+        "id": 1,
+        "invoice_no": "P1",
+        "date": "2025-09-10T06:05:36.000000Z",
+        "user_id": 1,
+        "location_id": 1,
+        "supplier_id": 1,
+        "total": "0.00",
+        "total_weight": "0.000",
+        "freight_cost": "0.00",
+        "status": "posted",
+        "received_at": null,
+        "received_by": null,
+        "posted_at": "2025-09-10T06:05:36.000000Z",
+        "posted_by": 1,
+        "voided_at": null,
+        "voided_by": null,
+        "created_at": "2025-09-10T06:05:36.000000Z",
+        "updated_at": "2025-09-10T06:05:36.000000Z",
+        "items": [
+            {
+                "id": 1,
+                "purchase_id": 1,
+                "product_id": 1,
+                "qty": "10.000",
+                "price": "2000.00",
+                "subtotal": "20000.00",
+                "created_at": "2025-09-10T06:05:36.000000Z",
+                "updated_at": "2025-09-10T06:05:36.000000Z"
+            }
+        ]
+    },
+    "socket": null
+}  
+[2025-09-10 14:05:36] testing.INFO: Broadcasting [stock.updated] on channels [private-location.1] with payload:
+{
+    "product_id": 1,
+    "location_id": 1,
+    "qty": -2,
+    "avg_cost": 1000,
+    "ref_type": "sale",
+    "ref_id": 1,
+    "socket": null
+}  
+[2025-09-10 14:05:36] testing.INFO: Broadcasting [stock.updated] on channels [private-location.1] with payload:
+{
+    "product_id": 1,
+    "location_id": 1,
+    "qty": -2,
+    "avg_cost": 1000,
+    "ref_type": "sale",
+    "ref_id": 1,
+    "socket": null
+}  
+[2025-09-10 14:05:36] testing.INFO: Broadcasting [sale.posted] on channels [private-location.1] with payload:
+{
+    "id": 1,
+    "invoice": "T1",
+    "total": 0,
+    "status": "posted",
+    "location_id": 1,
+    "posted_at": "2025-09-10T06:05:36.000000Z",
+    "socket": null
+}  
+[2025-09-10 14:05:36] testing.INFO: Broadcasting [stock.updated] on channels [private-location.1] with payload:
+{
+    "product_id": 1,
+    "location_id": 1,
+    "qty": 5,
+    "avg_cost": 1200,
+    "ref_type": "adjustment",
+    "ref_id": 1,
+    "socket": null
+}  
+[2025-09-10 14:05:37] testing.INFO: Broadcasting [stock.updated] on channels [private-location.1] with payload:
+{
+    "product_id": 1,
+    "location_id": 1,
+    "qty": -3,
+    "avg_cost": 1000,
+    "ref_type": "mutation",
+    "ref_id": 1,
+    "socket": null
+}  
+[2025-09-10 14:05:37] testing.INFO: Broadcasting [stock.updated] on channels [private-location.2] with payload:
+{
+    "product_id": 1,
+    "location_id": 2,
+    "qty": 3,
+    "avg_cost": 1000,
+    "ref_type": "mutation",
+    "ref_id": 1,
+    "socket": null
+}  
+[2025-09-10 14:08:18] testing.INFO: Broadcasting [purchase.posted] on channels [private-location.1] with payload:
+{
+    "purchase": {
+        "id": 1,
+        "invoice_no": "P1",
+        "date": "2025-09-10T06:08:18.000000Z",
+        "user_id": 1,
+        "location_id": 1,
+        "supplier_id": 1,
+        "total": "0.00",
+        "total_weight": "0.000",
+        "freight_cost": "0.00",
+        "status": "posted",
+        "received_at": null,
+        "received_by": null,
+        "posted_at": "2025-09-10T06:08:18.000000Z",
+        "posted_by": 1,
+        "voided_at": null,
+        "voided_by": null,
+        "created_at": "2025-09-10T06:08:18.000000Z",
+        "updated_at": "2025-09-10T06:08:18.000000Z",
+        "items": []
+    },
+    "socket": null
+}  
+[2025-09-10 14:08:18] testing.INFO: Broadcasting [stock.updated] on channels [private-location.1] with payload:
+{
+    "product_id": 1,
+    "location_id": 1,
+    "qty": 10,
+    "avg_cost": 2000,
+    "ref_type": "purchase",
+    "ref_id": 1,
+    "socket": null
+}  
+[2025-09-10 14:08:18] testing.INFO: Broadcasting [purchase.posted] on channels [private-location.1] with payload:
+{
+    "purchase": {
+        "id": 1,
+        "invoice_no": "P1",
+        "date": "2025-09-10T06:08:18.000000Z",
+        "user_id": 1,
+        "location_id": 1,
+        "supplier_id": 1,
+        "total": "0.00",
+        "total_weight": "0.000",
+        "freight_cost": "0.00",
+        "status": "posted",
+        "received_at": null,
+        "received_by": null,
+        "posted_at": "2025-09-10T06:08:18.000000Z",
+        "posted_by": 1,
+        "voided_at": null,
+        "voided_by": null,
+        "created_at": "2025-09-10T06:08:18.000000Z",
+        "updated_at": "2025-09-10T06:08:18.000000Z",
+        "items": [
+            {
+                "id": 1,
+                "purchase_id": 1,
+                "product_id": 1,
+                "qty": "10.000",
+                "price": "2000.00",
+                "subtotal": "20000.00",
+                "created_at": "2025-09-10T06:08:18.000000Z",
+                "updated_at": "2025-09-10T06:08:18.000000Z"
+            }
+        ]
+    },
+    "socket": null
+}  
+[2025-09-10 14:08:19] testing.INFO: Broadcasting [stock.updated] on channels [private-location.1] with payload:
+{
+    "product_id": 1,
+    "location_id": 1,
+    "qty": -2,
+    "avg_cost": 1000,
+    "ref_type": "sale",
+    "ref_id": 1,
+    "socket": null
+}  
+[2025-09-10 14:08:19] testing.INFO: Broadcasting [stock.updated] on channels [private-location.1] with payload:
+{
+    "product_id": 1,
+    "location_id": 1,
+    "qty": -2,
+    "avg_cost": 1000,
+    "ref_type": "sale",
+    "ref_id": 1,
+    "socket": null
+}  
+[2025-09-10 14:08:19] testing.INFO: Broadcasting [sale.posted] on channels [private-location.1] with payload:
+{
+    "id": 1,
+    "invoice": "T1",
+    "total": 0,
+    "status": "posted",
+    "location_id": 1,
+    "posted_at": "2025-09-10T06:08:19.000000Z",
+    "socket": null
+}  
+[2025-09-10 14:08:19] testing.INFO: Broadcasting [stock.updated] on channels [private-location.1] with payload:
+{
+    "product_id": 1,
+    "location_id": 1,
+    "qty": 5,
+    "avg_cost": 1200,
+    "ref_type": "adjustment",
+    "ref_id": 1,
+    "socket": null
+}  
+[2025-09-10 14:08:19] testing.INFO: Broadcasting [stock.updated] on channels [private-location.1] with payload:
+{
+    "product_id": 1,
+    "location_id": 1,
+    "qty": -3,
+    "avg_cost": 1000,
+    "ref_type": "mutation",
+    "ref_id": 1,
+    "socket": null
+}  
+[2025-09-10 14:08:19] testing.INFO: Broadcasting [stock.updated] on channels [private-location.2] with payload:
+{
+    "product_id": 1,
+    "location_id": 2,
+    "qty": 3,
+    "avg_cost": 1000,
+    "ref_type": "mutation",
+    "ref_id": 1,
+    "socket": null
+}  
+[2025-09-10 14:25:44] testing.INFO: Broadcasting [purchase.posted] on channels [private-location.1] with payload:
+{
+    "purchase": {
+        "id": 1,
+        "invoice_no": "P1",
+        "date": "2025-09-10T06:25:44.000000Z",
+        "user_id": 1,
+        "location_id": 1,
+        "supplier_id": 1,
+        "total": "0.00",
+        "total_weight": "0.000",
+        "freight_cost": "0.00",
+        "status": "posted",
+        "received_at": null,
+        "received_by": null,
+        "posted_at": "2025-09-10T06:25:44.000000Z",
+        "posted_by": 1,
+        "voided_at": null,
+        "voided_by": null,
+        "created_at": "2025-09-10T06:25:44.000000Z",
+        "updated_at": "2025-09-10T06:25:44.000000Z",
+        "items": []
+    },
+    "socket": null
+}  
+[2025-09-10 14:25:44] testing.INFO: Broadcasting [stock.updated] on channels [private-location.1] with payload:
+{
+    "product_id": 1,
+    "location_id": 1,
+    "qty": 10,
+    "avg_cost": 2000,
+    "ref_type": "purchase",
+    "ref_id": 1,
+    "socket": null
+}  
+[2025-09-10 14:25:44] testing.INFO: Broadcasting [purchase.posted] on channels [private-location.1] with payload:
+{
+    "purchase": {
+        "id": 1,
+        "invoice_no": "P1",
+        "date": "2025-09-10T06:25:44.000000Z",
+        "user_id": 1,
+        "location_id": 1,
+        "supplier_id": 1,
+        "total": "0.00",
+        "total_weight": "0.000",
+        "freight_cost": "0.00",
+        "status": "posted",
+        "received_at": null,
+        "received_by": null,
+        "posted_at": "2025-09-10T06:25:44.000000Z",
+        "posted_by": 1,
+        "voided_at": null,
+        "voided_by": null,
+        "created_at": "2025-09-10T06:25:44.000000Z",
+        "updated_at": "2025-09-10T06:25:44.000000Z",
+        "items": [
+            {
+                "id": 1,
+                "purchase_id": 1,
+                "product_id": 1,
+                "qty": "10.000",
+                "price": "2000.00",
+                "subtotal": "20000.00",
+                "created_at": "2025-09-10T06:25:44.000000Z",
+                "updated_at": "2025-09-10T06:25:44.000000Z"
+            }
+        ]
+    },
+    "socket": null
+}  
+[2025-09-10 14:25:44] testing.INFO: Broadcasting [stock.updated] on channels [private-location.1] with payload:
+{
+    "product_id": 1,
+    "location_id": 1,
+    "qty": -2,
+    "avg_cost": 1000,
+    "ref_type": "sale",
+    "ref_id": 1,
+    "socket": null
+}  
+[2025-09-10 14:25:44] testing.INFO: Broadcasting [stock.updated] on channels [private-location.1] with payload:
+{
+    "product_id": 1,
+    "location_id": 1,
+    "qty": -2,
+    "avg_cost": 1000,
+    "ref_type": "sale",
+    "ref_id": 1,
+    "socket": null
+}  
+[2025-09-10 14:25:44] testing.INFO: Broadcasting [sale.posted] on channels [private-location.1] with payload:
+{
+    "id": 1,
+    "invoice": "T1",
+    "total": 0,
+    "status": "posted",
+    "location_id": 1,
+    "posted_at": "2025-09-10T06:25:44.000000Z",
+    "socket": null
+}  
+[2025-09-10 14:25:45] testing.INFO: Broadcasting [stock.updated] on channels [private-location.1] with payload:
+{
+    "product_id": 1,
+    "location_id": 1,
+    "qty": 5,
+    "avg_cost": 1200,
+    "ref_type": "adjustment",
+    "ref_id": 1,
+    "socket": null
+}  
+[2025-09-10 14:25:45] testing.INFO: Broadcasting [stock.updated] on channels [private-location.1] with payload:
+{
+    "product_id": 1,
+    "location_id": 1,
+    "qty": -3,
+    "avg_cost": 1000,
+    "ref_type": "mutation",
+    "ref_id": 1,
+    "socket": null
+}  
+[2025-09-10 14:25:45] testing.INFO: Broadcasting [stock.updated] on channels [private-location.2] with payload:
+{
+    "product_id": 1,
+    "location_id": 2,
+    "qty": 3,
+    "avg_cost": 1000,
+    "ref_type": "mutation",
+    "ref_id": 1,
+    "socket": null
+}  

@@ -1,0 +1,1 @@
+﻿No syntax errors detected in c:\xampp\htdocs\Data IBA POS\IBAPOS\app\Http\Controllers\LocationController.php

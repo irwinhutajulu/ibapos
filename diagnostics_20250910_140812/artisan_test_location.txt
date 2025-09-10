@@ -1,0 +1,27 @@
+﻿
+   PASS  Tests\Feature\AjaxDeleteLocationTest
+  Γ£ô ajax delete location returns json and deletes                                                   0.84s  
+
+   PASS  Tests\Feature\ApiLocationsTest
+  Γ£ô api locations returns only user assigned locations                                              0.03s  
+  Γ£ô guest gets empty or forbidden on api locations                                                  0.02s  
+
+   PASS  Tests\Feature\BroadcastingTest
+  Γ£ô sale posted event broadcasts on location channel                                                0.02s  
+
+   PASS  Tests\Feature\LocationControllerTest
+  Γ£ô can view locations index                                                                        0.06s  
+  Γ£ô can create location                                                                             0.04s  
+  Γ£ô can update location                                                                             0.03s  
+  Γ£ô can delete location                                                                             0.03s  
+  Γ£ô cannot delete location with users                                                               0.03s  
+  Γ£ô api returns locations                                                                           0.03s  
+  Γ£ô unauthorized user cannot access                                                                 0.03s  
+  Γ£ô location name must be unique                                                                    0.03s  
+
+   PASS  Tests\Feature\LocationScopeTest
+  Γ£ô sales index returns only active location records                                                0.19s  
+
+  Tests:    13 passed (54 assertions)
+  Duration: 1.58s
+
