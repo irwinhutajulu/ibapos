@@ -120,6 +120,16 @@ Route::middleware(['web','auth'])->group(function () {
     Route::put('/suppliers/{supplier}', [\App\Http\Controllers\SupplierController::class, 'update'])->middleware('permission:suppliers.update')->name('suppliers.update');
     Route::delete('/suppliers/{supplier}', [\App\Http\Controllers\SupplierController::class, 'destroy'])->middleware('permission:suppliers.delete')->name('suppliers.destroy');
     Route::post('/suppliers/{id}/restore', [\App\Http\Controllers\SupplierController::class, 'restore'])->middleware('permission:suppliers.delete')->name('suppliers.restore');
+    
+    // Locations
+    Route::get('/locations', [\App\Http\Controllers\LocationController::class, 'index'])->middleware('permission:admin.locations')->name('locations.index');
+    Route::get('/locations/create', [\App\Http\Controllers\LocationController::class, 'create'])->middleware('permission:admin.locations')->name('locations.create');
+    Route::post('/locations', [\App\Http\Controllers\LocationController::class, 'store'])->middleware('permission:admin.locations')->name('locations.store');
+    Route::get('/locations/{location}', [\App\Http\Controllers\LocationController::class, 'show'])->middleware('permission:admin.locations')->name('locations.show');
+    Route::get('/locations/{location}/edit', [\App\Http\Controllers\LocationController::class, 'edit'])->middleware('permission:admin.locations')->name('locations.edit');
+    Route::put('/locations/{location}', [\App\Http\Controllers\LocationController::class, 'update'])->middleware('permission:admin.locations')->name('locations.update');
+    Route::delete('/locations/{location}', [\App\Http\Controllers\LocationController::class, 'destroy'])->middleware('permission:admin.locations')->name('locations.destroy');
+    
     Route::get('/products', [\App\Http\Controllers\ProductsController::class, 'index'])->middleware('permission:products.read')->name('products.index');
     Route::get('/products/create', [\App\Http\Controllers\ProductsController::class, 'create'])->middleware('permission:products.create')->name('products.create');
     Route::post('/products', [\App\Http\Controllers\ProductsController::class, 'store'])->middleware('permission:products.create')->name('products.store');
@@ -174,6 +184,9 @@ Route::middleware(['web','auth'])->group(function () {
         $user = auth()->user();
         return $user->locations()->select('id','name')->orderBy('name')->get();
     })->name('api.locations');
+
+    // Admin API for all locations (for location management)
+    Route::get('/api/admin/locations', [\App\Http\Controllers\LocationController::class, 'api'])->middleware('permission:admin.locations')->name('api.admin.locations');
 
     Route::get('/api/products', [\App\Http\Controllers\Api\ProductController::class, 'index'])->name('api.products');
     // Note: /api/products/search is already defined as closure above (line 26) - no duplicate needed
