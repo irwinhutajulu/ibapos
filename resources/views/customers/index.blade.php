@@ -1,3 +1,4 @@
+@include('customers._flash_notify')
 @extends('layouts.app', ['title' => 'Customers'])
 
 @section('content')
@@ -67,7 +68,7 @@
 
 <!-- Customers Table -->
 @php
-$tableHeaders = ['Customer', 'Phone', 'Address', 'Status'];
+$tableHeaders = ['Customer', 'Phone', 'Address'];
 $tableRows = $customers->map(function($c) {
     return [
         'cells' => [
@@ -77,10 +78,7 @@ $tableRows = $customers->map(function($c) {
                 'subtitle' => $c->trashed() ? 'Deleted Customer' : 'Active Customer'
             ],
             $c->phone ?? '-',
-            $c->address ?? '-',
-            $c->trashed() 
-                ? '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">Deleted</span>'
-                : '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Active</span>'
+            $c->address ?? '-'
         ],
         'actions' => collect([
             !$c->trashed() ? [

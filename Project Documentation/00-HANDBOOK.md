@@ -1,3 +1,8 @@
+# 2025-09-10
+- Semua toast notification kini pakai partial _flash_notify, dipanggil di setiap view utama
+- Script notify harus dipush ke Blade stack agar tidak error
+- Layout app.blade.php sudah memuat Alpine.js dan container toast
+- Semua perubahan UI mengikuti theme modern (Tailwind, dark mode)
 ````markdown
 # Catatan Project - Handbook (TOC)
 

@@ -19,10 +19,12 @@ C:\xampp\htdocs\Data IBA POS\IBAPOS\app\Http\Controllers\Controller.php
 C:\xampp\htdocs\Data IBA POS\IBAPOS\app\Http\Controllers\CustomerController.php                           
 C:\xampp\htdocs\Data IBA POS\IBAPOS\app\Http\Controllers\LocationController.php                           
 C:\xampp\htdocs\Data IBA POS\IBAPOS\app\Http\Controllers\NotificationsController.php                      
+C:\xampp\htdocs\Data IBA POS\IBAPOS\app\Http\Controllers\PermissionController.php                         
 C:\xampp\htdocs\Data IBA POS\IBAPOS\app\Http\Controllers\ProductsController.php                           
 C:\xampp\htdocs\Data IBA POS\IBAPOS\app\Http\Controllers\PurchasePostingController.php                    
 C:\xampp\htdocs\Data IBA POS\IBAPOS\app\Http\Controllers\PurchasesController.php                          
 C:\xampp\htdocs\Data IBA POS\IBAPOS\app\Http\Controllers\ReservationController.php                        
+C:\xampp\htdocs\Data IBA POS\IBAPOS\app\Http\Controllers\RoleController.php                               
 C:\xampp\htdocs\Data IBA POS\IBAPOS\app\Http\Controllers\SalesController.php                              
 C:\xampp\htdocs\Data IBA POS\IBAPOS\app\Http\Controllers\SalesPostingController.php                       
 C:\xampp\htdocs\Data IBA POS\IBAPOS\app\Http\Controllers\StockAdjustmentsController.php                   
@@ -34,6 +36,7 @@ C:\xampp\htdocs\Data IBA POS\IBAPOS\app\Http\Controllers\UserController.php
 C:\xampp\htdocs\Data IBA POS\IBAPOS\app\Http\Middleware\ActiveLocation.php                                
 C:\xampp\htdocs\Data IBA POS\IBAPOS\app\Http\Middleware\DeveloperMode.php                                 
 C:\xampp\htdocs\Data IBA POS\IBAPOS\app\Http\Middleware\DeveloperPermissionMiddleware.php                 
+C:\xampp\htdocs\Data IBA POS\IBAPOS\app\Http\Kernel.php                                                   
 C:\xampp\htdocs\Data IBA POS\IBAPOS\app\Models\Concerns\FiltersByLocation.php                             
 C:\xampp\htdocs\Data IBA POS\IBAPOS\app\Models\Category.php                                               
 C:\xampp\htdocs\Data IBA POS\IBAPOS\app\Models\Customer.php                                               
@@ -198,8 +201,5 @@ C:\xampp\htdocs\Data IBA POS\IBAPOS\node_modules\es-define-property\README.md
 C:\xampp\htdocs\Data IBA POS\IBAPOS\node_modules\es-errors\CHANGELOG.md                                   
 C:\xampp\htdocs\Data IBA POS\IBAPOS\node_modules\es-errors\README.md                                      
 C:\xampp\htdocs\Data IBA POS\IBAPOS\node_modules\es-object-atoms\CHANGELOG.md                             
-C:\xampp\htdocs\Data IBA POS\IBAPOS\node_modules\es-object-atoms\README.md                                
-C:\xampp\htdocs\Data IBA POS\IBAPOS\node_modules\es-set-tostringtag\CHANGELOG.md                          
-C:\xampp\htdocs\Data IBA POS\IBAPOS\node_modules\es-set-tostringtag\README.md                             
 
 

@@ -1,3 +1,4 @@
+@include('mutations._flash_notify')
 @extends('layouts.app', ['title' => 'Stock Mutations'])
 
 @section('content')

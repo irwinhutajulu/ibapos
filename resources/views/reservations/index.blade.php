@@ -1,3 +1,4 @@
+@include('reservations._flash_notify')
 @extends('layouts.app', ['title' => 'Reservations'])
 
 @section('content')

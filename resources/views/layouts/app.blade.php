@@ -376,85 +376,58 @@
             
                                     <!-- Toast Notifications -->
                                     <div x-data="{ 
-                                             toasts: [], 
-                                             add(t) { 
-                                                 const id = Date.now() + Math.random(); 
-                                                 this.toasts.push({ ...t, id }); 
-                                                 setTimeout(() => this.remove(id), t.ttl ?? 3500); 
-                                             }, 
-                                             remove(id) { 
-                                                 this.toasts = this.toasts.filter(x => x.id !== id) 
-                                             } 
+                                             toasts: [],
+                                             add(t) {
+                                                 const id = Date.now() + Math.random();
+                                                 this.toasts.push({ ...t, id });
+                                                 setTimeout(() => this.remove(id), t.ttl ?? 3500);
+                                             },
+                                             remove(id) {
+                                                 this.toasts = this.toasts.filter(x => x.id !== id)
+                                             }
                                          }"
                                          x-init="
-                                             const api = $data; 
-                                             window.notify = (msg, type='info', ttl=3500) => api.add({msg, type, ttl}); 
-                                             window.addEventListener('notify', e => api.add(e.detail)); 
-                                             if (window._notifyQueue && window._notifyQueue.length) { 
-                                                 window._notifyQueue.splice(0).forEach(d => api.add(d)); 
+                                             const api = $data;
+                                             window.notify = (msg, type='info', ttl=3500) => api.add({msg, type, ttl});
+                                             window.addEventListener('notify', e => api.add(e.detail));
+                                             if (window._notifyQueue && window._notifyQueue.length) {
+                                                 window._notifyQueue.splice(0).forEach(d => api.add(d));
                                              }
                                          "
-                                         class="fixed top-6 right-6 z-50 space-y-3 max-w-sm">
+                                         class="fixed top-8 left-1/2 transform -translate-x-1/2 z-50 space-y-3 max-w-md">
                                         <template x-for="t in toasts" :key="t.id">
-                                            <div x-transition:enter="transform ease-out duration-300 transition"
-                                                 x-transition:enter-start="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
-                                                 x-transition:enter-end="translate-y-0 opacity-100 sm:translate-x-0"
-                                                 x-transition:leave="transition ease-in duration-100"
-                                                 x-transition:leave-start="opacity-100"
-                                                 x-transition:leave-end="opacity-0"
-                                                 class="relative max-w-sm w-full rounded-xl shadow-lg overflow-hidden"
+                                            <div x-transition:enter="transform ease-out duration-800"
+                                                 x-transition:enter-start="-translate-y-full opacity-50"
+                                                 x-transition:enter-end="translate-y-0 opacity-100"
+                                                 x-transition:leave="transform ease-in duration-800 delay-500"
+                                                 x-transition:leave-start="translate-y-0 opacity-100"
+                                                 x-transition:leave-end="-translate-y-full opacity-0"
+                                                 class="rounded-xl border max-w-md shadow-lg flex items-center px-4 py-2"
                                                  :class="{
-                                                     'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700': t.type==='info',
-                                                     'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800': t.type==='success',
-                                                     'bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800': t.type==='warning',
-                                                     'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800': t.type==='error',
+                                                     'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100': t.type==='info',
+                                                     'bg-green-600 dark:bg-green-700 border-green-500 dark:border-green-600 text-white': t.type==='success',
+                                                     'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 text-yellow-900 dark:text-yellow-200': t.type==='warning',
+                                                     'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-900 dark:text-red-200': t.type==='error',
                                                  }">
-                                                <div class="p-4">
-                                                    <div class="flex items-start">
-                                                        <div class="flex-shrink-0">
-                                                            <!-- Info Icon -->
-                                                            <svg x-show="t.type === 'info'" class="h-5 w-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                            </svg>
-                                                            <!-- Success Icon -->
-                                                            <svg x-show="t.type === 'success'" class="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                            </svg>
-                                                            <!-- Warning Icon -->
-                                                            <svg x-show="t.type === 'warning'" class="h-5 w-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                                                            </svg>
-                                                            <!-- Error Icon -->
-                                                            <svg x-show="t.type === 'error'" class="h-5 w-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                            </svg>
-                                                        </div>
-                                                        <div class="ml-3 w-0 flex-1 pt-0.5">
-                                                            <p class="text-sm font-medium" 
-                                                               :class="{
-                                                                   'text-gray-900 dark:text-gray-100': t.type==='info',
-                                                                   'text-green-800 dark:text-green-200': t.type==='success',
-                                                                   'text-yellow-800 dark:text-yellow-200': t.type==='warning',
-                                                                   'text-red-800 dark:text-red-200': t.type==='error',
-                                                               }"
-                                                               x-text="t.msg"></p>
-                                                        </div>
-                                                        <div class="ml-4 flex-shrink-0 flex">
-                                                            <button @click="$parent.remove(t.id)" 
-                                                                    class="inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2"
-                                                                    :class="{
-                                                                        'text-gray-400 hover:text-gray-500 focus:ring-gray-500': t.type==='info',
-                                                                        'text-green-400 hover:text-green-500 focus:ring-green-500': t.type==='success',
-                                                                        'text-yellow-400 hover:text-yellow-500 focus:ring-yellow-500': t.type==='warning',
-                                                                        'text-red-400 hover:text-red-500 focus:ring-red-500': t.type==='error',
-                                                                    }">
-                                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                                                </svg>
-                                                            </button>
-                                                        </div>
-                                                    </div>
+                                                <div class="flex-shrink-0">
+                                                    <!-- Info Icon -->
+                                                    <svg x-show="t.type === 'info'" class="h-5 w-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                    <!-- Success Icon -->
+                                                    <svg x-show="t.type === 'success'" class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                    <!-- Warning Icon -->
+                                                    <svg x-show="t.type === 'warning'" class="h-5 w-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                                    </svg>
+                                                    <!-- Error Icon -->
+                                                    <svg x-show="t.type === 'error'" class="h-5 w-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
                                                 </div>
+                                                <span class="ml-3 text-sm font-normal" x-text="t.msg"></span>
                                             </div>
                                         </template>
                                     </div>
@@ -500,6 +473,5 @@
         };
     </script>
 
-    <x-floating-success />
 </body>
 </html>

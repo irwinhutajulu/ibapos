@@ -1,3 +1,10 @@
+# 2025-09-10
+- DONE: Konsistensi tampilan purchases, suppliers, customers
+- DONE: Refactor dan hapus status pada customers
+- DONE: Toast notification unified (desain, logic, partial)
+- DONE: Hapus notify page load di semua index
+- DONE: Diagnostik dan troubleshooting error window.notify
+- PENDING: Validasi notifikasi di semua modul, monitoring error baru
 # PROGRESS IBA POS
 
 Catat progres harian, fitur yang sudah selesai, yang sedang dikerjakan, dan rencana berikutnya.

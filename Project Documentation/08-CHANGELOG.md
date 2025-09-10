@@ -1,3 +1,12 @@
+# 2025-09-10
+- Konsistensi UI pada purchases, suppliers, customers (dark mode, Tailwind, badge, toast)
+- Refactor dan hapus field status pada customers
+- Toast notification disatukan: desain, logic, dan penempatan
+- Semua view index kini pakai partial _flash_notify untuk notifikasi sukses/error
+- Hapus script notify yang muncul saat page load tanpa aksi
+- Diagnostik dan troubleshooting error window.notify
+- Update bootstrap.js untuk real-time event
+- Dokumentasi progres dan keputusan teknis
 # CHANGELOG IBA POS
 
 Catat setiap perubahan, penambahan fitur, atau revisi di bawah ini secara kronologis.

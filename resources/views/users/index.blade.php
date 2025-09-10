@@ -1,3 +1,4 @@
+@include('users._flash_notify')
 @extends('layouts.app')
 
 @section('content')

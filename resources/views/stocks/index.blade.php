@@ -1,3 +1,4 @@
+@include('stocks._flash_notify')
 @extends('layouts.app', ['title' => 'Stock Overview'])
 
 @section('content')

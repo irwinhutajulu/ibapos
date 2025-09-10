@@ -1,3 +1,7 @@
+# 2025-09-10
+- Toast notification: partial _flash_notify, Blade stack, Alpine.js
+- UI konsisten: purchases, suppliers, customers
+- Diagnostik: window.notify error, troubleshooting, best practice
 # 🚀 IBA POS - Project Configuration
 
 ## 📍 **CRITICAL PROJECT PATHS** 

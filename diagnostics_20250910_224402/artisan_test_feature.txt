@@ -5,8 +5,8 @@
   Γ£ô ajax delete location returns json and deletes                                                   0.80s  
 
    PASS  Tests\Feature\ApiLocationsTest
-  Γ£ô api locations returns only user assigned locations                                              0.04s  
-  Γ£ô guest gets empty or forbidden on api locations                                                  0.03s  
+  Γ£ô api locations returns only user assigned locations                                              0.03s  
+  Γ£ô guest gets empty or forbidden on api locations                                                  0.02s  
 
    PASS  Tests\Feature\BroadcastingTest
   Γ£ô sale posted event broadcasts on location channel                                                0.02s  
@@ -15,8 +15,8 @@
   Γ£ô the application redirects to login when unauthenticated                                         0.02s  
 
    PASS  Tests\Feature\LocationControllerTest
-  Γ£ô can view locations index                                                                        0.06s  
-  Γ£ô can create location                                                                             0.04s  
+  Γ£ô can view locations index                                                                        0.07s  
+  Γ£ô can create location                                                                             0.05s  
   Γ£ô can update location                                                                             0.03s  
   Γ£ô can delete location                                                                             0.03s  
   Γ£ô cannot delete location with users                                                               0.03s  
@@ -25,35 +25,35 @@
   Γ£ô location name must be unique                                                                    0.03s  
 
    PASS  Tests\Feature\LocationDeleteTest
-  Γ£ô placeholder test to match filename                                                              0.03s  
+  Γ£ô placeholder test to match filename                                                              0.02s  
 
    PASS  Tests\Feature\LocationScopeTest
-  Γ£ô sales index returns only active location records                                                0.21s  
+  Γ£ô sales index returns only active location records                                                0.19s  
 
    PASS  Tests\Feature\PurchasesIndexFilterTest
   Γ£ô purchase index filters by status and date                                                       0.21s  
 
    PASS  Tests\Feature\PurchasesPostingJsonTest
-  Γ£ô posting actions return json when accept header is json                                          0.24s  
+  Γ£ô posting actions return json when accept header is json                                          0.27s  
 
    PASS  Tests\Feature\PurchasesPostingTest
-  Γ£ô purchase posting increases stock and updates avg cost                                           0.21s  
+  Γ£ô purchase posting increases stock and updates avg cost                                           0.18s  
 
    PASS  Tests\Feature\RbacAndScopeTest
   Γ£ô sales route requires permission                                                                 0.19s  
 
    PASS  Tests\Feature\RelationsSoftDeletedUserTest
   Γ£ô purchase user relation returns trashed user                                                     0.03s  
-  Γ£ô expense user relation returns trashed user                                                      0.03s  
-  Γ£ô delivery assigned user relation returns trashed user                                            0.03s  
-  Γ£ô kasbon requester and approver relations return trashed users                                    0.02s  
+  Γ£ô expense user relation returns trashed user                                                      0.02s  
+  Γ£ô delivery assigned user relation returns trashed user                                            0.02s  
+  Γ£ô kasbon requester and approver relations return trashed users                                    0.03s  
   Γ£ô location users relation includes trashed user                                                   0.02s  
 
    PASS  Tests\Feature\SalesAvailabilityValidationTest
-  Γ£ô cannot save sale when stock insufficient                                                        0.22s  
+  Γ£ô cannot save sale when stock insufficient                                                        0.26s  
 
    PASS  Tests\Feature\SalesPostingTest
-  Γ£ô sale posting reduces stock and writes ledger                                                    0.17s  
+  Γ£ô sale posting reduces stock and writes ledger                                                    0.19s  
 
    PASS  Tests\Feature\StockAdjustmentPostingTest
   Γ£ô stock adjustment posting updates stock and writes ledger                                        0.18s  
@@ -62,11 +62,11 @@
   Γ£ô confirm moves stock and writes ledger                                                           0.17s  
 
    PASS  Tests\Feature\StocksLiveSearchTest
-  Γ£ô ajax search returns expected json shape                                                         0.57s  
+  Γ£ô ajax search returns expected json shape                                                         0.60s  
 
    PASS  Tests\Feature\UserSoftDeleteTest
   Γ£ô soft delete user preserves related sales                                                        0.04s  
 
   Tests:    30 passed (107 assertions)
-  Duration: 4.03s
+  Duration: 4.10s
 
