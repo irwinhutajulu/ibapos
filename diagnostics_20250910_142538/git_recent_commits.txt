@@ -1,5 +1,0 @@
-﻿0982ced 2025-09-10 Mau mulai baru lupa sudah sampe mana.
-f3ad9ab 2025-09-09 chore(git): ignore compiled blade views
-f402748 2025-09-09 chore(views): finalize adjustments form modal styling
-a2d367c 2025-09-09 style(adjustments): apply modal component header/body/footer layout to adjustments form partial
-6de2c8f 2025-09-09 fix(views): guard against undefined / in adjustments form partial

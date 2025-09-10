@@ -32,6 +32,6 @@ class Delivery extends Model
 
     public function assignedUser()
     {
-        return $this->belongsTo(User::class, 'assigned_to');
+    return $this->belongsTo(User::class, 'assigned_to')->withTrashed();
     }
 }

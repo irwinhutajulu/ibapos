@@ -129,6 +129,15 @@ Route::middleware(['web','auth'])->group(function () {
     Route::get('/locations/{location}/edit', [\App\Http\Controllers\LocationController::class, 'edit'])->middleware('permission:admin.locations')->name('locations.edit');
     Route::put('/locations/{location}', [\App\Http\Controllers\LocationController::class, 'update'])->middleware('permission:admin.locations')->name('locations.update');
     Route::delete('/locations/{location}', [\App\Http\Controllers\LocationController::class, 'destroy'])->middleware('permission:admin.locations')->name('locations.destroy');
+
+    // Users (Admin)
+    Route::get('/admin/users', [\App\Http\Controllers\UserController::class, 'index'])->middleware('permission:admin.users')->name('admin.users.index');
+    Route::get('/admin/users/create', [\App\Http\Controllers\UserController::class, 'create'])->middleware('permission:admin.users')->name('admin.users.create');
+    Route::post('/admin/users', [\App\Http\Controllers\UserController::class, 'store'])->middleware('permission:admin.users')->name('admin.users.store');
+    Route::get('/admin/users/{user}/edit', [\App\Http\Controllers\UserController::class, 'edit'])->middleware('permission:admin.users')->name('admin.users.edit');
+    Route::put('/admin/users/{user}', [\App\Http\Controllers\UserController::class, 'update'])->middleware('permission:admin.users')->name('admin.users.update');
+    Route::delete('/admin/users/{user}', [\App\Http\Controllers\UserController::class, 'destroy'])->middleware('permission:admin.users')->name('admin.users.destroy');
+    Route::post('/admin/users/{id}/restore', [\App\Http\Controllers\UserController::class, 'restore'])->middleware('permission:admin.users')->name('admin.users.restore');
     
     Route::get('/products', [\App\Http\Controllers\ProductsController::class, 'index'])->middleware('permission:products.read')->name('products.index');
     Route::get('/products/create', [\App\Http\Controllers\ProductsController::class, 'create'])->middleware('permission:products.create')->name('products.create');
@@ -138,6 +147,21 @@ Route::middleware(['web','auth'])->group(function () {
     Route::put('/products/{product}', [\App\Http\Controllers\ProductsController::class, 'update'])->middleware('permission:products.update')->name('products.update');
     Route::delete('/products/{product}', [\App\Http\Controllers\ProductsController::class, 'destroy'])->middleware('permission:products.delete')->name('products.destroy');
     Route::post('/products/{id}/restore', [\App\Http\Controllers\ProductsController::class, 'restore'])->middleware('permission:products.delete')->name('products.restore');
+        // Role management
+        Route::get('/admin/roles', [\App\Http\Controllers\RoleController::class, 'index'])->middleware('permission:admin.roles')->name('roles.index');
+        Route::get('/admin/roles/create', [\App\Http\Controllers\RoleController::class, 'create'])->middleware('permission:admin.roles')->name('roles.create');
+        Route::post('/admin/roles', [\App\Http\Controllers\RoleController::class, 'store'])->middleware('permission:admin.roles')->name('roles.store');
+        Route::get('/admin/roles/{role}/edit', [\App\Http\Controllers\RoleController::class, 'edit'])->middleware('permission:admin.roles')->name('roles.edit');
+        Route::put('/admin/roles/{role}', [\App\Http\Controllers\RoleController::class, 'update'])->middleware('permission:admin.roles')->name('roles.update');
+        Route::delete('/admin/roles/{role}', [\App\Http\Controllers\RoleController::class, 'destroy'])->middleware('permission:admin.roles')->name('roles.destroy');
+
+        // Permission management
+        Route::get('/admin/permissions', [\App\Http\Controllers\PermissionController::class, 'index'])->middleware('permission:admin.permissions')->name('permissions.index');
+        Route::get('/admin/permissions/create', [\App\Http\Controllers\PermissionController::class, 'create'])->middleware('permission:admin.permissions')->name('permissions.create');
+        Route::post('/admin/permissions', [\App\Http\Controllers\PermissionController::class, 'store'])->middleware('permission:admin.permissions')->name('permissions.store');
+        Route::get('/admin/permissions/{permission}/edit', [\App\Http\Controllers\PermissionController::class, 'edit'])->middleware('permission:admin.permissions')->name('permissions.edit');
+        Route::put('/admin/permissions/{permission}', [\App\Http\Controllers\PermissionController::class, 'update'])->middleware('permission:admin.permissions')->name('permissions.update');
+        Route::delete('/admin/permissions/{permission}', [\App\Http\Controllers\PermissionController::class, 'destroy'])->middleware('permission:admin.permissions')->name('permissions.destroy');
     Route::post('/products/{id}/force-delete', [\App\Http\Controllers\ProductsController::class, 'forceDelete'])->middleware('permission:products.delete')->name('products.force-delete');
     Route::post('/active-location', [\App\Http\Controllers\ActiveLocationController::class, 'set'])->name('active-location.set');
     Route::view('/pos', 'pos.index')->name('pos.index');

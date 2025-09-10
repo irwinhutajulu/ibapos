@@ -7,7 +7,7 @@
 ])
 
 <div id="{{ $modalId }}" style="display:none;" class="fixed inset-0 bg-black bg-opacity-40 overflow-y-auto h-full w-full hidden z-50 flex items-center justify-center" aria-hidden="true">
-    <div class="relative mx-auto p-6 border w-96 max-w-sm shadow-2xl rounded-xl bg-white dark:bg-gray-800" role="dialog" aria-modal="true" aria-labelledby="{{ $modalId }}_title" aria-describedby="{{ $modalId }}_desc">
+    <div class="relative mx-auto p-6 border w-96 max-w-sm shadow-2xl rounded-xl" role="dialog" aria-modal="true" aria-labelledby="{{ $modalId }}_title" aria-describedby="{{ $modalId }}_desc">
         <div class="text-center">
             <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 dark:bg-red-900 mb-4">
                 <svg class="h-8 w-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -176,9 +176,10 @@ document.addEventListener('click', function(e) {
 
     // Call the global helper, with a small retry fallback if it's not yet defined
     if (window.openConfirmationModal) {
-        // Build action URL relative to the current path so apps served from subfolders or "public" work correctly.
-        const baseAction = opener.getAttribute('data-delete-action') || window.location.pathname.replace(/\/+$/, '');
-        const actionUrl = (baseAction.endsWith('/locations') || baseAction.match(/\/locations(\/.*)?$/)) ? baseAction.replace(/\/+$/, '') + '/' + id : baseAction + '/locations/' + id;
+        // Build action URL generically: take provided data-delete-action (or current path)
+        // and append the id. This works for both /admin/users and /admin/locations
+    const baseAction = opener.getAttribute('data-delete-action') || window.location.pathname.replace(/\/+$/, '');
+    const actionUrl = baseAction.replace(/\/+$/, '') + '/' + id;
         window.openConfirmationModal(modalId, actionUrl, name, { rowId: id });
     } else {
         try { console.warn('[confirm-modal] openConfirmationModal not defined yet, retrying'); } catch (err) {}
@@ -188,7 +189,7 @@ document.addEventListener('click', function(e) {
             attempts++;
             if (window.openConfirmationModal) {
                 const baseAction = opener.getAttribute('data-delete-action') || window.location.pathname.replace(/\/+$/, '');
-                const actionUrl = (baseAction.endsWith('/locations') || baseAction.match(/\/locations(\/.*)?$/)) ? baseAction.replace(/\/+$/, '') + '/' + id : baseAction + '/locations/' + id;
+                const actionUrl = baseAction.replace(/\/+$/, '') + '/' + id;
                 window.openConfirmationModal(modalId, actionUrl, name, { rowId: id });
                 clearInterval(t);
             } else if (attempts > 10) {
@@ -237,11 +238,13 @@ document.addEventListener('submit', function(e) {
             // Close modal
             closeModal(modalId);
 
-            // Remove row if rowId set
+            // Remove row if rowId set (support both data-location-id and data-user-id)
             const rowId = form.dataset.rowId;
             if (rowId) {
-                const tr = document.querySelector('[data-location-id="' + rowId + '"]');
-                if (tr) tr.remove();
+                const trLoc = document.querySelector('[data-location-id="' + rowId + '"]');
+                const trUser = document.querySelector('[data-user-id="' + rowId + '"]');
+                if (trLoc) trLoc.remove();
+                if (trUser) trUser.remove();
             }
 
             // Try parse JSON message

@@ -47,7 +47,7 @@ Run-CommandToFile -Command "git status --porcelain" -OutFile (Join-Path $outDir 
 Run-CommandToFile -Command "git log -n 5 --pretty=format:'%h %ad %s' --date=short" -OutFile (Join-Path $outDir 'git_recent_commits.txt')
 
 # 3) Important file lists
-Get-ChildItem -Path (Join-Path $ProjectRoot 'Catatan Project') -File | Select-Object Name | Out-File (Join-Path $outDir 'catatan_project_files.txt') -Encoding utf8
+Get-ChildItem -Path (Join-Path $ProjectRoot 'Project Documentation') -File | Select-Object Name | Out-File (Join-Path $outDir 'catatan_project_files.txt') -Encoding utf8
 Get-ChildItem -Path $ProjectRoot -Recurse -Include *.php,*.blade.php,*.md -File -ErrorAction SilentlyContinue | Select-Object FullName -First 200 | Out-File (Join-Path $outDir 'sample_files.txt') -Encoding utf8
 
 # 4) Optional install (skipped by default)

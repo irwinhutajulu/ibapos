@@ -28,7 +28,8 @@ class PurchasesIndexFilterTest extends TestCase
         session(['active_location_id' => $loc->id]);
 
         $supplier = Supplier::factory()->create();
-        $p1 = Purchase::create(['invoice_no'=>'P1','date'=>now()->subDays(2),'user_id'=>$user->id,'location_id'=>$loc->id,'supplier_id'=>$supplier->id,'status'=>'draft']);
+    // make P1 clearly older than the filter 'from' (yesterday) to avoid timezone edge cases
+    $p1 = Purchase::create(['invoice_no'=>'P1','date'=>now()->subDays(5),'user_id'=>$user->id,'location_id'=>$loc->id,'supplier_id'=>$supplier->id,'status'=>'draft']);
         $p2 = Purchase::create(['invoice_no'=>'P2','date'=>now(),'user_id'=>$user->id,'location_id'=>$loc->id,'supplier_id'=>$supplier->id,'status'=>'posted']);
 
         $response = $this->actingAs($user)->get('/purchases?status=posted&from='.now()->subDay()->format('Y-m-d'));

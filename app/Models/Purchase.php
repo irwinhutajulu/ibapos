@@ -27,5 +27,5 @@ class Purchase extends Model
     public function items() { return $this->hasMany(PurchaseItem::class); }
     public function supplier() { return $this->belongsTo(Supplier::class); }
     public function location() { return $this->belongsTo(Location::class); }
-    public function user() { return $this->belongsTo(User::class); }
+    public function user() { return $this->belongsTo(User::class)->withTrashed(); }
 }

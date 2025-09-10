@@ -28,6 +28,6 @@ class Sale extends Model
     public function items() { return $this->hasMany(SaleItem::class); }
     public function payments() { return $this->hasMany(SalesPayment::class); }
     public function location() { return $this->belongsTo(Location::class); }
-    public function user() { return $this->belongsTo(User::class); }
+    public function user() { return $this->belongsTo(User::class)->withTrashed(); }
     public function customer() { return $this->belongsTo(Customer::class); }
 }

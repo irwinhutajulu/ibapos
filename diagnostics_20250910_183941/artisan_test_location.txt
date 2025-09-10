@@ -1,0 +1,35 @@
+﻿
+   WARN  Metadata found in doc-comment for method Tests\Feature\LocationDeleteTest::placeholder_test_to_match_filename(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   PASS  Tests\Feature\AjaxDeleteLocationTest
+  Γ£ô ajax delete location returns json and deletes                                                   0.83s  
+
+   PASS  Tests\Feature\ApiLocationsTest
+  Γ£ô api locations returns only user assigned locations                                              0.03s  
+  Γ£ô guest gets empty or forbidden on api locations                                                  0.02s  
+
+   PASS  Tests\Feature\BroadcastingTest
+  Γ£ô sale posted event broadcasts on location channel                                                0.02s  
+
+   PASS  Tests\Feature\LocationControllerTest
+  Γ£ô can view locations index                                                                        0.05s  
+  Γ£ô can create location                                                                             0.04s  
+  Γ£ô can update location                                                                             0.04s  
+  Γ£ô can delete location                                                                             0.03s  
+  Γ£ô cannot delete location with users                                                               0.03s  
+  Γ£ô api returns locations                                                                           0.03s  
+  Γ£ô unauthorized user cannot access                                                                 0.03s  
+  Γ£ô location name must be unique                                                                    0.03s  
+
+   PASS  Tests\Feature\LocationDeleteTest
+  Γ£ô placeholder test to match filename                                                              0.02s  
+
+   PASS  Tests\Feature\LocationScopeTest
+  Γ£ô sales index returns only active location records                                                0.18s  
+
+   PASS  Tests\Feature\RelationsSoftDeletedUserTest
+  Γ£ô location users relation includes trashed user                                                   0.02s  
+
+  Tests:    15 passed (56 assertions)
+  Duration: 1.61s
+

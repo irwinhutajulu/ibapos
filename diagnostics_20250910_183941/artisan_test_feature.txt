@@ -1,0 +1,72 @@
+﻿
+   WARN  Metadata found in doc-comment for method Tests\Feature\LocationDeleteTest::placeholder_test_to_match_filename(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   PASS  Tests\Feature\AjaxDeleteLocationTest
+  Γ£ô ajax delete location returns json and deletes                                                   0.83s  
+
+   PASS  Tests\Feature\ApiLocationsTest
+  Γ£ô api locations returns only user assigned locations                                              0.03s  
+  Γ£ô guest gets empty or forbidden on api locations                                                  0.02s  
+
+   PASS  Tests\Feature\BroadcastingTest
+  Γ£ô sale posted event broadcasts on location channel                                                0.02s  
+
+   PASS  Tests\Feature\ExampleTest
+  Γ£ô the application redirects to login when unauthenticated                                         0.03s  
+
+   PASS  Tests\Feature\LocationControllerTest
+  Γ£ô can view locations index                                                                        0.06s  
+  Γ£ô can create location                                                                             0.05s  
+  Γ£ô can update location                                                                             0.04s  
+  Γ£ô can delete location                                                                             0.03s  
+  Γ£ô cannot delete location with users                                                               0.04s  
+  Γ£ô api returns locations                                                                           0.04s  
+  Γ£ô unauthorized user cannot access                                                                 0.03s  
+  Γ£ô location name must be unique                                                                    0.04s  
+
+   PASS  Tests\Feature\LocationDeleteTest
+  Γ£ô placeholder test to match filename                                                              0.03s  
+
+   PASS  Tests\Feature\LocationScopeTest
+  Γ£ô sales index returns only active location records                                                0.19s  
+
+   PASS  Tests\Feature\PurchasesIndexFilterTest
+  Γ£ô purchase index filters by status and date                                                       0.21s  
+
+   PASS  Tests\Feature\PurchasesPostingJsonTest
+  Γ£ô posting actions return json when accept header is json                                          0.22s  
+
+   PASS  Tests\Feature\PurchasesPostingTest
+  Γ£ô purchase posting increases stock and updates avg cost                                           0.17s  
+
+   PASS  Tests\Feature\RbacAndScopeTest
+  Γ£ô sales route requires permission                                                                 0.19s  
+
+   PASS  Tests\Feature\RelationsSoftDeletedUserTest
+  Γ£ô purchase user relation returns trashed user                                                     0.02s  
+  Γ£ô expense user relation returns trashed user                                                      0.02s  
+  Γ£ô delivery assigned user relation returns trashed user                                            0.02s  
+  Γ£ô kasbon requester and approver relations return trashed users                                    0.02s  
+  Γ£ô location users relation includes trashed user                                                   0.02s  
+
+   PASS  Tests\Feature\SalesAvailabilityValidationTest
+  Γ£ô cannot save sale when stock insufficient                                                        0.21s  
+
+   PASS  Tests\Feature\SalesPostingTest
+  Γ£ô sale posting reduces stock and writes ledger                                                    0.17s  
+
+   PASS  Tests\Feature\StockAdjustmentPostingTest
+  Γ£ô stock adjustment posting updates stock and writes ledger                                        0.17s  
+
+   PASS  Tests\Feature\StockMutationTest
+  Γ£ô confirm moves stock and writes ledger                                                           0.16s  
+
+   PASS  Tests\Feature\StocksLiveSearchTest
+  Γ£ô ajax search returns expected json shape                                                         0.61s  
+
+   PASS  Tests\Feature\UserSoftDeleteTest
+  Γ£ô soft delete user preserves related sales                                                        0.03s  
+
+  Tests:    30 passed (107 assertions)
+  Duration: 4.01s
+
