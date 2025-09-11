@@ -204,6 +204,39 @@
                 <!-- System Section -->
                 <div class="pt-6 border-t border-gray-200/50 dark:border-gray-700/50">
                     <p class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider px-4 pb-2">System</p>
+                        @can('expenses.read')
+                        <a href="{{ route('expenses.index') }}" class="group flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-gray-100/80 dark:hover:bg-gray-700/50 transition-all duration-200 text-gray-700 dark:text-gray-200">
+                            <div class="w-5 h-5 text-gray-500 group-hover:text-emerald-500 transition-colors">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6v8H9zM9 5h6v4H9zM4 9h16v2H4z" />
+                                </svg>
+                            </div>
+                            <span>Expenses</span>
+                        </a>
+                        @endcan
+                        @can('expense_categories.read')
+                        <a href="{{ route('expense_categories.index') }}" class="group flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-gray-100/80 dark:hover:bg-gray-700/50 transition-all duration-200 text-gray-700 dark:text-gray-200">
+                            <div class="w-5 h-5 text-gray-500 group-hover:text-emerald-500 transition-colors">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                </svg>
+                            </div>
+                            <span>Expense Categories</span>
+                        </a>
+                        @endcan
+
+                    @can('kasbons.read')
+                        <a href="{{ route('kasbons.index') }}" class="group flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-gray-100/80 dark:hover:bg-gray-700/50 transition-all duration-200 text-gray-700 dark:text-gray-200">
+                            <div class="w-5 h-5 text-gray-500 group-hover:text-amber-500 transition-colors">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a5 5 0 00-10 0v2a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 17v.01" />
+                                </svg>
+                            </div>
+                            <span>Kasbon</span>
+                        </a>
+                        @endcan
+
                     @can('stocks.read')
                     <a href="{{ route('reservations.index') }}" class="group flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-gray-100/80 dark:hover:bg-gray-700/50 transition-all duration-200 text-gray-700 dark:text-gray-200">
                         <div class="w-5 h-5 text-gray-500 group-hover:text-yellow-500 transition-colors">

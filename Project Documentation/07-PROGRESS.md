@@ -291,3 +291,20 @@ php artisan test --filter StockControllerFormatterTest --stop-on-failure
   - Selalu jalankan `php artisan view:clear` setelah mengedit Blade yang mengandung Alpine `x-data` untuk memastikan compile ulang bersih.
 
 Catatan ini dibuat untuk memudahkan kelanjutan pekerjaan tanpa mengulangi debugging panjang yang telah dilakukan.
+
+## 2025-09-11
+### Selesai:
+- Konsistensi layout expense_categories dan expenses.
+- Penambangan permission expense_categories dan kasbons ke seeder.
+- Sidebar dinamis: link kasbons dan expense_categories.
+- Implementasi fitur Kasbon (model, migration, controller, views, route, permission, sidebar).
+- Validasi permission dan seed ulang.
+- Update dokumentasi dan summary untuk handoff.
+
+### Dalam Proses:
+- Validasi UI/UX sidebar dan akses kasbon.
+- Audit Project Documentation untuk kelengkapan.
+
+### Rencana Berikutnya:
+- Lanjutkan pengembangan fitur kasbon (approval, history, reporting).
+- Integrasi kasbon dengan modul keuangan/expense.

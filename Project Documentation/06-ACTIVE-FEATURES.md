@@ -52,6 +52,12 @@
 - Stock Mutations: daftar + Confirm/Reject (pending)
 - Stock Adjustments: daftar + Post/Void
 
+## Kasbon Module
+- CRUD kasbon: pemohon, lokasi, tanggal, jumlah, status, catatan, approval.
+- Sidebar dinamis, permission-based.
+- Modal create/edit, partial views, responsive layout.
+- Seeder permission kasbons.
+
 ## APIs
 - GET /api/locations
 - GET /api/products?q=

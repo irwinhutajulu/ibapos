@@ -238,3 +238,12 @@ Catat setiap perubahan, penambahan fitur, atau revisi di bawah ini secara kronol
 - Setup Laravel
 - Buat struktur folder
 - Tambah template dokumentasi
+
+## 2025-09-11 - Expense Category & Kasbon Module, Sidebar, Permission Seeder, Layout Consistency
+
+- Konsistensi layout dan struktur antara expense_categories dan expenses (padding, wrapper, responsive).
+- Penambahan permission expense_categories dan kasbons ke PermissionsSeeder.
+- Sidebar dinamis: link expense_categories dan kasbons muncul sesuai permission.
+- Implementasi fitur Kasbon: model, migration, controller, views (index, modal, partial), route, sidebar, permission.
+- Validasi dan troubleshooting visibility menu sidebar berbasis permission.
+- Update Project Documentation untuk handoff sesi berikutnya.

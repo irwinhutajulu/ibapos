@@ -14,6 +14,7 @@ class PermissionsSeeder extends Seeder
             // masters
             'products.read','products.create','products.update','products.delete',
             'categories.read','categories.create','categories.update','categories.delete',
+            'expense_categories.read','expense_categories.create','expense_categories.update','expense_categories.delete',
             'suppliers.read','suppliers.create','suppliers.update','suppliers.delete',
             'customers.read','customers.create','customers.update','customers.delete',
             // sales
@@ -29,6 +30,8 @@ class PermissionsSeeder extends Seeder
             'reports.sales','reports.stock','reports.purchase','reports.finance',
             // admin
             'admin.users','admin.roles','admin.permissions','admin.locations',
+            // kasbons
+            'kasbons.read','kasbons.create','kasbons.update','kasbons.delete',
         ];
 
         foreach ($permissions as $name) {

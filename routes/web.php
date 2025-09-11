@@ -227,7 +227,13 @@ Route::middleware(['web','auth'])->group(function () {
     Route::get('/admin/notifications', [\App\Http\Controllers\NotificationsController::class, 'index'])->middleware('permission:admin.permissions')->name('admin.notifications.index');
     Route::post('/admin/notifications/{notification}/read', [\App\Http\Controllers\NotificationsController::class, 'markAsRead'])->middleware('permission:admin.permissions')->name('admin.notifications.read');
 
-    // Realtime debug helpers
+    // Expense Management
+    Route::resource('expenses', App\Http\Controllers\ExpenseController::class)
+        ->middleware(['permission:expenses.read|expenses.create|expenses.update|expenses.delete','active.location']);
+
+    // Expense Category Management
+    Route::resource('expense_categories', App\Http\Controllers\ExpenseCategoryController::class)
+        ->middleware(['permission:expense_categories.read|expense_categories.create|expense_categories.update|expense_categories.delete']);
     Route::view('/debug/realtime', 'debug.realtime')->name('debug.realtime');
     Route::post('/debug/fire', function() {
         $locId = (int) (session('active_location_id') ?? 1);
@@ -269,4 +275,8 @@ Route::middleware(['web','auth'])->group(function () {
         event(new \App\Events\SaleVoided($sale));
         return response()->json(['ok' => true]);
     })->name('debug.sale-voided');
+
+    // Kasbon Management
+    Route::resource('kasbons', App\Http\Controllers\KasbonController::class)
+        ->middleware(['permission:kasbons.read|kasbons.create|kasbons.update|kasbons.delete','active.location']);
 });

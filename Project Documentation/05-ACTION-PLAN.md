@@ -207,3 +207,9 @@ See also: RBAC guidance in `Catatan Project/03-SPATIE-PERMISSION.md` for permiss
   - Suggested first targets when resumed: `resources/views/users/*` and `resources/views/products/*` (high duplication & impact).
   - Verify: controllers return JSON for AJAX deletes and add an AJAX-delete feature test per resource.
 
+## 2025-09-11
+- Implementasi Kasbon: model, migration, controller, views, route, permission, sidebar.
+- Konsistensi layout expense_categories dan expenses.
+- Validasi permission dan seed ulang.
+- Update dokumentasi dan summary untuk handoff.
+
