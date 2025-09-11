@@ -38,11 +38,11 @@ class NotificationsController extends Controller
     // Tampilkan preferensi notifikasi user
     public function preferences()
     {
-        $user = auth()->user();
-        $settings = \App\Models\NotificationSetting::where('user_id', $user->id)->get();
-        $channels = ['email', 'webpush', 'inapp'];
-        $types = ['sale_created', 'purchase_created', 'low_stock', 'stock_out']; // Bisa diambil dari config/event
-        return view('admin.notifications.preferences', compact('settings', 'channels', 'types'));
+    $user = auth()->user();
+    $settings = \App\Models\NotificationSetting::where('user_id', $user->id)->get();
+    $channels = config('notification.channels', []);
+    $types = array_keys(config('notification.types', []));
+    return view('admin.notifications.preferences', compact('settings', 'channels', 'types'));
     }
 
     // Update preferensi notifikasi user
@@ -53,8 +53,13 @@ class NotificationsController extends Controller
         $types = $request->input('type', []);
         $enabled = $request->input('enabled', []);
 
+        $validChannels = config('notification.channels', []);
+        $validTypes = array_keys(config('notification.types', []));
+
         foreach ($channels as $channel) {
+            if (!in_array($channel, $validChannels)) continue;
             foreach ($types as $type) {
+                if (!in_array($type, $validTypes)) continue;
                 $setting = \App\Models\NotificationSetting::firstOrNew([
                     'user_id' => $user->id,
                     'channel' => $channel,

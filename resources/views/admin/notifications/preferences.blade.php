@@ -18,10 +18,11 @@
                     @foreach($types as $type)
                         @php
                             $setting = $settings->where('channel', $channel)->where('type', $type)->first();
+                            $typeLabel = config('notification.types')[$type] ?? ucfirst(str_replace('_',' ',$type));
                         @endphp
                         <tr>
                             <td>{{ ucfirst($channel) }}</td>
-                            <td>{{ ucfirst(str_replace('_',' ',$type)) }}</td>
+                            <td>{{ $typeLabel }}</td>
                             <td>
                                 <input type="checkbox" name="enabled[{{ $channel }}][{{ $type }}]" value="1" {{ ($setting && $setting->enabled) ? 'checked' : '' }}>
                             </td>
@@ -30,8 +31,7 @@
                 @endforeach
             </tbody>
         </table>
-        <input type="hidden" name="channel[]" value="{{ implode(',', $channels) }}">
-        <input type="hidden" name="type[]" value="{{ implode(',', $types) }}">
+    <!-- channel/type dikirim dari loop dinamis, tidak perlu hidden array -->
         <button type="submit" class="btn btn-primary">Save Preferences</button>
     </form>
     @if(session('ok'))

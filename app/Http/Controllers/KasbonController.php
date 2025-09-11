@@ -28,7 +28,23 @@ class KasbonController extends Controller
             'note' => 'nullable|string',
         ]);
         $validated['status'] = 'pending';
-        Kasbon::create($validated);
+        $kasbon = Kasbon::create($validated);
+
+        // Kirim notifikasi ke admin/finance
+        $admins = \App\Models\User::role(['admin','finance'])->get();
+        foreach ($admins as $admin) {
+            app(\App\Services\NotificationService::class)->sendToUser(
+                $admin,
+                'kasbon_created',
+                [
+                    'kasbon_id' => $kasbon->id,
+                    'user_id' => $kasbon->user_id,
+                    'amount' => $kasbon->amount,
+                    'note' => $kasbon->note,
+                ]
+            );
+        }
+
         return redirect()->route('kasbons.index')->with('success','Kasbon created');
     }
 
@@ -46,6 +62,25 @@ class KasbonController extends Controller
             'status' => 'required|in:pending,approved,rejected',
         ]);
         $kasbon->update($validated);
+
+        // Jika status berubah menjadi approved/rejected, kirim notifikasi ke user pembuat
+        if (in_array($validated['status'], ['approved','rejected'])) {
+            $creator = $kasbon->user;
+            if ($creator) {
+                $type = $validated['status'] === 'approved' ? 'kasbon_approved' : 'kasbon_rejected';
+                app(\App\Services\NotificationService::class)->sendToUser(
+                    $creator,
+                    $type,
+                    [
+                        'kasbon_id' => $kasbon->id,
+                        'status' => $validated['status'],
+                        'amount' => $kasbon->amount,
+                        'note' => $kasbon->note,
+                    ]
+                );
+            }
+        }
+
         return redirect()->route('kasbons.index')->with('success','Kasbon updated');
     }
 
