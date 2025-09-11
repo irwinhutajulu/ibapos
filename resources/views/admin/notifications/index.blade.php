@@ -1,4 +1,3 @@
-@include('admin.notifications._flash_notify')
 @extends('layouts.app', ['title' => 'Notifications'])
 
 @section('content')

@@ -23,6 +23,7 @@
         .glass-dark { backdrop-filter: blur(10px); background: rgba(31, 41, 55, 0.8); }
     </style>
     <script>
+        window.appBaseUrl = "{{ url('/') }}";
         // Safe stub: queue notifications fired before Alpine toast component is ready
         window._notifyQueue = window._notifyQueue || [];
         window.notify = window.notify || function (msg, type = 'info', ttl = 3500) {
@@ -71,20 +72,23 @@
             </div>
 
             <!-- Navigation -->
-            <nav class="p-6 space-y-2 overflow-y-auto h-full">
-                <!-- Dashboard -->
-                <a href="/" class="group flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-gray-100/80 dark:hover:bg-gray-700/50 transition-all duration-200 font-medium text-gray-700 dark:text-gray-200">
-                    <div class="w-5 h-5 text-gray-500 group-hover:text-blue-500 transition-colors">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v0H8v0z"></path>
-                        </svg>
-                    </div>
-                    <span>Dashboard</span>
-                </a>
+            <nav class="p-6 space-y-4 overflow-y-auto h-full">
+                <!-- Dashboard Section -->
+                <div>
+                    <p class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider px-4 pb-2">Dashboard</p>
+                    <a href="{{ route('dashboard') }}" class="group flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-gray-100/80 dark:hover:bg-gray-700/50 transition-all duration-200 font-medium text-gray-700 dark:text-gray-200">
+                        <div class="w-5 h-5 text-gray-500 group-hover:text-blue-500 transition-colors">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v0H8v0z"></path>
+                            </svg>
+                        </div>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
 
                 <!-- Sales Section -->
-                <div class="pt-4">
+                <div>
                     <p class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider px-4 pb-2">Sales</p>
                     @can('sales.create')
                     <a href="{{ route('pos.index') }}" class="group flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200 text-gray-700 dark:text-gray-200">
@@ -106,10 +110,20 @@
                         <span>Sales History</span>
                     </a>
                     @endcan
+                    @can('customers.read')
+                    <a href="{{ route('customers.index') }}" class="group flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-gray-100/80 dark:hover:bg-gray-700/50 transition-all duration-200 text-gray-700 dark:text-gray-200">
+                        <div class="w-5 h-5 text-gray-500 group-hover:text-indigo-500 transition-colors">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
+                        </div>
+                        <span>Customers</span>
+                    </a>
+                    @endcan
                 </div>
 
                 <!-- Inventory Section -->
-                <div class="pt-4">
+                <div>
                     <p class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider px-4 pb-2">Inventory</p>
                     @can('products.read')
                     <a href="{{ route('products.index') }}" class="group flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-gray-100/80 dark:hover:bg-gray-700/50 transition-all duration-200 text-gray-700 dark:text-gray-200">
@@ -182,21 +196,6 @@
                             </svg>
                         </div>
                         <span>Suppliers</span>
-                    </a>
-                    @endcan
-                </div>
-
-                <!-- Customers Section -->
-                <div class="pt-4">
-                    <p class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider px-4 pb-2">Customers</p>
-                    @can('customers.read')
-                    <a href="{{ route('customers.index') }}" class="group flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-gray-100/80 dark:hover:bg-gray-700/50 transition-all duration-200 text-gray-700 dark:text-gray-200">
-                        <div class="w-5 h-5 text-gray-500 group-hover:text-indigo-500 transition-colors">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                            </svg>
-                        </div>
-                        <span>Customers</span>
                     </a>
                     @endcan
                 </div>
@@ -343,18 +342,6 @@
                 </div>
 
                 <div class="flex items-center space-x-4">
-                    <!-- Search Bar (Hidden on mobile) -->
-                    <div class="hidden md:flex items-center">
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                </svg>
-                            </div>
-                            <input type="text" placeholder="Search..." 
-                                   class="block w-64 pl-10 pr-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" />
-                        </div>
-                    </div>
 
                     <!-- Location Selector Component -->
                     <x-location-selector />
