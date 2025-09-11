@@ -25,6 +25,12 @@ Route::get('/ajax/products', [\App\Http\Controllers\ProductsController::class, '
 Route::get('/', function () { return view('dashboard'); })->middleware('auth');
 Route::get('/dashboard', function () { return view('dashboard'); })->middleware('auth')->name('dashboard');
 
+// Notification preferences
+Route::middleware(['auth'])->group(function() {
+    Route::get('/notifications/preferences', [\App\Http\Controllers\NotificationsController::class, 'preferences'])->name('admin.notifications.preferences');
+    Route::post('/notifications/preferences', [\App\Http\Controllers\NotificationsController::class, 'updatePreferences'])->name('admin.notifications.preferences.update');
+});
+
 // Test dropdown components
 Route::get('/dropdown-test', function () { return view('dropdown-demo'); })->middleware('auth')->name('dropdown.test');
 
@@ -226,6 +232,7 @@ Route::middleware(['web','auth'])->group(function () {
     // Notifications (admin/user inbox)
     Route::get('/admin/notifications', [\App\Http\Controllers\NotificationsController::class, 'index'])->middleware('permission:admin.permissions')->name('admin.notifications.index');
     Route::post('/admin/notifications/{notification}/read', [\App\Http\Controllers\NotificationsController::class, 'markAsRead'])->middleware('permission:admin.permissions')->name('admin.notifications.read');
+    Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationsController::class, 'markAllRead'])->name('admin.notifications.mark-all-read');
 
     // Expense Management
     Route::resource('expenses', App\Http\Controllers\ExpenseController::class)

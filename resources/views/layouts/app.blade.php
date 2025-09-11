@@ -283,6 +283,14 @@
                         </div>
                         <span>Notifications</span>
                     </a>
+                        <a href="{{ route('admin.notifications.preferences') }}" class="group flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-green-100/80 dark:hover:bg-green-700/50 transition-all duration-200 text-gray-700 dark:text-gray-200">
+                            <div class="w-5 h-5 text-gray-500 group-hover:text-green-500 transition-colors">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                </svg>
+                            </div>
+                            <span>Notification Settings</span>
+                        </a>
                     @endcan
                     @can('admin.locations')
                     <a href="{{ route('locations.index') }}" class="group flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-gray-100/80 dark:hover:bg-gray-700/50 transition-all duration-200 text-gray-700 dark:text-gray-200">

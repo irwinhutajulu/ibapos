@@ -1,0 +1,6 @@
+﻿
+Path                                                  LineNumber
+----                                                  ----------
+C:\xampp\htdocs\Data IBA POS\IBAPOS\bootstrap\app.php         21
+
+

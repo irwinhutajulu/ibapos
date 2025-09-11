@@ -145,6 +145,10 @@ Catatan: Purchases kini memiliki form create/edit draft, index dengan filter ser
 - [ ] Laravel Notifications (database/webpush) & pengaturan notification_settings
 - [ ] Service Worker & manifest (cache shell, update strategi)
 - [ ] Trigger notifikasi: kasbon, mutasi masuk, status purchase/sale
+- [ ] Penyesuaian tipe notifikasi dan channel agar dinamis (mengambil dari config/database, bukan hardcode).
+- [ ] Penambahan validasi input pada pengaturan preferensi notifikasi (hanya tipe/channel yang valid dapat disimpan).
+- [ ] Buat file config untuk notification types dan channels.
+- [ ] Update controller dan view agar menggunakan data dinamis dan validasi.
 
 ## 10) Pengujian Otomatis
 - [ ] Unit/Feature tests minimal:
