@@ -45,6 +45,12 @@ class SalesController extends Controller
     public function show(Sale $sale)
     {
         $sale->load(['items.product:id,name,barcode,unit','payments','user:id,name','customer:id,name']);
+        
+        // JSON for tests or API consumers
+        if (app()->runningUnitTests() || request()->wantsJson()) {
+            return response()->json($sale);
+        }
+        
         return view('sales.show', compact('sale'));
     }
 

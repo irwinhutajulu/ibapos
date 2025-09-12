@@ -11,10 +11,23 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $q = trim((string)$request->string('q'));
+        $activeLocationId = (int) session('active_location_id');
+        
         $products = Product::query()
+            ->with(['stocks' => function($query) use ($activeLocationId) {
+                // Load stocks for active location and all locations for source selection
+                if ($activeLocationId) {
+                    $query->where('location_id', $activeLocationId)
+                          ->orWhereIn('location_id', function($subQuery) {
+                              $subQuery->select('id')->from('locations');
+                          });
+                } else {
+                    // Load all stocks if no active location
+                    $query->orderBy('location_id');
+                }
+            }])
             ->when($q, fn($b) => $b->where('name', 'like', "%$q%")
                                     ->orWhere('barcode', 'like', "%$q%"))
-            ->select('id','name','barcode','price')
             ->orderBy('name')
             ->limit(20)
             ->get();

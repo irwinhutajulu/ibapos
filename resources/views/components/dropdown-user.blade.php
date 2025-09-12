@@ -10,7 +10,7 @@ $currentUser = $user ?? auth()->user();
 
 <x-dropdown :align="$align" :width="$width" content-classes="py-2">
     <x-slot name="trigger">
-        <button type="button" class="flex items-center space-x-2 p-2 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+        <button type="button" class="flex items-center space-x-2 p-2 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
             <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
                 <span class="text-white text-sm font-medium">{{ substr($currentUser->name, 0, 1) }}</span>
             </div>

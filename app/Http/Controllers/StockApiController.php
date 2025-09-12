@@ -15,10 +15,31 @@ class StockApiController extends Controller
             'product_id' => 'required|integer',
             'location_id' => 'nullable|integer',
         ]);
+        
         $locationId = $validated['location_id'] ?? (int) session('active_location_id');
-        $onHand = (float) Stock::where('product_id', $validated['product_id'])->where('location_id', $locationId)->value('qty') ?? 0.0;
-        $reserved = (float) StockReservation::where('product_id', $validated['product_id'])->where('location_id', $locationId)->where('status','active')->sum('qty_reserved');
-        return response()->json(['available' => max(0, $onHand - $reserved)]);
+        
+        if (!$locationId) {
+            return response()->json([
+                'error' => 'No active location set',
+                'available' => 0
+            ], 400);
+        }
+        
+        $onHand = (float) Stock::where('product_id', $validated['product_id'])
+                                ->where('location_id', $locationId)
+                                ->value('qty') ?? 0.0;
+                                
+        $reserved = (float) StockReservation::where('product_id', $validated['product_id'])
+                                           ->where('location_id', $locationId)
+                                           ->where('status','active')
+                                           ->sum('qty_reserved');
+                                           
+        return response()->json([
+            'available' => max(0, $onHand - $reserved),
+            'on_hand' => $onHand,
+            'reserved' => $reserved,
+            'location_id' => $locationId
+        ]);
     }
 
     public function availableBatch(Request $request)

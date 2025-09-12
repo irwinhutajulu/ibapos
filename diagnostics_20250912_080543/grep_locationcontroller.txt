@@ -1,0 +1,7 @@
+﻿
+Path                                               LineNumber
+----                                               ----------
+C:\xampp\htdocs\Data IBA POS\IBAPOS\routes\api.php          4
+C:\xampp\htdocs\Data IBA POS\IBAPOS\routes\web.php        131
+
+
