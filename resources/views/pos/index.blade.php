@@ -108,11 +108,11 @@
                                                   <div @click="addToCart(p);show=false" class="px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-600 last:border-b-0 transition-colors">
                                                       <div class="flex items-center justify-between">
                                                           <div class="flex-1">
-                                                              <div class="font-medium text-gray-900 dark:text-white" x-text="p.name"></div>
-                                                              <div class="text-sm text-gray-500 dark:text-gray-400" x-text="'SKU: ' + (p.sku || '-')"></div>
+                                                              <div class="font-small text-gray-900 dark:text-white" x-text="p.name"></div>
+                                                              <div class="font-small text-gray-900 dark:text-white" x-text="format(p.price)"></div>
                                                             </div>
                                                           <div class="text-right">
-                                                              <div class="font-semibold text-gray-900 dark:text-white" x-text="format(p.price)"></div>
+                                                              
                                                               <div class="text-xs" 
                                                                   :class="(p.stocks && p.stocks.length > 0) ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'"
                                                                   x-text="(p.stocks && p.stocks.length > 0) ? `Stock: ${p.stocks.reduce((total, s) => total + parseFloat(s.qty || 0), 0)}` : 'No Stock'">
@@ -137,20 +137,30 @@
                                     </div>
                                 
                                 <!-- Clear All Button -->
-                                <button @click="clearAll()" class="px-2 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-small rounded-xl transition-colors flex items-center">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <!-- Kebab Menu for Clear & Draft -->
+                                <div x-data="{ open: false }" class="relative">
+                                  <button @click="open = !open" class="px-2 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-100 rounded-xl flex items-center">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <circle cx="5" cy="12" r="2" />
+                                      <circle cx="12" cy="12" r="2" />
+                                      <circle cx="19" cy="12" r="2" />
+                                    </svg>
+                                  </button>
+                                  <div x-show="open" @click.away="open = false" x-transition class="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-xl shadow-lg z-30 border border-gray-200 dark:border-gray-700">
+                                    <button @click="clearAll(); open = false" class="w-full flex items-center px-4 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-gray-700 gap-2">
+                                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                    </svg>
-                                    Hapus
-                                </button>
-                                
-                                <!-- Draft Sales Button -->
-                                <button @click="showDraftModal = true" class="px-2 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-small rounded-xl transition-colors flex items-center">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      </svg>
+                                      Hapus Semua
+                                    </button>
+                                    <button @click="showDraftModal = true; open = false" class="w-full flex items-center px-4 py-2 text-amber-700 hover:bg-amber-50 dark:hover:bg-gray-700 gap-2">
+                                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                    </svg>
-                                    Draft
-                                </button>
+                                      </svg>
+                                      Draft Sales
+                                    </button>
+                                  </div>
+                                </div>
                               </div>
                         </div>
                     </div>

@@ -1,41 +1,109 @@
 <!-- Payment & Checkout -->
-<div class="card" x-show="cart.length > 0" x-transition>
+<div class="card" x-show="cart.length > 0" x-transition x-data="{
+  additional_fee: null,
+  discount: null,
+  payments: [],
+  getCart() {
+    // Ambil cart dari window atau parent scope jika tidak ada di data
+    return this.cart ?? (typeof cart !== 'undefined' ? cart : []);
+  },
+  subtotal() {
+  return this.getCart().reduce((acc, item) => acc + ((Number(item.price) - Number(item.discount || 0)) * Number(item.qty || 0)), 0);
+  },
+  total() {
+    let fee = parseFloat(this.additional_fee) || 0;
+    let disc = parseFloat(this.discount) || 0;
+    return Math.max(0, this.subtotal() + fee - disc);
+  },
+  payTotal() {
+    return this.payments.reduce((acc, p) => acc + (parseFloat(p.amount) || 0), 0);
+  }
+}">
   <div class="card-header">
     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Payment & Checkout</h3>
   </div>
   <div class="card-body space-y-4">
     <!-- Total Summary -->
-    <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
-      <div class="flex justify-between items-center text-lg font-semibold">
+    <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-2 space-y-2">
+      <div class="flex justify-between items-center text-base">
+        <span class="text-gray-600 dark:text-gray-300">Subtotal</span>
+  <span class="text-gray-900 dark:text-white" x-text="format(subtotal())"></span>
+      </div>
+      <div class="flex justify-between items-center text-base">
+        <span class="text-gray-600 dark:text-gray-300">Additional Fee</span>
+        <input type="text" inputmode="numeric" class="form-input text-right"
+          :value="additional_fee === null ? '' : new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(additional_fee)"
+          @input="
+            let raw = $event.target.value.replace(/\D/g, '');
+            if(raw === '') { additional_fee = null; return; }
+            let padded = raw.padStart(3, '0');
+            let rupiah = parseFloat(padded.slice(0, -2) + '.' + padded.slice(-2));
+            additional_fee = isNaN(rupiah) ? 0 : rupiah;
+            $event.target.value = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(additional_fee);
+          "
+          placeholder="Masukkan nominal">
+      </div>
+      <div class="flex justify-between items-center text-base">
+        <span class="text-gray-600 dark:text-gray-300">Discount</span>
+        <input type="text" inputmode="numeric" class="form-input text-right"
+          :value="discount === null ? '' : new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(discount)"
+          @input="
+            let raw = $event.target.value.replace(/\D/g, '');
+            if(raw === '') { discount = null; return; }
+            let padded = raw.padStart(3, '0');
+            let rupiah = parseFloat(padded.slice(0, -2) + '.' + padded.slice(-2));
+            discount = isNaN(rupiah) ? 0 : rupiah;
+            $event.target.value = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(discount);
+          "
+          placeholder="Masukkan nominal">
+      </div>
+      <div class="flex justify-between items-center text-lg font-semibold pt-2">
         <span class="text-gray-900 dark:text-white">Total</span>
         <span class="text-gray-900 dark:text-white" x-text="format(total())"></span>
       </div>
     </div>
     
+   
     <!-- Payment Methods -->
     <div>
       <div class="flex items-center justify-between mb-3">
         <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Payment Methods</label>
-        <button @click="payments.push({type:'cash',amount:0,reference:''})" class="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">+ Add Payment</button>
+        <button @click="payments.push({type:'cash',amount:null,reference:null})" class="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">+ Add Payment</button>
       </div>
       
-      <div class="space-y-3">
+      <div class="space-y-3 bg-gray-50 dark:bg-gray-700 rounded-xl p-2">
         <template x-for="(p, i) in payments" :key="i">
+          <div class= "space-y-2">
           <div class="flex items-center gap-2">
-            <select class="form-select flex-1" x-model="p.type">
+          <select class="form-select flex-1 bg-gray-50 dark:bg-gray-700 text-white" x-model="p.type">
               <option value="cash">Cash</option>
               <option value="transfer">Transfer</option>
               <option value="card">Card</option>
               <option value="qris">QRIS</option>
             </select>
-            <input type="number" step="0.01" class="form-input flex-1" x-model.number="p.amount" placeholder="Amount">
-            <input type="text" class="form-input flex-1" x-model="p.reference" placeholder="Reference">
+            <input type="text" inputmode="numeric" class="form-input flex-1 text-right"
+              :value="p.amount === null || p.amount === undefined ? '' : new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(p.amount)"
+              @input="
+                let raw = $event.target.value.replace(/\D/g, '');
+                if(raw === '') { p.amount = null; return; }
+                let padded = raw.padStart(3, '0');
+                let rupiah = parseFloat(padded.slice(0, -2) + '.' + padded.slice(-2));
+                p.amount = isNaN(rupiah) ? 0 : rupiah;
+                $event.target.value = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(p.amount);
+              "
+              placeholder="Masukkan nominal">
+            
+            </div>
+
+            <div class="flex items-center gap-2">
+            <input type="text" class="form-input flex-1" x-model="p.reference" placeholder="Masukan No Referensi">
             <button @click="payments.splice(i,1)" class="text-red-500 hover:text-red-700 p-2">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
               </svg>
             </button>
-          </div>
+            </div>
+            </div>
         </template>
       </div>
     </div>
@@ -46,10 +114,7 @@
         <span class="text-gray-600 dark:text-gray-400">Amount Paid</span>
         <span class="font-medium text-gray-900 dark:text-white" x-text="format(payTotal())"></span>
       </div>
-      <div class="flex justify-between">
-        <span class="text-gray-600 dark:text-gray-400">Change</span>
-        <span class="font-medium text-gray-900 dark:text-white" x-text="format(Math.max(0, payTotal() - total()))"></span>
-      </div>
+      
     </div>
     
     <!-- Action Buttons -->

@@ -101,9 +101,12 @@ class SalesController extends Controller
         }
 
     $sale = DB::transaction(function () use ($data, $locationId, $reservations) {
-            $totals = collect($data['items'])->reduce(function ($acc, $it) {
+            $subtotal = collect($data['items'])->reduce(function ($acc, $it) {
                 return $acc + (float) ($it['subtotal'] ?? 0);
             }, 0.0);
+            $additionalFee = (float)($data['additional_fee'] ?? 0);
+            $discount = (float)($data['discount'] ?? 0);
+            $total = max(0, $subtotal + $additionalFee - $discount);
 
             $sale = Sale::create([
                 'invoice_no' => $data['invoice_no'],
@@ -111,9 +114,9 @@ class SalesController extends Controller
                 'user_id' => auth()->id(),
                 'location_id' => $locationId,
                 'customer_id' => $data['customer_id'] ?? null,
-                'additional_fee' => $data['additional_fee'] ?? 0,
-                'discount' => $data['discount'] ?? 0,
-                'total' => $totals,
+                'additional_fee' => $additionalFee,
+                'discount' => $discount,
+                'total' => $total,
                 'payment' => 0,
                 'change' => 0,
                 'payment_type' => $data['payment_type'] ?? null,
