@@ -39,13 +39,15 @@ class LocationController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:150|unique:locations,name',
             'address' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:20',
             'user_ids' => 'array',
             'user_ids.*' => 'exists:users,id'
         ]);
 
         $location = Location::create([
             'name' => $validated['name'],
-            'address' => $validated['address']
+            'address' => $validated['address'],
+            'phone' => $validated['phone']
         ]);
 
         // Sync users
@@ -89,13 +91,15 @@ class LocationController extends Controller
                 Rule::unique('locations', 'name')->ignore($location->id)
             ],
             'address' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:20',
             'user_ids' => 'array',
             'user_ids.*' => 'exists:users,id'
         ]);
 
         $location->update([
             'name' => $validated['name'],
-            'address' => $validated['address']
+            'address' => $validated['address'],
+            'phone' => $validated['phone']
         ]);
 
         // Sync users
@@ -185,7 +189,7 @@ class LocationController extends Controller
      */
     public function api()
     {
-        $locations = Location::select('id', 'name', 'address')
+        $locations = Location::select('id', 'name', 'address', 'phone')
             ->orderBy('name')
             ->get();
 

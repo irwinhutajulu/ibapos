@@ -31,6 +31,9 @@
                             Address
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            Phone
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Users
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -52,6 +55,11 @@
                             <td class="px-6 py-4">
                                 <div class="text-sm text-gray-900 dark:text-gray-300">
                                     {{ $location->address ?: 'N/A' }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900 dark:text-gray-300">
+                                    {{ $location->phone ?: '-' }}
                                 </div>
                             </td>
                             <td class="px-6 py-4">
@@ -99,7 +107,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-4 text-sm text-gray-500">
+                            <td colspan="6" class="px-6 py-4 text-sm text-gray-500">
                                 No locations found. <a href="{{ route('locations.create') }}" class="text-blue-600 hover:text-blue-800">Create your first location</a>
                             </td>
                         </tr>

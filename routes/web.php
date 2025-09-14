@@ -95,6 +95,9 @@ Route::get('/api/products/search', function (Request $request) {
 })->name('api.products.search');
 
 // Auth
+// Receipt template (no auth required for printing)
+Route::view('/pos/print-receipt', 'pos.receipt-template')->name('pos.print-receipt');
+
 Route::get('/login', [\App\Http\Controllers\AuthController::class, 'showLogin'])->name('login')->middleware('guest');
 Route::post('/login', [\App\Http\Controllers\AuthController::class, 'login'])->name('login.post')->middleware('guest');
 Route::post('/logout', [\App\Http\Controllers\AuthController::class, 'logout'])->name('logout')->middleware('auth');
@@ -212,7 +215,7 @@ Route::middleware(['web','auth'])->group(function () {
     // Simple APIs for POS
     Route::get('/api/locations', function() {
         $user = auth()->user();
-        return $user->locations()->select('id','name')->orderBy('name')->get();
+        return $user->locations()->select('id','name','address','phone')->orderBy('name')->get();
     })->name('api.locations');
 
     // Admin API for all locations (for location management)

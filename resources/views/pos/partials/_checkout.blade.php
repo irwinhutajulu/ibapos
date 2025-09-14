@@ -1,8 +1,5 @@
 <!-- Payment & Checkout -->
 <div class="card" x-show="cart.length > 0" x-transition x-data="{
-  additional_fee: null,
-  discount: null,
-  payments: [],
   getCart() {
     // Ambil cart dari window atau parent scope jika tidak ada di data
     return this.cart ?? (typeof cart !== 'undefined' ? cart : []);
@@ -17,6 +14,48 @@
   },
   payTotal() {
     return this.payments.reduce((acc, p) => acc + (parseFloat(p.amount) || 0), 0);
+  },
+  printStruk() {
+    // Open receipt window
+    const receiptWindow = window.open('/pos/print-receipt', '_blank', 'width=400,height=600');
+    
+    // Prepare receipt data
+    const receiptData = {
+      store: {
+        name: document.getElementById('store-name') ? document.getElementById('store-name').textContent : 'NAMA TOKO',
+        address: document.getElementById('store-address') ? document.getElementById('store-address').textContent : 'Alamat Toko',
+        phone: document.getElementById('store-phone') ? document.getElementById('store-phone').textContent : 'Telp: 08xxxxxxxxxx',
+      },
+      trx: {
+        date: new Date().toLocaleString('id-ID'),
+        no: this.trxNo || ('TRX' + Date.now()),
+        buyer: this.buyerName || '-',
+      },
+      products: this.getCart().map(item => ({
+        name: item.name,
+        qty: item.qty,
+        price: item.price,
+        subtotal: (Number(item.price) - Number(item.discount || 0)) * Number(item.qty || 0)
+      })),
+      total: this.total(),
+      payment: this.payTotal(),
+      change: (this.payTotal() - this.total()),
+      additional_fee: this.additional_fee,
+      note: 'Terima kasih atas pembelian Anda!'
+    };
+    
+    // Send data to receipt window when it's loaded
+    const sendData = () => {
+      receiptWindow.postMessage({ type: 'RECEIPT_DATA', data: receiptData }, '*');
+    };
+    
+    // Wait for window to load before sending data
+    const timer = setInterval(() => {
+      if (receiptWindow && receiptWindow.document && receiptWindow.document.readyState === 'complete') {
+        clearInterval(timer);
+        sendData();
+      }
+    }, 300);
   }
 }">
   <div class="card-header">
@@ -131,6 +170,33 @@
         </svg>
         Process Sale
       </button>
+    </div>
+    
+    <!-- Print Receipt Button (appears after successful transaction) -->
+    <div class="pt-4" x-show="saleProcessed">
+      <div class="space-y-3">
+        <button @click="printStruk()" class="btn-success w-full">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a1 1 0 001-1v-4a1 1 0 00-1-1H9a1 1 0 00-1 1v4a1 1 0 001 1zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+          </svg>
+          Print Struk
+        </button>
+        
+        <div class="grid grid-cols-2 gap-3">
+          <button @click="saleProcessed = false; showCheckoutModal = false;" class="btn-secondary">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+            Close
+          </button>
+          <button @click="saleProcessed = false; additional_fee = null; discount = null;" class="btn-primary">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            New Sale
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

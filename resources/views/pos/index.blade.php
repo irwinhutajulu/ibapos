@@ -52,6 +52,13 @@
             window._notifyQueue.push({ msg, type, ttl });
         };
     </script>
+    
+    <!-- Hidden store information will be populated dynamically -->
+    <div style="display: none;">
+        <span id="store-name">Loading...</span>
+        <span id="store-address">Loading...</span>
+        <span id="store-phone">Loading...</span>
+    </div>
 </head>
 <body class="h-full bg-slate-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 antialiased">
     <div class="min-h-screen flex">
@@ -523,6 +530,10 @@
         showCheckoutModal: false,
         showDraftModal: false,
         draftSales: [],
+        saleProcessed: false,
+        additional_fee: null,
+        discount: null,
+        activeLocationId: window.appActiveLocationId || null,
         
         async search() {
           if (!this.keyword.trim()) {
@@ -566,7 +577,10 @@
         },
         
         total() { 
-          return this.cart.reduce((a, c) => a + this.itemSubtotal(c), 0); 
+          const subtotal = this.cart.reduce((a, c) => a + this.itemSubtotal(c), 0);
+          const fee = parseFloat(this.additional_fee) || 0;
+          const disc = parseFloat(this.discount) || 0;
+          return Math.max(0, subtotal + fee - disc); 
         },
         
         payTotal() { 
@@ -591,6 +605,9 @@
           if (confirm('Are you sure you want to clear all items?')) {
             this.cart = [];
             this.payments = [];
+            this.saleProcessed = false;
+            this.additional_fee = null;
+            this.discount = null;
           }
         },
         
@@ -677,7 +694,17 @@
             if (res.ok) { 
               this.cart = []; 
               this.payments = [];
-              this.showCheckoutModal = false;
+              
+              // Set saleProcessed to true for successful posted transactions (not drafts)
+              if (status === 'posted') {
+                this.saleProcessed = true;
+                // Keep modal open for print receipt after successful transaction
+                // User can close manually after printing
+              } else {
+                // Close modal for draft transactions
+                this.showCheckoutModal = false;
+              }
+              
               window.notify(`Transaction ${status === 'draft' ? 'saved as draft' : 'completed'} successfully`, 'success');
             } else { 
               const errorText = await res.text(); 
@@ -687,6 +714,71 @@
             console.error('Transaction error:', error);
             window.notify('Transaction failed', 'error');
           }
+        },
+        
+        printStruk() {
+          // Open receipt window
+          const receiptWindow = window.open(window.appBaseUrl + '/pos/print-receipt', '_blank', 'width=400,height=600');
+          
+          // Get store info from current location or fallback to defaults
+          const currentLoc = this.currentLocation || {};
+          const storeName = currentLoc.name || 'IBA POS - Istana Batu Alam';
+          const storeAddress = currentLoc.address || 'Jl. Raya Batu Alam No. 123';
+          const storePhone = currentLoc.phone || 'Telp: 021-7654321';
+          
+          // Calculate subtotal from cart items
+          const subtotal = this.cart.reduce((sum, item) => sum + this.itemSubtotal(item), 0);
+          
+          // Prepare receipt data
+          const receiptData = {
+            store: {
+              name: storeName,
+              address: storeAddress,
+              phone: storePhone,
+            },
+            trx: {
+              date: new Date().toLocaleDateString('id-ID') + ' ' + new Date().toLocaleTimeString('id-ID'),
+              no: this.trxNo || ('TRX' + Date.now()),
+              buyer: this.buyerName || 'Customer',
+            },
+            products: this.cart.map(item => ({
+              name: item.name || 'Unknown Product',
+              qty: item.qty || 1,
+              price: Number(item.price) || 0,
+              subtotal: this.itemSubtotal(item)
+            })),
+            total: this.total(),
+            payment: this.payTotal(),
+            change: Math.max(0, this.payTotal() - this.total()),
+            additional_fee: parseFloat(this.additional_fee) || 0,
+            discount: parseFloat(this.discount) || 0,
+            subtotal: subtotal,
+            note: 'Terima kasih atas pembelian Anda!'
+          };
+          
+          console.log('Sending receipt data with location:', {
+            locationId: this.activeLocationId,
+            locationName: storeName,
+            receiptData: receiptData
+          });
+          
+          // Send data to receipt window when it's loaded
+          const sendData = () => {
+            receiptWindow.postMessage({ type: 'RECEIPT_DATA', data: receiptData }, '*');
+          };
+          
+          // Wait for window to load before sending data
+          const timer = setInterval(() => {
+            if (receiptWindow && receiptWindow.document && receiptWindow.document.readyState === 'complete') {
+              clearInterval(timer);
+              sendData();
+            }
+          }, 300);
+          
+          // Fallback - send data after 1 second regardless
+          setTimeout(() => {
+            sendData();
+          }, 1000);
         },
         
         async loadDraftSales() {
@@ -787,13 +879,62 @@
         async init() {
           try { 
             const r = await fetch(`${window.appBaseUrl}/api/locations`); 
-            this.locations = r.ok ? await r.json() : []; 
+            this.locations = r.ok ? await r.json() : [];
+            
+            // Update store info based on active location
+            this.updateStoreInfo();
+            
+            // Listen for location changes
+            this.startLocationWatcher();
           } catch (error) {
             console.error('Failed to load locations:', error);
           }
           
           // Initialize with one cash payment method
           this.payments.push({type: 'cash', amount: 0, reference: ''});
+        },
+        
+        startLocationWatcher() {
+          // Watch for changes in window.appActiveLocationId
+          const checkLocationChange = () => {
+            const newLocationId = window.appActiveLocationId;
+            if (this.activeLocationId !== newLocationId) {
+              this.activeLocationId = newLocationId;
+              this.updateStoreInfo();
+            }
+          };
+          
+          // Check every 500ms for location changes
+          setInterval(checkLocationChange, 500);
+        },
+        
+        updateStoreInfo() {
+          const activeLocationId = this.activeLocationId || window.appActiveLocationId;
+          const activeLocation = this.locations.find(loc => loc.id === activeLocationId);
+          
+          if (activeLocation) {
+            // Update hidden elements for receipt printing
+            const storeNameEl = document.getElementById('store-name');
+            const storeAddressEl = document.getElementById('store-address');
+            const storePhoneEl = document.getElementById('store-phone');
+            
+            if (storeNameEl) storeNameEl.textContent = `{{ config('app.name', 'IBA POS') }} - ${activeLocation.name}`;
+            if (storeAddressEl) storeAddressEl.textContent = activeLocation.address || 'Alamat tidak tersedia';
+            if (storePhoneEl) storePhoneEl.textContent = activeLocation.phone ? `Telp / WA: ${activeLocation.phone}` : 'Telp: -';
+            
+            console.log('Store info updated for location:', activeLocation.name);
+          } else {
+            // Fallback to default values
+            const storeNameEl = document.getElementById('store-name');
+            const storeAddressEl = document.getElementById('store-address');
+            const storePhoneEl = document.getElementById('store-phone');
+            
+            if (storeNameEl) storeNameEl.textContent = '{{ config('app.name', 'IBA POS') }}';
+            if (storeAddressEl) storeAddressEl.textContent = 'Alamat tidak tersedia';
+            if (storePhoneEl) storePhoneEl.textContent = 'Telp: -';
+            
+            console.log('Store info reset to default values');
+          }
         }
       }
     }

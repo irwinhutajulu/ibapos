@@ -1,6 +1,6 @@
 # ⚡ Active Features - Working Functionality
 
-**Last Updated**: September 7, 2025  
+**Last Updated**: September 14, 2025  
 **Purpose**: Complete list of implemented and working features
 
 ## 🔧 **DEVELOPMENT ENVIRONMENT**
@@ -18,6 +18,27 @@
 - **Environment**: Local only (`APP_ENV=local`)
 - **Configuration**: `DEVELOPER_MODE=true` in .env
 
+## 📱 **RECEIPT PRINTING SYSTEM** ✅ Active
+
+### Thermal Receipt Template
+- **Template**: `resources/views/pos/receipt-template.blade.php`
+- **Format Support**: 58mm/80mm thermal printers with CSS optimization
+- **Data Integration**: PostMessage API for receipt data transfer
+- **Store Information**: Dynamic store data from active location
+- **Print Features**: Automatic print dialog and receipt formatting
+
+### Location-Based Store Information
+- **Complete Store Data**: Name, address, and phone number from active location
+- **API Integration**: `/api/locations/{id}` endpoint with phone field support
+- **Dynamic Loading**: Store information updates based on location selector
+- **Receipt Integration**: Store data automatically included in printed receipts
+
+### Process Sale Verification
+- **Sale Verification**: Print button only appears after successful server transaction
+- **Server Validation**: Complete stock availability and payment validation
+- **State Management**: `saleProcessed` state controls print button visibility
+- **UX Enhancement**: Modal stays open after successful sale for immediate printing
+
 ## Auth & RBAC
 - Login/Logout sederhana; roles & permissions ter-seed (super-admin, admin, manager, cashier, warehouse, driver, kepala-gudang)
 - Middleware permission di route utama; sidebar/menu dinamis sesuai permission
@@ -25,6 +46,7 @@
 
 ## Database & Domain
 - Tabel inti: sales, sale_items (dengan source_location_id), sales_payments
+- **Locations**: Enhanced with phone field (nullable string, max 20 chars)
 - Purchases + purchase_items (status: draft/received/posted/void + metadata)
 - Stocks (qty, avg_cost DECIMAL(18,4)), stock_ledger, stock_adjustments + items, stock_reservations, stock_mutations (CHECK from != to)
 - Constraints: UNIQUE stocks(product_id, location_id); UNIQUE sales(location_id, invoice_no); UNIQUE purchases(location_id, invoice_no)

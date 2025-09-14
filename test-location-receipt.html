@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Location-based Receipt</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .location-selector {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 4px;
+        }
+        .test-button {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        .test-button:hover {
+            background: #45a049;
+        }
+        select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            min-width: 200px;
+        }
+        .location-info {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .info {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #ffeaa7;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Test Location-based Receipt Printing</h1>
+        
+        <div class="info">
+            <h3>Testing Location Integration:</h3>
+            <p>1. Pilih location dari dropdown</p>
+            <p>2. Klik "Test Print Receipt" untuk membuka receipt dengan data location tersebut</p>
+            <p>3. Verify bahwa store name, address, dan phone sesuai dengan location yang dipilih</p>
+        </div>
+
+        <div class="location-selector">
+            <h3>Select Location:</h3>
+            <select id="location-select" onchange="updateLocationInfo()">
+                <option value="">Select Location...</option>
+            </select>
+            
+            <div class="location-info" id="location-info">
+                <strong>Selected Location Info:</strong><br>
+                <span id="location-details">No location selected</span>
+            </div>
+        </div>
+
+        <button class="test-button" onclick="testReceiptWithSelectedLocation()">Test Print Receipt</button>
+        <button class="test-button" onclick="loadLocations()">Reload Locations</button>
+
+        <div class="location-info">
+            <h4>Available Sample Locations:</h4>
+            <pre id="locations-list">Loading...</pre>
+        </div>
+    </div>
+
+    <script>
+        let locations = [];
+        let selectedLocation = null;
+
+        // Sample locations data (in case API fails)
+        const sampleLocations = [
+            {
+                id: 1,
+                name: 'Main Store - IBA POS',
+                address: 'Jl. Raya Batu Alam No. 123, Jakarta Selatan',
+                phone: '021-7654321'
+            },
+            {
+                id: 2,
+                name: 'Warehouse - IBA POS',
+                address: 'Jl. Industri No. 45, Jakarta Timur',
+                phone: '021-7654322'
+            },
+            {
+                id: 3,
+                name: 'Branch A - Tangerang',
+                address: 'Jl. BSD Raya No. 78, Tangerang',
+                phone: '021-7654323'
+            }
+        ];
+
+        async function loadLocations() {
+            try {
+                // Try to fetch from API (will fail if not authenticated)
+                const response = await fetch('http://localhost/Data%20IBA%20POS/IBAPOS/public/api/locations');
+                
+                if (response.ok) {
+                    locations = await response.json();
+                } else {
+                    console.log('API failed, using sample data');
+                    locations = sampleLocations;
+                }
+            } catch (error) {
+                console.log('Fetch failed, using sample data:', error);
+                locations = sampleLocations;
+            }
+
+            populateLocationSelect();
+            updateLocationsList();
+        }
+
+        function populateLocationSelect() {
+            const select = document.getElementById('location-select');
+            select.innerHTML = '<option value="">Select Location...</option>';
+            
+            locations.forEach(location => {
+                const option = document.createElement('option');
+                option.value = location.id;
+                option.textContent = location.name;
+                select.appendChild(option);
+            });
+        }
+
+        function updateLocationsList() {
+            document.getElementById('locations-list').textContent = JSON.stringify(locations, null, 2);
+        }
+
+        function updateLocationInfo() {
+            const select = document.getElementById('location-select');
+            const locationId = parseInt(select.value);
+            
+            if (locationId) {
+                selectedLocation = locations.find(loc => loc.id === locationId);
+                
+                if (selectedLocation) {
+                    document.getElementById('location-details').innerHTML = `
+                        <strong>Name:</strong> ${selectedLocation.name}<br>
+                        <strong>Address:</strong> ${selectedLocation.address}<br>
+                        <strong>Phone:</strong> ${selectedLocation.phone}
+                    `;
+                }
+            } else {
+                selectedLocation = null;
+                document.getElementById('location-details').textContent = 'No location selected';
+            }
+        }
+
+        function testReceiptWithSelectedLocation() {
+            if (!selectedLocation) {
+                alert('Please select a location first!');
+                return;
+            }
+
+            console.log('Testing receipt with location:', selectedLocation);
+            
+            // Prepare receipt data with selected location
+            const receiptData = {
+                type: 'RECEIPT_DATA',
+                data: {
+                    store: {
+                        name: selectedLocation.name,
+                        address: selectedLocation.address,
+                        phone: selectedLocation.phone
+                    },
+                    trx: {
+                        date: new Date().toLocaleDateString('id-ID') + ' ' + new Date().toLocaleTimeString('id-ID'),
+                        no: 'TEST-TRX' + Date.now(),
+                        buyer: 'Test Customer'
+                    },
+                    products: [
+                        {
+                            name: 'Test Product A',
+                            qty: 2,
+                            price: 50000,
+                            subtotal: 100000
+                        },
+                        {
+                            name: 'Test Product B',
+                            qty: 1,
+                            price: 75000,
+                            subtotal: 75000
+                        }
+                    ],
+                    subtotal: 175000,
+                    discount: 0,
+                    additional_fee: 5000,
+                    total: 180000,
+                    payment: 200000,
+                    change: 20000
+                }
+            };
+
+            // Open receipt window
+            const receiptWindow = window.open(
+                'http://localhost/Data%20IBA%20POS/IBAPOS/public/pos/print-receipt',
+                'receipt-test-location',
+                'width=400,height=700,scrollbars=yes,resizable=yes'
+            );
+
+            if (!receiptWindow) {
+                alert('Popup blocked! Please allow popups and try again.');
+                return;
+            }
+
+            // Send data when window is loaded
+            const sendData = () => {
+                console.log('Sending receipt data with location info:', receiptData);
+                receiptWindow.postMessage(receiptData, '*');
+            };
+
+            // Wait for window to load
+            receiptWindow.addEventListener('load', sendData);
+            
+            // Fallback
+            setTimeout(sendData, 1000);
+        }
+
+        // Load locations on page load
+        window.addEventListener('load', loadLocations);
+    </script>
+</body>
+</html>
