@@ -146,21 +146,23 @@
                                 <!-- Clear All Button -->
                                 <!-- Kebab Menu for Clear & Draft -->
                                 <div x-data="{ open: false }" class="relative">
-                                  <button @click="open = !open" class="px-2 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-100 rounded-xl flex items-center">
+                                  <button @click="open = !open" class="py-2 text-gray-700 dark:text-gray-100 rounded-xl flex items-center">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <circle cx="5" cy="12" r="2" />
+                                      <circle cx="12" cy="5" r="2" />
                                       <circle cx="12" cy="12" r="2" />
-                                      <circle cx="19" cy="12" r="2" />
+                                      <circle cx="12" cy="19" r="2" />
                                     </svg>
                                   </button>
-                                  <div x-show="open" @click.away="open = false" x-transition class="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-xl shadow-lg z-30 border border-gray-200 dark:border-gray-700">
-                                    <button @click="clearAll(); open = false" class="w-full flex items-center px-4 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-gray-700 gap-2">
-                                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                      </svg>
-                                      Hapus Semua
+                                  <div x-show="open" @click.away="open = false" x-transition class="absolute right-0 mt-2 w-40 rounded-xl shadow-lg z-30 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex flex-col">
+                                    <button @click="clearAll(); open = false" class="w-full flex flex-col items-start px-4 py-2 text-red-600 gap-2">
+                                      <span class="flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                        Hapus Semua
+                                      </span>
                                     </button>
-                                    <button @click="showDraftModal = true; open = false" class="w-full flex items-center px-4 py-2 text-amber-700 hover:bg-amber-50 dark:hover:bg-gray-700 gap-2">
+                                    <button @click="showDraftModal = true; open = false" class="w-full flex items-center px-4 py-2 text-amber-700 gap-2">
                                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                       </svg>
@@ -180,57 +182,60 @@
 
                   <div class="max-w-md mx-auto">
                     <!-- Cart & Checkout -->
-                    <div class="space-y-6">
+                    <div class="space-y-6 px-1">
                       <!-- Customer Selection -->
                       <div class="card">
                         <div class="card-body">
-                          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Customer</h3>
+                          <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Customer</h3>
+                          </div>
                           <div x-data="{q:'',results:[],selected:null,show:false,showModal:false,newCustomer:{name:'',phone:'',address:''}}" @click.away="show=false">
-                            <div class="relative">
+                            <div x-show="!selected" class="relative px-2">
                               <input 
                                 type="text" 
-                                class="form-input" 
+                                class="form-input w-full border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700 px-4" 
                                 placeholder="Search customer..." 
                                 x-model="q" 
                                 @input.debounce.300ms="fetch(`${window.appBaseUrl}/api/customers?q=${encodeURIComponent(q)}`).then(r=>r.json()).then(data=>{results=data;show=true})"
                                 @focus="show=q.length>0">
                               
                               <template x-if="show && results.length">
-                                <div class="absolute z-20 w-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl shadow-lg max-h-40 overflow-auto">
+                                <div class="absolute z-20 left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 max-h-40 overflow-auto">
                                   <template x-for="item in results" :key="item.id">
                                     <div @click="selected=item;show=false;q=item.name" class="px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                       <div class="font-medium text-gray-900 dark:text-white" x-text="item.name"></div>
                                       <div class="text-sm text-gray-500 dark:text-gray-400" x-text="item.phone"></div>
-                                    </div>
-                                  </template>
-                                </div>
-                              </template>
+                                      <div class="text-sm text-gray-500 dark:text-gray-400" x-text="item.address"></div>
+                                      </div>
+                                    </template>
+                                  </div>
+                                </template>
                               
                               <template x-if="show && q && results.length === 0">
-                                <div class="absolute z-20 w-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl shadow-lg p-4">
+                                <div class="absolute z-20 left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 p-4">
                                   <div class="text-center">
                                     <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">Customer not found</p>
                                     <button type="button" class="btn-primary btn-sm" @click="showModal=true">
                                       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                      </svg>
+                                        </svg>
                                       Add New Customer
-                                    </button>
+                                      </button>
+                                    </div>
                                   </div>
-                                </div>
-                              </template>
+                                </template>
                             </div>
                             
                             <input type="hidden" name="customer_id" :value="selected?.id">
                             
                             <template x-if="selected">
-                              <div class="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+                              <div class="mt-2 py-1 px-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700/50">
                                 <div class="flex items-center justify-between">
                                   <div>
-                                    <p class="font-medium text-blue-900 dark:text-blue-100" x-text="selected.name"></p>
-                                    <p class="text-sm text-blue-600 dark:text-blue-300" x-text="selected.phone"></p>
+                                    <p class="font-medium text-gray-900 dark:text-white" x-text="selected.name"></p>
+                                    <p class="text-sm text-gray-900 dark:text-white" x-text="selected.phone"></p>
                                   </div>
-                                  <button @click="selected=null;q=''" class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                                  <button @click="selected=null;q=''" class="text-gray-900 dark:text-white">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                     </svg>
@@ -240,17 +245,37 @@
                             </template>
 
                             <!-- Modal for new customer -->
-                            <div x-show="showModal" x-transition class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                              <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 w-full max-w-md">
-                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Add New Customer</h3>
-                                <div class="space-y-4">
-                                  <input type="text" class="form-input" placeholder="Customer Name" x-model="newCustomer.name">
-                                  <input type="text" class="form-input" placeholder="Phone Number" x-model="newCustomer.phone">
-                                  <textarea class="form-textarea" rows="3" placeholder="Address" x-model="newCustomer.address"></textarea>
+                            <div x-show="showModal" x-transition class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 p-4">
+                              <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md max-h-[80vh] overflow-hidden">
+                                <!-- Header -->
+                                <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Tambah Pelanggan Baru</h3>
                                 </div>
-                                <div class="flex gap-3 justify-end mt-6">
+
+                                <!-- Body (scrollable) -->
+                                <div class="p-6 modal-scroll" style="max-height: calc(80vh - 140px);">
+                                  <div class="space-y-4">
+                                    <div class="flex items-center gap-4">
+                                      <label class="block text-gray-700 dark:text-gray-200 w-32">Nama</label>
+                                      <input type="text" class="form-input bg-white dark:bg-gray-700 w-full border border-gray-200 dark:border-gray-600 px-2" placeholder="Nama Pelanggan" x-model="newCustomer.name">
+                                    </div>
+
+                                    <div class="flex items-center gap-4">
+                                      <label class="block text-gray-700 dark:text-gray-200 w-32">Telepon</label>
+                                      <input type="tel" class="form-input bg-white dark:bg-gray-700 w-full border border-gray-200 dark:border-gray-600 px-2" placeholder="Nomor Telepon" x-model="newCustomer.phone">
+                                    </div>
+
+                                    <div>
+                                      <label class="block text-gray-700 dark:text-gray-200 mb-2">Alamat</label>
+                                      <textarea class="form-textarea bg-white dark:bg-gray-700 w-full border border-gray-200 dark:border-gray-600 px-2" rows="4" placeholder="Alamat" x-model="newCustomer.address"></textarea>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <!-- Footer -->
+                                <div class="px-6 pb-4 flex justify-end gap-3">
                                   <button type="button" class="btn-secondary" @click="showModal=false">Cancel</button>
-                                  <button type="button" class="btn-primary" @click="
+                                  <button type="button" class="btn-primary px-3 py-1" @click="
                                     fetch(`${window.appBaseUrl}/customers`, {
                                       method: 'POST',
                                       headers: {
@@ -317,7 +342,7 @@
                                   </div>
                                   <div>
                                     <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Discount</label>
-                                    <input type="number" step="0.01" class="w-full px-2 py-1 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" x-model.number="it.discount">
+                                    <input type="number" step="0.01" class="w-full px-2 py-1 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" x-model.number="it.discount" >
                                   </div>
                                 </div>
                                 
