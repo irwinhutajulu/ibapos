@@ -4,30 +4,30 @@
 
 ### Halaman Utama POS:
 ```
-http://localhost/Data%20IBA%20POS/IBAPOS/public/pos
+http://localhost/IBAPOS/public/pos
 ```
 
 ### Template Receipt:
 ```
-http://localhost/Data%20IBA%20POS/IBAPOS/public/pos/print-receipt
+http://localhost/IBAPOS/public/pos/print-receipt
 ```
 
 ### Test Page:
 ```
-http://localhost/Data%20IBA%20POS/IBAPOS/public/test-receipt.html
+http://localhost/IBAPOS/public/test-receipt.html
 ```
 
 ## Cara Testing Print Receipt
 
 ### 1. Testing Manual via Test Page
-1. Buka: `http://localhost/Data%20IBA%20POS/IBAPOS/public/test-receipt.html`
+1. Buka: `http://localhost/IBAPOS/public/test-receipt.html`
 2. Klik tombol "Test Print Receipt" 
 3. Window baru akan terbuka dengan template receipt
 4. Data contoh akan otomatis ter-populate
 5. Print dialog akan muncul otomatis
 
 ### 2. Testing via POS System
-1. Buka: `http://localhost/Data%20IBA%20POS/IBAPOS/public/pos`
+1. Buka: `http://localhost/IBAPOS/public/pos`
 2. Login jika diperlukan
 3. Tambahkan produk ke cart
 4. Lakukan checkout (isi payment)

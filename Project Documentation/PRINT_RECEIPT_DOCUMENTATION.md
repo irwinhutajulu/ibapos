@@ -131,13 +131,13 @@ const receiptData = {
 ## Testing
 
 ### 1. Manual Testing
-1. Buka `http://localhost/Data IBA POS/IBAPOS/test-receipt.html`
+1. Buka `http://localhost/IBAPOS/test-receipt.html`
 2. Klik "Test Print Receipt"
 3. Verifikasi template receipt muncul dengan data yang benar
 4. Test fungsi print browser
 
 ### 2. Integration Testing
-1. Buka halaman POS: `http://localhost/Data IBA POS/IBAPOS/public/pos`
+1. Buka halaman POS: `http://localhost/IBAPOS/public/pos`
 2. Tambahkan item ke cart
 3. Lakukan checkout
 4. Klik tombol "Print Struk" setelah transaksi berhasil

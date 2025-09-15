@@ -122,7 +122,7 @@
         async function loadLocations() {
             try {
                 // Try to fetch from API (will fail if not authenticated)
-                const response = await fetch('http://localhost/Data%20IBA%20POS/IBAPOS/public/api/locations');
+                const response = await fetch('http://localhost/IBAPOS/public/api/locations');
                 
                 if (response.ok) {
                     locations = await response.json();
@@ -222,7 +222,7 @@
 
             // Open receipt window
             const receiptWindow = window.open(
-                'http://localhost/Data%20IBA%20POS/IBAPOS/public/pos/print-receipt',
+                'http://localhost/IBAPOS/public/pos/print-receipt',
                 'receipt-test-location',
                 'width=400,height=700,scrollbars=yes,resizable=yes'
             );

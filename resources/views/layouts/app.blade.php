@@ -52,11 +52,11 @@
             <div class="h-20 flex items-center px-6 border-b border-gray-200/50 dark:border-gray-700/50">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
-                        <span class="text-white font-bold text-lg">IB</span>
+                        <span class="text-white font-bold text-lg">IBA</span>
                     </div>
                     <div>
                         <div class="flex items-center space-x-2">
-                            <h1 class="font-bold text-xl text-gray-900 dark:text-white">IBAPOS</h1>
+                            <h1 class="font-bold text-xl text-gray-900 dark:text-white">Management</h1>
                             @if(app()->environment('local') && config('app.developer_mode'))
                                 <span class="bg-orange-500 text-white text-xs px-2 py-1 rounded-full font-semibold">DEV</span>
                             @endif

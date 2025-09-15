@@ -165,7 +165,7 @@ http://127.0.0.1:8000/api/products/search
 
 ### Clear All Caches (After Permission Changes)
 ```bash
-cd "c:\xampp\htdocs\Data IBA POS\IBAPOS"
+cd "c:\xampp\htdocs\IBAPOS"
 php artisan cache:clear
 php artisan route:clear  
 php artisan config:clear

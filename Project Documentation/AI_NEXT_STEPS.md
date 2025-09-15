@@ -15,7 +15,7 @@ Tujuan: file ini adalah versi kanonis dari catatan "next steps" yang sebelumnya 
 ## Quick commands (PowerShell)
 
 ```powershell
-cd "c:\xampp\htdocs\Data IBA POS\IBAPOS"
+cd "c:\xampp\htdocs\IBAPOS"
 composer install; npm install
 copy .env.example .env
 php artisan key:generate

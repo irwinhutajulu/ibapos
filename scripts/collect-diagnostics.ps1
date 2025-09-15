@@ -3,12 +3,12 @@ collect-diagnostics.ps1
 Usage: run from project root or from anywhere; collects diagnostics for the IBAPOS project.
 Example: powershell -ExecutionPolicy Bypass -File .\scripts\collect-diagnostics.ps1
 Optional switches:
-  -ProjectRoot <path>  : Project root (default: c:\xampp\htdocs\Data IBA POS\IBAPOS)
+    -ProjectRoot <path>  : Project root (default: c:\xampp\htdocs\IBAPOS)
   -RunInstall           : Run composer install & npm ci (OFF by default)
   -IncludeTests         : Run phpunit / artisan tests (ON by default)
 #>
 param(
-    [string]$ProjectRoot = 'c:\xampp\htdocs\Data IBA POS\IBAPOS',
+    [string]$ProjectRoot = 'c:\xampp\htdocs\IBAPOS',
     [switch]$RunInstall = $false,
     [switch]$IncludeTests = $true
 )

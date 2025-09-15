@@ -146,7 +146,7 @@ Route::get('/api/products/search', function (Request $request) {
 
 ### Check System Health
 ```powershell
-cd "c:\xampp\htdocs\Data IBA POS\IBAPOS"
+cd "c:\xampp\htdocs\IBAPOS"
 
 # Verify permissions
 php artisan permission:show

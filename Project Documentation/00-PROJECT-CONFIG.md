@@ -9,17 +9,17 @@
 
 ### Main Project Directory
 ```
-PROJECT_ROOT = "c:\xampp\htdocs\Data IBA POS\IBAPOS"
+PROJECT_ROOT = "c:\xampp\htdocs\IBAPOS"
 ```
 
 ### Key Folders
 ```
-APP_PATH = "c:\xampp\htdocs\Data IBA POS\IBAPOS\app"
-VIEWS_PATH = "c:\xampp\htdocs\Data IBA POS\IBAPOS\resources\views"
-ROUTES_PATH = "c:\xampp\htdocs\Data IBA POS\IBAPOS\routes"
-CONFIG_PATH = "c:\xampp\htdocs\Data IBA POS\IBAPOS\config"
-DATABASE_PATH = "c:\xampp\htdocs\Data IBA POS\IBAPOS\database"
-DOCS_PATH = "c:\xampp\htdocs\Data IBA POS\Catatan Project"
+APP_PATH = "c:\xampp\htdocs\IBAPOS\app"
+VIEWS_PATH = "c:\xampp\htdocs\IBAPOS\resources\views"
+ROUTES_PATH = "c:\xampp\htdocs\IBAPOS\routes"
+CONFIG_PATH = "c:\xampp\htdocs\IBAPOS\config"
+DATABASE_PATH = "c:\xampp\htdocs\IBAPOS\database"
+DOCS_PATH = "c:\xampp\htdocs\Catatan Project"
 ```
 
 ## � **RECENT CRITICAL FIXES** (September 8, 2025)
@@ -54,14 +54,14 @@ SHELL = "powershell.exe" (Windows PowerShell v5.1)
 ```
 
 ### Command Syntax Rules
-- **Path navigation**: Use quotes for paths with spaces: `cd "c:\xampp\htdocs\Data IBA POS\IBAPOS"`
+ **Path navigation**: Use quotes for paths with spaces: `cd "c:\xampp\htdocs\IBAPOS"`
 - **Command chaining**: Use semicolon `;` NOT `&&`: `composer install; php artisan serve`
 - **File operations**: Use PowerShell syntax: `Get-Content file.txt`, `Remove-Item file.txt`
 
 ### Common Commands Template
-```powershell
+cd "c:\xampp\htdocs\IBAPOS"
 # Navigate to project
-cd "c:\xampp\htdocs\Data IBA POS\IBAPOS"
+cd "c:\xampp\htdocs\IBAPOS"
 
 # Laravel operations
 php artisan serve                    # Start server (default port 8000)
@@ -105,7 +105,7 @@ Role: super-admin (all permissions)
 ## 🏗️ **PROJECT STRUCTURE REFERENCE**
 
 ```
-c:\xampp\htdocs\Data IBA POS\
+c:\xampp\htdocs\
 ├── IBAPOS/                          # Main Laravel application
 │   ├── app/
 │   │   ├── Http/Controllers/        # Controllers
@@ -138,7 +138,7 @@ c:\xampp\htdocs\Data IBA POS\
 ### Essential First Commands
 ```powershell
 # 1. Navigate to project
-cd "c:\xampp\htdocs\Data IBA POS\IBAPOS"
+cd "c:\xampp\htdocs\IBAPOS"
 
 # 2. Start server (if not running)
 php artisan serve

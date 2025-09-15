@@ -7,7 +7,7 @@ This file consolidates the recent work, critical files, commands, and next steps
 
 Context
 -------
-- Project root: C:\xampp\htdocs\Data IBA POS\IBAPOS
+- Project root: C:\xampp\htdocs\IBAPOS
 - OS / shell used: Windows / PowerShell
 - Recent work focused on: Users admin UI, soft deletes for `User`, delete/restore UX, relation visibility for trashed users, and tests.
 
@@ -52,7 +52,7 @@ Important code/behavior notes
 
 How to reproduce/verify locally (PowerShell)
 -------------------------------------------
-Open PowerShell (project root C:\xampp\htdocs\Data IBA POS\IBAPOS) and run:
+Open PowerShell (project root C:\xampp\htdocs\IBAPOS) and run:
 
 php -v
 composer --version

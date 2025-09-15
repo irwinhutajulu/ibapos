@@ -195,7 +195,7 @@ grep "Permission check bypassed" storage/logs/laravel.log
 
 ### Enable Developer Mode
 ```powershell
-cd "c:\xampp\htdocs\Data IBA POS\IBAPOS"
+cd "c:\xampp\htdocs\IBAPOS"
 
 # Set environment variables
 # Edit .env file: DEVELOPER_MODE=true
@@ -256,7 +256,7 @@ Production Safety: ✅ Environment-gated
 ### Enable Full Security Bypass
 ```powershell
 # Quick enable (if not already active)
-cd "c:\xampp\htdocs\Data IBA POS\IBAPOS"
+cd "c:\xampp\htdocs\IBAPOS"
 # Middleware is already set to DeveloperPermissionMiddleware
 php artisan cache:clear
 ```
