@@ -22,7 +22,9 @@
         </div>
         <div>
           <div class="text-gray-500">Category</div>
-          <div>{{ $product->category->name ?? '-' }}</div>
+          <div>{{ $product->category?->name ?? '-' }}</div>
+          {{-- Debug helper: show raw category_id for troubleshooting --}}
+          <div class="text-xs text-gray-400">cat_id: {{ $product->category_id ?? '-' }}</div>
         </div>
         <div>
           <div class="text-gray-500">Unit</div>

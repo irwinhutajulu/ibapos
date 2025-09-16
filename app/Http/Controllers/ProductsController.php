@@ -153,10 +153,12 @@ class ProductsController extends Controller
     public function show(Request $request, Product $product)
     {
         $product->load('category:id,name');
-        
+        // Prepare categories for modal/form use
+        $categories = Category::orderBy('name')->pluck('name','id');
+
         // If this is a modal request, return only the form
         if ($request->get('modal') === '1') {
-            return view('products.partials.show-form', compact('product'));
+            return view('products.partials.show-form', compact('product', 'categories'));
         }
         
         return view('products.show', compact('product'));

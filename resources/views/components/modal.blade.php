@@ -103,7 +103,13 @@ function modalComponent() {
 window.openModal = function(modalId) {
     const modal = document.getElementById(modalId);
     if (modal && modal._x_dataStack) {
-        modal._x_dataStack[0].openModal();
+        try {
+            // Ensure DOM visibility matches Alpine open state
+            try { modal.classList.remove('hidden'); modal.style.display = ''; } catch(e) {}
+            modal._x_dataStack[0].openModal();
+        } catch (err) {
+            // keep silent in production — developer can re-enable logs when needed
+        }
     }
 };
 
@@ -111,7 +117,13 @@ window.openModal = function(modalId) {
 window.closeModal = function(modalId) {
     const modal = document.getElementById(modalId);
     if (modal && modal._x_dataStack) {
-        modal._x_dataStack[0].closeModal();
+        try {
+            modal._x_dataStack[0].closeModal();
+            // Ensure element is hidden after close to avoid display mismatch
+            try { modal.classList.add('hidden'); modal.style.display = 'none'; } catch(e) {}
+        } catch (err) {
+            // keep silent in production — developer can re-enable logs when needed
+        }
     }
 };
 
@@ -147,51 +159,3 @@ window.openRemoteModal = async function(modalId, url, title = null) {
 };
 </script>
 
-<script>
-// Global function to open modal
-window.openModal = function(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal && modal._x_dataStack) {
-        modal._x_dataStack[0].openModal();
-    }
-};
-
-// Global function to close modal
-window.closeModal = function(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal && modal._x_dataStack) {
-        modal._x_dataStack[0].closeModal();
-    }
-};
-
-// Open a modal and load remote HTML into its body. Useful for view-ledger modals.
-window.openRemoteModal = async function(modalId, url, title = null) {
-    const modal = document.getElementById(modalId);
-    if (!modal || !modal._x_dataStack) return;
-
-    const bodyEl = modal.querySelector('[data-modal-body]');
-    const titleEl = modal.querySelector('[data-modal-title]');
-
-    try {
-        // Show loading skeleton
-        if (bodyEl) bodyEl.innerHTML = '<div class="py-8 text-center">Loading...</div>';
-        if (titleEl && title) titleEl.textContent = title;
-
-        modal._x_dataStack[0].openModal();
-
-        const resp = await fetch(url, {
-            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'text/html' },
-            credentials: 'same-origin'
-        });
-
-        if (!resp.ok) throw new Error('Failed to load content: ' + resp.status);
-
-        const html = await resp.text();
-
-        if (bodyEl) bodyEl.innerHTML = html;
-    } catch (err) {
-        console.error('openRemoteModal error', err);
-        if (bodyEl) bodyEl.innerHTML = '<div class="py-8 text-center text-red-400">Failed to load content</div>';
-    }
-};
-</script>

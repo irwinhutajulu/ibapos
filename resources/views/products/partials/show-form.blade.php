@@ -1,6 +1,6 @@
 <x-product-form 
     :product="$product"
-    :categories="[]"
+    :categories="$categories"
     action=""
     method="GET"
     mode="show"
