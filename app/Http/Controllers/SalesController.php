@@ -100,7 +100,7 @@ class SalesController extends Controller
             }
         }
 
-    $sale = DB::transaction(function () use ($data, $locationId, $reservations) {
+        $sale = DB::transaction(function () use ($data, $locationId, $reservations) {
             $subtotal = collect($data['items'])->reduce(function ($acc, $it) {
                 return $acc + (float) ($it['subtotal'] ?? 0);
             }, 0.0);
@@ -108,8 +108,14 @@ class SalesController extends Controller
             $discount = (float)($data['discount'] ?? 0);
             $total = max(0, $subtotal + $additionalFee - $discount);
 
+            // Ensure invoice_no exists: generate if missing
+            $invoiceNo = $data['invoice_no'] ?? null;
+            if (empty($invoiceNo)) {
+                $invoiceNo = \App\Services\InvoiceGenerator::next('sale', $locationId);
+            }
+
             $sale = Sale::create([
-                'invoice_no' => $data['invoice_no'],
+                'invoice_no' => $invoiceNo,
                 'date' => $data['date'],
                 'user_id' => auth()->id(),
                 'location_id' => $locationId,
@@ -149,9 +155,8 @@ class SalesController extends Controller
                     ]);
                     $sum += (float)$pay['amount'];
                 }
-                $sale->payment = $sum;
-                $sale->change = max(0, $sum - $sale->total);
-                $sale->save();
+                // Recalculate aggregated payment fields from saved payments
+                $sale->recalculatePayments();
             }
 
             if (!empty($data['reserve'])) {

@@ -1,8 +1,8 @@
 @extends('layouts.app', ['title' => 'Sale '.$sale->invoice_no])
 
 @section('content')
-<div class="bg-white border rounded-md p-4" x-data="saleShowRealtime()" x-init="init()">
-  <div class="flex items-start justify-between">
+<div class="bg-white dark:bg-gray-800 border rounded-md p-4" x-data="saleShowRealtime()" x-init="init()">
+  <div class="flex items-start justify-between ">
     <div>
       <div class="text-sm text-gray-500">Invoice</div>
       <div class="text-lg font-semibold">{{ $sale->invoice_no }}</div>
@@ -36,12 +36,12 @@
     <table class="min-w-full text-sm">
       <thead class="bg-gray-50">
         <tr>
-          <th class="text-left px-3 py-2">Product</th>
-          <th class="text-right px-3 py-2">Qty</th>
-          <th class="text-right px-3 py-2">Price</th>
-          <th class="text-right px-3 py-2">Disc</th>
-          <th class="text-right px-3 py-2">Subtotal</th>
-          <th class="text-left px-3 py-2">Src Loc</th>
+          <th class="text-left px-3 py-2 bg-white dark:bg-gray-800/90">Product</th>
+          <th class="text-right px-3 py-2 bg-white dark:bg-gray-800/90">Qty</th>
+          <th class="text-right px-3 py-2 bg-white dark:bg-gray-800/90">Price</th>
+          <th class="text-right px-3 py-2 bg-white dark:bg-gray-800/90">Disc</th>
+          <th class="text-right px-3 py-2 bg-white dark:bg-gray-800/90">Subtotal</th>
+          <th class="text-left px-3 py-2 bg-white dark:bg-gray-800/90">Src Loc</th>
         </tr>
       </thead>
       <tbody>
@@ -65,11 +65,11 @@
       <table class="min-w-full text-sm">
         <thead class="bg-gray-50">
           <tr>
-            <th class="text-left px-3 py-2">Type</th>
-            <th class="text-left px-3 py-2">Reference</th>
-            <th class="text-left px-3 py-2">Note</th>
-            <th class="text-right px-3 py-2">Amount</th>
-            <th class="text-left px-3 py-2">Paid At</th>
+            <th class="text-left px-3 py-2 bg-white dark:bg-gray-800/90">Type</th>
+            <th class="text-left px-3 py-2 bg-white dark:bg-gray-800/90">Reference</th>
+            <th class="text-left px-3 py-2 bg-white dark:bg-gray-800/90">Note</th>
+            <th class="text-right px-3 py-2 bg-white dark:bg-gray-800/90">Amount</th>
+            <th class="text-left px-3 py-2 bg-white dark:bg-gray-800/90">Paid At</th>
           </tr>
         </thead>
         <tbody>
