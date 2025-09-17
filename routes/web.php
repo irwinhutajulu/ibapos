@@ -221,6 +221,10 @@ Route::middleware(['web','auth'])->group(function () {
     // Admin API for all locations (for location management)
     Route::get('/api/admin/locations', [\App\Http\Controllers\LocationController::class, 'api'])->middleware('permission:admin.locations')->name('api.admin.locations');
 
+    // Dashboard reports API
+    Route::get('/api/reports/dashboard', [\App\Http\Controllers\ReportsController::class, 'dashboard'])->name('api.reports.dashboard');
+    Route::get('/api/reports/sales-series', [\App\Http\Controllers\ReportsController::class, 'salesSeries'])->name('api.reports.sales-series');
+
     Route::get('/api/products', [\App\Http\Controllers\Api\ProductController::class, 'index'])->name('api.products');
     // Note: /api/products/search is already defined as closure above (line 26) - no duplicate needed
     Route::get('/api/stock/available', [\App\Http\Controllers\StockApiController::class, 'available'])->name('api.stock.available');
@@ -285,6 +289,8 @@ Route::middleware(['web','auth'])->group(function () {
         event(new \App\Events\SaleVoided($sale));
         return response()->json(['ok' => true]);
     })->name('debug.sale-voided');
+
+    // (debug sample routes removed) 
 
     // Kasbon Management
     Route::resource('kasbons', App\Http\Controllers\KasbonController::class)

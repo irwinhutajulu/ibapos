@@ -199,24 +199,19 @@
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Sales Overview</h3>
                 <div class="flex items-center space-x-2">
-                    <select class="px-3 py-1 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                        <option>Last 7 days</option>
-                        <option>Last 30 days</option>
-                        <option>Last 3 months</option>
+                    <select id="sales-range-select" class="px-3 py-1 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                        <option value="7">Last 7 days</option>
+                        <option value="30">Last 30 days</option>
+                        <option value="90">Last 3 months</option>
                     </select>
                 </div>
             </div>
-            <div class="h-80 flex items-center justify-center text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                <div class="text-center">
-                    <svg class="w-12 h-12 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                    </svg>
-                    <p class="font-medium">Sales Chart</p>
-                    <p class="text-sm mt-1">Chart visualization will appear here</p>
-                </div>
+            <div id="sales-chart-wrapper" data-server-rendered="1" class="h-80 bg-gray-50 dark:bg-gray-700/50 rounded-xl p-2">
+                <canvas id="sales-chart" height="240"></canvas>
             </div>
         </div>
     </div>
+
 
     <!-- Recent Activity -->
     <div class="space-y-6">
@@ -283,3 +278,286 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    // Expose active location and base url to JS for debugging
+    window.appActiveLocationId = window.appActiveLocationId ?? @json(session('active_location_id'));
+    window.appBaseUrl = window.appBaseUrl ?? '';
+    console.debug('window.appActiveLocationId (from blade):', window.appActiveLocationId);
+    console.debug('window.appBaseUrl (from blade):', window.appBaseUrl);
+
+</script>
+<script>
+    (function(){
+        async function loadDashboard() {
+            try {
+                const res = await fetch(`${window.appBaseUrl || ''}/api/reports/dashboard?_cache=${Date.now()}`, { credentials: 'same-origin' });
+                if (!res.ok) return console.warn('Dashboard API not available', await res.text());
+                const data = await res.json();
+                // Fill cards
+                const totalEl = document.querySelector('[data-dashboard="today-total"]');
+                const countEl = document.querySelector('[data-dashboard="today-count"]');
+                const topEl = document.querySelector('[data-dashboard="top-product"]');
+                const alertsEl = document.querySelector('[data-dashboard="stock-alerts"]');
+                const recentEl = document.querySelector('[data-dashboard="recent-orders"]');
+
+                if (totalEl) totalEl.textContent = new Intl.NumberFormat('id-ID', { style:'currency', currency:'IDR' }).format(data.today_total || 0);
+                if (countEl) countEl.textContent = (data.today_count || 0);
+                if (topEl) topEl.textContent = data.top_product ? `${data.top_product.name} (${data.top_product.qty_sold})` : '-';
+                if (alertsEl) alertsEl.textContent = (data.stock_alerts || 0);
+                if (recentEl) {
+                    recentEl.innerHTML = '';
+                    if ((data.recent || []).length === 0) {
+                        recentEl.innerHTML = '<div class="flex items-center justify-center h-32 text-gray-500 text-sm">No recent orders</div>';
+                    } else {
+                        const ul = document.createElement('div');
+                        ul.className = 'space-y-2';
+                        data.recent.forEach(r=>{
+                            const d = document.createElement('div');
+                            d.className = 'flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg';
+                            d.innerHTML = `<div class="text-sm">${r.invoice_no || 'INV-'+r.id}</div><div class="text-sm font-medium">${new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR'}).format(r.total||0)}</div>`;
+                            ul.appendChild(d);
+                        })
+                        recentEl.appendChild(ul);
+                    }
+                }
+
+            } catch (err) {
+                console.error('Failed loading dashboard:', err);
+            }
+        }
+
+        loadDashboard();
+
+        // Realtime updates via Echo
+        if (window.Echo && window.appActiveLocationId) {
+            const ch = window.Echo.private(`location.${window.appActiveLocationId}`);
+            ch.listen('.sale.posted', (e)=>{
+                // small heuristic: increment counters and prepend recent
+                loadDashboard();
+            }).listen('.sale.voided', (e)=>{
+                loadDashboard();
+            }).listen('.stock.updated', (e)=>{
+                // stock alert may change
+                loadDashboard();
+            });
+        }
+
+        // Wire to specific placeholders in DOM (mark elements)
+        (function markPlaceholders(){
+            const totalWrap = document.querySelector('.text-2xl.font-bold');
+            if (totalWrap && !totalWrap.hasAttribute('data-dashboard')) totalWrap.setAttribute('data-dashboard','today-total');
+            const txCount = document.querySelectorAll('.text-2xl.font-bold')[1];
+            if (txCount && !txCount.hasAttribute('data-dashboard')) txCount.setAttribute('data-dashboard','today-count');
+            const top = document.querySelectorAll('.text-lg.font-bold')[0];
+            if (top && !top.hasAttribute('data-dashboard')) top.setAttribute('data-dashboard','top-product');
+            const alerts = document.querySelectorAll('.text-2xl.font-bold')[3];
+            if (alerts && !alerts.hasAttribute('data-dashboard')) alerts.setAttribute('data-dashboard','stock-alerts');
+            const recent = document.querySelectorAll('.space-y-4')[0];
+            if (recent && !recent.hasAttribute('data-dashboard')) recent.setAttribute('data-dashboard','recent-orders');
+        })();
+
+    })();
+</script>
+    <script>
+        // Ensure Chart.js is available. If not, load it dynamically from CDN and resolve when ready.
+        function ensureChartJs(timeout = 5000) {
+            return new Promise((resolve, reject) => {
+                if (window.Chart) return resolve(window.Chart);
+                const existing = document.querySelector('script[data-chartjs-loader]');
+                if (existing) {
+                    // wait for it to load
+                    existing.addEventListener('load', () => resolve(window.Chart));
+                    existing.addEventListener('error', () => reject(new Error('Failed loading Chart.js')));
+                    return;
+                }
+                const s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+                s.setAttribute('data-chartjs-loader', '1');
+                s.async = true;
+                s.onload = () => resolve(window.Chart);
+                s.onerror = () => reject(new Error('Failed loading Chart.js'));
+                document.head.appendChild(s);
+
+                // safety timeout
+                setTimeout(() => {
+                    if (!window.Chart) reject(new Error('Chart.js load timeout'));
+                }, timeout);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function(){
+        (function(){
+            let salesChart = null;
+
+            // Temporary debug toggle: when true, the dashboard will use the sample debug endpoint
+            // so we can verify Chart.js rendering and layout independent from real backend data.
+            // Set to false to use the real API again.
+            // default to false in normal runs; set to true only for manual debugging
+            window.__useDashboardSample = window.__useDashboardSample ?? false;
+
+            async function fetchSeries(days){
+                let url;
+                // Use real API by default. Developers can set `window.__useDashboardSample = true` in console to override.
+                url = `${window.appBaseUrl || ''}/api/reports/sales-series?days=${encodeURIComponent(days)}`;
+                if (window.appActiveLocationId) url += `&location_id=${encodeURIComponent(window.appActiveLocationId)}`;
+                console.debug('Fetching sales series URL:', url);
+                const res = await fetch(url, { credentials: 'same-origin' });
+                if (!res.ok) {
+                    console.error('Sales series fetch failed, status:', res.status, await res.text());
+                    throw new Error('Failed fetching series');
+                }
+                const json = await res.json();
+                console.debug('Sales series response:', json);
+                return json;
+            }
+
+            function renderChart(ctx, labels, data){
+                if (salesChart) {
+                    salesChart.data.labels = labels.map(l=>new Date(l).toLocaleDateString());
+                    salesChart.data.datasets[0].data = data;
+                    salesChart.update();
+                    return salesChart;
+                }
+
+                salesChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels.map(l=>new Date(l).toLocaleDateString()),
+                        datasets: [{
+                                label: 'Sales',
+                                data: data,
+                                borderColor: '#1e40af',
+                                backgroundColor: 'rgba(30,64,175,0.12)',
+                                fill: true,
+                                tension: 0.35,
+                                borderWidth: 2,
+                                pointRadius: 4,
+                                pointHoverRadius: 6,
+                                pointBackgroundColor: '#fff',
+                                pointBorderColor: '#1e40af',
+                            }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { callback: v => new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR'}).format(v) }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const v = context.raw || 0;
+                                        return new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR'}).format(v);
+                                    }
+                                }
+                            }
+                        },
+                        maintainAspectRatio: false,
+                    }
+                });
+
+                return salesChart;
+            }
+
+            async function loadAndRenderSeries(days){
+                try {
+                    // ensure Chart.js exists before attempting to render
+                    await ensureChartJs();
+                    const js = await fetchSeries(days);
+                    // Ensure canvas element exists and has proper pixel dimensions — sometimes CSS/Flex collapses it
+                    const wrapperEl = document.getElementById('sales-chart-wrapper');
+                    if (!document.getElementById('sales-chart')) {
+                        if (wrapperEl) wrapperEl.innerHTML = '<canvas id="sales-chart" height="240"></canvas>';
+                    }
+                    const canvasEl = document.getElementById('sales-chart');
+                    if (!canvasEl) {
+                        console.error('Cannot find sales-chart canvas after ensuring it');
+                        return;
+                    }
+
+                    // compute and set explicit pixel size to avoid 0x0 canvas in some layouts
+                    const ratio = window.devicePixelRatio || 1;
+                    const w = (wrapperEl && wrapperEl.clientWidth) ? wrapperEl.clientWidth : 600;
+                    const h = (wrapperEl && wrapperEl.clientHeight) ? wrapperEl.clientHeight : 240;
+                    // set style for layout and attributes for pixel buffer
+                    canvasEl.style.width = w + 'px';
+                    canvasEl.style.height = h + 'px';
+                    canvasEl.width = Math.floor(w * ratio);
+                    canvasEl.height = Math.floor(h * ratio);
+                    // ensure drawing context scaled for DPR
+                    const ctx = canvasEl.getContext('2d');
+                    try { ctx.setTransform(ratio, 0, 0, ratio, 0, 0); } catch(e) { /* older browsers */ }
+
+                    // temporary visual aid while debugging
+                    if (window.__useDashboardSample) {
+                        canvasEl.style.border = '2px dashed rgba(59,130,246,0.6)';
+                    }
+
+                    console.debug('Canvas pixel size:', canvasEl.width, canvasEl.height, 'style:', canvasEl.style.width, canvasEl.style.height, 'wrapper:', wrapperEl && wrapperEl.clientWidth, wrapperEl && wrapperEl.clientHeight);
+
+                    console.debug('Sales series data values:', js.data);
+                    const isAllZero = Array.isArray(js.data) && js.data.every(v=>!v);
+                    if (isAllZero) {
+                        // show a friendly message in the wrapper
+                        if (wrapper) wrapper.innerHTML = '<div class="flex items-center justify-center h-full text-sm text-gray-500">No sales data for the selected range</div>';
+                        // destroy existing chart if any
+                        if (salesChart) { salesChart.destroy(); salesChart = null; }
+                        return;
+                    }
+                    // restore canvas if wrapper was replaced
+                    if (!document.getElementById('sales-chart')) {
+                        wrapper.innerHTML = '<canvas id="sales-chart" height="240"></canvas>';
+                    }
+                    const ctx2 = document.getElementById('sales-chart').getContext('2d');
+                    console.debug('Rendering chart with labels length:', (js.labels||[]).length, 'data length:', (js.data||[]).length);
+                    const created = renderChart(ctx2, js.labels || [], js.data || []);
+                    console.debug('Chart instance:', created);
+                } catch (err) {
+                    console.error('Chart render failed', err);
+                    if (wrapper) wrapper.innerHTML = '<div class="flex items-center justify-center h-full text-sm text-red-500">Failed loading chart data</div>';
+                }
+            }
+
+            // initial load (ensure canvas exists and sizing is applied)
+            const initialSelect = document.getElementById('sales-range-select');
+            const initialDays = initialSelect ? initialSelect.value : 7;
+            const wrapper = document.getElementById('sales-chart-wrapper');
+            const canvas = document.getElementById('sales-chart');
+            if (!canvas) {
+                if (wrapper) wrapper.innerHTML = '<div class="flex items-center justify-center h-full text-sm text-gray-500">Chart canvas is missing</div>';
+                console.warn('sales-chart canvas not found');
+            } else {
+                // Make canvas fill the wrapper for responsive sizing
+                canvas.style.width = '100%';
+                canvas.style.height = '100%';
+                loadAndRenderSeries(initialDays);
+            }
+
+            // change range
+            if (initialSelect) {
+                initialSelect.addEventListener('change', (e)=>{
+                    loadAndRenderSeries(e.target.value);
+                });
+            }
+
+            // refresh chart when dashboard reloads (used by Echo listeners)
+            window.refreshDashboardSeries = function(){
+                const days = (document.getElementById('sales-range-select') || {}).value || 7;
+                loadAndRenderSeries(days);
+            }
+
+            // Subscribe to Echo events to refresh chart as well
+            if (window.Echo && window.appActiveLocationId) {
+                try{
+                    const ch = window.Echo.private(`location.${window.appActiveLocationId}`);
+                    ch.listen('.sale.posted', (e)=>{ console.debug('Echo sale.posted received', e); window.refreshDashboardSeries(); }).listen('.sale.voided', (e)=>{ console.debug('Echo sale.voided received', e); window.refreshDashboardSeries(); }).listen('.stock.updated', (e)=>{ console.debug('Echo stock.updated received', e); /* keep for consistency */ });
+                } catch (err) { console.warn('Failed to subscribe to Echo channel', err); }
+            }
+        })();
+        });
+    </script>
+@endpush
