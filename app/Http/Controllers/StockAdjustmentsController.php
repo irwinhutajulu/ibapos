@@ -18,7 +18,9 @@ class StockAdjustmentsController extends Controller
     public function create(Request $request)
     {
         // Simple create form; items entered as dynamic rows in the view
-        return view('adjustments.create');
+        $locations = \App\Models\Location::orderBy('name')->get(['id','name']);
+    $products = \App\Models\Product::orderBy('name')->get(['id','name']);
+        return view('adjustments.create', compact('locations', 'products'));
     }
 
     public function store(Request $request, AdjustmentService $service)
@@ -93,7 +95,9 @@ class StockAdjustmentsController extends Controller
             return redirect()->route('stock-adjustments.show', $adjustment)->with('error', 'Only draft can be edited.');
         }
         $adjustment->load('items.product');
-        return view('adjustments.edit', compact('adjustment'));
+        $locations = \App\Models\Location::orderBy('name')->get(['id','name']);
+    $products = \App\Models\Product::orderBy('name')->get(['id','name']);
+        return view('adjustments.edit', compact('adjustment', 'locations', 'products'));
     }
 
     public function update(Request $request, StockAdjustment $adjustment)

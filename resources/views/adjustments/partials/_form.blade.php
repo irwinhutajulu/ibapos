@@ -70,7 +70,7 @@
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-300 dark:text-gray-300 mb-2">Qty Change</label>
-                                <input type="number" name="items[{{ $idx }}][qty_change]" step="0.001" class="w-full px-3 py-2 border border-gray-600 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-700 dark:bg-gray-700 text-white" value="{{ $it['qty_change'] ?? 0 }}">
+                                <input type="number" name="items[{{ $idx }}][qty_change]" class="w-full px-3 py-2 border border-gray-600 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-700 dark:bg-gray-700 text-white" value="{{ $it['qty_change'] ?? 0 }}">
                             </div>
 
                             <div>
