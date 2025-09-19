@@ -38,12 +38,19 @@
       <div class="text-white">{{ $purchase->supplier->name ?? '-' }}</div>
     </div>
     <div>
-      <div class="text-sm text-gray-300">Freight</div>
-      <div class="text-white">{{ number_format($purchase->freight_cost ?? 0,2) }}</div>
+      <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2">
+        <div class="text-sm text-gray-300 mt-1">Freight</div>
+        <div class="text-white">{{ number_format($purchase->freight_cost ?? 0,2) }}</div>
+        <div class="text-sm text-gray-300 mt-1">Loading</div>
+        <div class="text-white">{{ number_format($purchase->loading_cost ?? 0,2) }}</div>
+        <div class="text-sm text-gray-300 mt-1">Unloading</div>
+        <div class="text-white">{{ number_format($purchase->unloading_cost ?? 0,2) }}</div>
+        </div>
     </div>
     <div>
       <div class="text-sm text-gray-300">Totals</div>
-      <div class="text-white">Total: {{ number_format($purchase->total ?? 0,2) }} | Weight: {{ number_format($purchase->total_weight ?? 0,3) }}</div>
+      <div class="text-white">Total : {{ number_format($purchase->total ?? 0,2) }}</div>
+      <div class="text-white">Weight : {{ number_format($purchase->total_weight ?? 0,0) }} Kg</div>
     </div>
   </div>
 
@@ -71,7 +78,7 @@
           @if($purchase->status === 'posted')
             @php
               // Estimasi landed cost: freight dialokasikan proporsional subtotal
-              $freight = $purchase->freight_cost ?? 0;
+              $freight = ($purchase->freight_cost ?? 0) + ($purchase->loading_cost ?? 0) + ($purchase->unloading_cost ?? 0);
               $total = $purchase->total > 0 ? $purchase->total : 1;
               $allocation = $freight * ($it->subtotal / $total);
               $landed = $it->price + ($allocation / max($it->qty,1));

@@ -11,20 +11,87 @@ class PurchasePostingService
 {
     public function calculateLandedCost(Purchase $purchase): array
     {
-        // simple proportional allocation by item subtotal
-        $freight = (float)($purchase->freight_cost ?? 0);
-        if ($freight <= 0) {
+        // total extra cost includes freight + loading + unloading
+        $totalExtra = (float)($purchase->freight_cost ?? 0) + (float)($purchase->loading_cost ?? 0) + (float)($purchase->unloading_cost ?? 0);
+        if ($totalExtra <= 0) {
             return [];
         }
-        $totalSubtotal = (float)$purchase->items->sum(fn($i) => (float)$i->subtotal);
-        if ($totalSubtotal <= 0) {
-            return [];
-        }
-        $map = [];
+
+        // Prefer weight-based allocation: use item weight * qty
+        // Each item may not have product relation loaded; try to read product weight if available on item or via relation
+        $itemWeights = [];
+        $totalWeight = 0.0;
         foreach ($purchase->items as $item) {
-            $portion = ((float)$item->subtotal / $totalSubtotal) * $freight;
-            $map[$item->id] = round($portion, 2);
+            // item may have a 'weight' attribute (copied from Product when saving purchase), otherwise try relation
+            $w = (float)($item->weight ?? 0);
+            if ($w <= 0 && isset($item->product) && isset($item->product->weight)) {
+                $w = (float)$item->product->weight;
+            }
+            $itemWeightTotal = $w * (float)$item->qty;
+            $itemWeights[$item->id] = $itemWeightTotal;
+            $totalWeight += $itemWeightTotal;
         }
+
+        $map = [];
+
+        // We'll allocate using integer cents via Largest Remainder (Hamilton) method
+        $totalExtraCents = (int) round($totalExtra * 100);
+        if ($totalExtraCents === 0) {
+            return [];
+        }
+
+        $itemsData = [];
+        $index = 0;
+
+        if ($totalWeight > 0) {
+            // compute raw portion in cents for each item based on weight
+            foreach ($purchase->items as $item) {
+                $raw = ($itemWeights[$item->id] / $totalWeight) * $totalExtraCents; // in cents (float)
+                $floor = (int) floor($raw + 1e-9);
+                $fraction = $raw - $floor;
+                $itemsData[$item->id] = ['floor' => $floor, 'fraction' => $fraction, 'index' => $index++];
+            }
+        } else {
+            // fallback: allocate by subtotal
+            $totalSubtotal = (float)$purchase->items->sum(fn($i) => (float)$i->subtotal);
+            if ($totalSubtotal <= 0) {
+                return [];
+            }
+            foreach ($purchase->items as $item) {
+                $raw = ((float)$item->subtotal / $totalSubtotal) * $totalExtraCents; // in cents
+                $floor = (int) floor($raw + 1e-9);
+                $fraction = $raw - $floor;
+                $itemsData[$item->id] = ['floor' => $floor, 'fraction' => $fraction, 'index' => $index++];
+            }
+        }
+
+        // sum floor cents and compute residual cents to distribute
+        $sumFloor = array_sum(array_map(fn($d) => $d['floor'], $itemsData));
+        $residualCents = $totalExtraCents - $sumFloor; // >= 0
+
+        if ($residualCents > 0) {
+            // sort items by fractional remainder desc, tie-break by original index (stable)
+            uasort($itemsData, function ($a, $b) {
+                if ($a['fraction'] === $b['fraction']) return $a['index'] <=> $b['index'];
+                return ($b['fraction'] <=> $a['fraction']);
+            });
+
+            // distribute one cent to top residualCents items
+            $i = 0;
+            foreach ($itemsData as $id => &$d) {
+                if ($i < $residualCents) {
+                    $d['floor'] += 1;
+                }
+                $i++;
+            }
+            unset($d);
+        }
+
+        // prepare map in decimal currency
+        foreach ($itemsData as $id => $d) {
+            $map[$id] = round($d['floor'] / 100, 2);
+        }
+
         return $map;
     }
 

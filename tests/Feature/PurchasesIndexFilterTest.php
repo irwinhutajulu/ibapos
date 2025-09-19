@@ -29,8 +29,8 @@ class PurchasesIndexFilterTest extends TestCase
 
         $supplier = Supplier::factory()->create();
     // make P1 clearly older than the filter 'from' (yesterday) to avoid timezone edge cases
-    $p1 = Purchase::create(['invoice_no'=>'P1','date'=>now()->subDays(5),'user_id'=>$user->id,'location_id'=>$loc->id,'supplier_id'=>$supplier->id,'status'=>'draft']);
-        $p2 = Purchase::create(['invoice_no'=>'P2','date'=>now(),'user_id'=>$user->id,'location_id'=>$loc->id,'supplier_id'=>$supplier->id,'status'=>'posted']);
+    $p1 = Purchase::create(['invoice_no'=>'P1','date'=>now()->subDays(5),'user_id'=>$user->id,'location_id'=>$loc->id,'supplier_id'=>$supplier->id,'status'=>'draft','freight_cost'=>0,'loading_cost'=>0,'unloading_cost'=>0]);
+        $p2 = Purchase::create(['invoice_no'=>'P2','date'=>now(),'user_id'=>$user->id,'location_id'=>$loc->id,'supplier_id'=>$supplier->id,'status'=>'posted','freight_cost'=>0,'loading_cost'=>0,'unloading_cost'=>0]);
 
         $response = $this->actingAs($user)->get('/purchases?status=posted&from='.now()->subDay()->format('Y-m-d'));
         $response->assertStatus(200);

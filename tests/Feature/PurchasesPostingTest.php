@@ -34,7 +34,7 @@ class PurchasesPostingTest extends TestCase
         $stock = Stock::create(['product_id'=>$p->id,'location_id'=>$loc->id,'qty'=>'10','avg_cost'=>'1000']);
 
     $supplier = \App\Models\Supplier::factory()->create();
-    $purchase = Purchase::create(['invoice_no'=>'P1','date'=>now(),'user_id'=>$user->id,'location_id'=>$loc->id,'supplier_id'=>$supplier->id,'status'=>'received']);
+    $purchase = Purchase::create(['invoice_no'=>'P1','date'=>now(),'user_id'=>$user->id,'location_id'=>$loc->id,'supplier_id'=>$supplier->id,'status'=>'received','freight_cost'=>0,'loading_cost'=>0,'unloading_cost'=>0]);
         PurchaseItem::create(['purchase_id'=>$purchase->id,'product_id'=>$p->id,'qty'=>'10','price'=>'2000','subtotal'=>'20000']);
 
         app(PurchasePostingService::class)->post($purchase, $user->id);

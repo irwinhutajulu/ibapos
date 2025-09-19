@@ -27,8 +27,8 @@ class PurchasesPostingJsonTest extends TestCase
         $user->locations()->attach($loc->id);
         session(['active_location_id' => $loc->id]);
 
-        $supplier = Supplier::factory()->create();
-        $purchase = Purchase::create(['invoice_no'=>'P1','date'=>now(),'user_id'=>$user->id,'location_id'=>$loc->id,'supplier_id'=>$supplier->id,'status'=>'received']);
+    $supplier = Supplier::factory()->create();
+    $purchase = Purchase::create(['invoice_no'=>'P1','date'=>now(),'user_id'=>$user->id,'location_id'=>$loc->id,'supplier_id'=>$supplier->id,'status'=>'received','freight_cost'=>0,'loading_cost'=>0,'unloading_cost'=>0]);
 
         $response = $this->actingAs($user)->post('/purchases/'.$purchase->id.'/post', [], ['Accept' => 'application/json']);
         $response->assertStatus(200);

@@ -1,4 +1,20 @@
 # CHANGELOG IBA POS
+## 2025-09-20 - ⚖️ Landed Cost: loading/unloading + weight-based allocation
+
+### Summary
+- Added two new purchase fields: `loading_cost` and `unloading_cost` (DECIMAL(12,2), default 0).
+- Landed cost allocation changed to weight-based (item weight * qty). If total weight is zero, falls back to subtotal-based allocation.
+- Residual cents distribution now uses Largest Remainder (Hamilton) method for fair distribution.
+
+### Technical Changes
+- Migration: `database/migrations/2025_09_19_000000_add_loading_unloading_to_purchases_table.php` (added columns)
+- Service: `app/Services/PurchasePostingService.php` updated: `calculateLandedCost` and `allocateFreightCost` now support weight-based allocation and largest-remainder residual distribution.
+- Views: purchases create/edit/show updated to accept/display `loading_cost` and `unloading_cost`.
+- Tests: unit and feature tests updated/added to cover allocation and posting behavior.
+
+### Impact
+- Existing posted purchases are not changed; migration affects future posting flows. Backfill/re-post decisions must be handled separately.
+
 
 Catat setiap perubahan, penambahan fitur, atau revisi di bawah ini secara kronologis.
 

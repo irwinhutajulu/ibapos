@@ -24,9 +24,19 @@
     </div>
   </div>
 
-  <div class="mt-4">
-    <label class="block text-sm font-medium text-gray-300 dark:text-gray-300 mb-2">Freight Cost</label>
-    <input type="number" step="0.01" name="freight_cost" class="w-60 px-3 py-2 border border-gray-600 dark:border-gray-600 rounded-lg shadow-sm bg-gray-700 dark:bg-gray-700 text-white" value="{{ $purchase->freight_cost ?? 0 }}">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 py-4">
+    <div>
+      <label class="block text-sm font-medium text-gray-300 dark:text-gray-300 mb-2">Freight Cost</label>
+      <input type="number" name="freight_cost" x-model.number="freight_cost" class="w-60 px-3 py-2 border border-gray-600 dark:border-gray-600 rounded-lg shadow-sm bg-gray-700 dark:bg-gray-700 text-white text-right" value="{{ $purchase->freight_cost ?? 0 }}">
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-300 mb-1">Loading Cost</label>
+      <input type="number" name="loading_cost" x-model.number="loading_cost" class="w-60 px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white text-right" value="{{ $purchase->loading_cost ?? 0 }}">
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-300 mb-1">Unloading Cost</label>
+      <input type="number" name="unloading_cost" x-model.number="unloading_cost" class="w-60 px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white text-right" value="{{ $purchase->unloading_cost ?? 0 }}">
+    </div>
   </div>
 
   <div class="mt-6 overflow-x-auto border border-gray-600 dark:border-gray-600 rounded-lg">
@@ -94,11 +104,15 @@ function purchaseForm(initialRows){
   return {
     // ensure each row has a stable unique id to use as key (prevents DOM reuse issues)
     rows: (initialRows || [{product_id: '', qty: 1, price: 0, subtotal: 0}]).map(r => ({...r, uid: r.uid || (Date.now().toString(36) + Math.random().toString(36).slice(2))})),
+    freight_cost: {{ $purchase->freight_cost ?? 0 }},
+    loading_cost: {{ $purchase->loading_cost ?? 0 }},
+    unloading_cost: {{ $purchase->unloading_cost ?? 0 }},
     init(){ this.rows.forEach((_,i)=>this.recalc(i)); },
     add(){ this.rows.push({product_id: '', qty: 1, price: 0, subtotal: 0, uid: (Date.now().toString(36) + Math.random().toString(36).slice(2))}); },
     remove(i){ this.rows.splice(i,1); if(this.rows.length===0) this.add(); },
     recalc(i){ const r=this.rows[i]; r.subtotal=(Number(r.qty||0)*Number(r.price||0)); },
     total(){ return this.rows.reduce((s,r)=>s+Number(r.subtotal||0),0); },
+    totalExtra(){ return (Number(this.freight_cost||0) + Number(this.loading_cost||0) + Number(this.unloading_cost||0)); }
   }
 }
 </script>

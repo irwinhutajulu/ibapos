@@ -11,14 +11,16 @@ class Purchase extends Model
     use HasFactory, FiltersByLocation;
 
     protected $fillable = [
-        'invoice_no','date','user_id','location_id','supplier_id','total','total_weight','freight_cost','status','received_at','received_by','posted_at','posted_by','voided_at','voided_by'
+        'invoice_no','date','user_id','location_id','supplier_id','total','total_weight','freight_cost','loading_cost','unloading_cost','status','received_at','received_by','posted_at','posted_by','voided_at','voided_by'
     ];
 
     protected $casts = [
         'date' => 'datetime',
-        'total' => 'decimal:2',
-        'total_weight' => 'decimal:3',
-        'freight_cost' => 'decimal:2',
+    'total' => 'decimal:2',
+    'total_weight' => 'decimal:3',
+    'freight_cost' => 'decimal:2',
+    'loading_cost' => 'decimal:2',
+    'unloading_cost' => 'decimal:2',
         'received_at' => 'datetime',
         'posted_at' => 'datetime',
         'voided_at' => 'datetime',

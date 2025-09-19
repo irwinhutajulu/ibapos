@@ -109,6 +109,13 @@ Catatan sumber kebenaran:
   - [x] Tulis ledger (qty positif)
   - [x] Set posted_at/by & status=posted
   - [x] Reversal void (kebijakan konsistensi avg_cost dicatat)
+  
+  Decision (2025-09-19): Loading & Unloading Cost
+  - Add two new columns to `purchases`: `loading_cost` and `unloading_cost` of type DECIMAL(12,2), default 0.
+  - These fields are included when calculating landed cost. Total extra cost = `freight + loading_cost + unloading_cost`.
+  - Allocation strategy (updated 2025-09-20): allocate by product weight (weight * qty) when available. If total weight == 0, fallback to subtotal-based allocation.
+  - Residual distribution (updated 2025-09-20): use Largest Remainder (Hamilton) method — compute allocations in cents, floor each share, then distribute leftover cents to items with largest fractional remainders (stable tie-break by item order). This replaces the previous deterministic +first-item residual policy.
+  - Default behaviour: existing purchases are not retroactively modified; any backfill/recalculation requires an explicit data-migration or re-posting workflow.
  - [x] MutationsService
   - [x] pending → confirmed: satu transaksi atomik; stok turun di asal, naik di tujuan; ledger ±; avg_cost tujuan berbobot
  - [x] AdjustmentsService

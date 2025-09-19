@@ -46,8 +46,8 @@ class LocationController extends Controller
 
         $location = Location::create([
             'name' => $validated['name'],
-            'address' => $validated['address'],
-            'phone' => $validated['phone']
+            'address' => $validated['address'] ?? null,
+            'phone' => $validated['phone'] ?? null
         ]);
 
         // Sync users
@@ -98,8 +98,8 @@ class LocationController extends Controller
 
         $location->update([
             'name' => $validated['name'],
-            'address' => $validated['address'],
-            'phone' => $validated['phone']
+            'address' => $validated['address'] ?? null,
+            'phone' => $validated['phone'] ?? null
         ]);
 
         // Sync users
