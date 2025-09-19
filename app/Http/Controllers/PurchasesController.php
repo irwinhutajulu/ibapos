@@ -47,6 +47,8 @@ class PurchasesController extends Controller
                 $w = (float) ($weights[$row['product_id']] ?? 0);
                 $totalWeight += ((float)$row['qty']) * $w;
             }
+            // break reference to avoid unexpected side-effects when re-iterating $data['items']
+            unset($row);
 
             $purchase = Purchase::create([
                 'invoice_no' => $data['invoice_no'],
@@ -114,6 +116,8 @@ class PurchasesController extends Controller
                 $w = (float) ($weights[$row['product_id']] ?? 0);
                 $totalWeight += ((float)$row['qty']) * $w;
             }
+            // break reference to avoid unexpected side-effects when re-iterating $data['items']
+            unset($row);
 
             $purchase->update([
                 'invoice_no' => $data['invoice_no'],

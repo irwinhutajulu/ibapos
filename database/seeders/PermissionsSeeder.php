@@ -10,6 +10,8 @@ class PermissionsSeeder extends Seeder
 {
     public function run(): void
     {
+        // Ensure permission cache is cleared before seeding to avoid stale entries
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
         $permissions = [
             // masters
             'products.read','products.create','products.update','products.delete',

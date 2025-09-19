@@ -41,7 +41,7 @@
         </tr>
       </thead>
       <tbody>
-        <template x-for="(row, idx) in rows" :key="idx">
+        <template x-for="(row, idx) in rows" :key="row.uid">
           <tr class="border-t border-gray-700">
             <td class="px-3 py-2">
               <select :name="`items[${idx}][product_id]`" class="w-64 px-2 py-1 border border-gray-600 rounded-lg bg-gray-700 text-white" x-model.number="row.product_id" required>
@@ -92,9 +92,10 @@
 <script>
 function purchaseForm(initialRows){
   return {
-    rows: initialRows || [{product_id: '', qty: 1, price: 0, subtotal: 0}],
+    // ensure each row has a stable unique id to use as key (prevents DOM reuse issues)
+    rows: (initialRows || [{product_id: '', qty: 1, price: 0, subtotal: 0}]).map(r => ({...r, uid: r.uid || (Date.now().toString(36) + Math.random().toString(36).slice(2))})),
     init(){ this.rows.forEach((_,i)=>this.recalc(i)); },
-    add(){ this.rows.push({product_id: '', qty: 1, price: 0, subtotal: 0}); },
+    add(){ this.rows.push({product_id: '', qty: 1, price: 0, subtotal: 0, uid: (Date.now().toString(36) + Math.random().toString(36).slice(2))}); },
     remove(i){ this.rows.splice(i,1); if(this.rows.length===0) this.add(); },
     recalc(i){ const r=this.rows[i]; r.subtotal=(Number(r.qty||0)*Number(r.price||0)); },
     total(){ return this.rows.reduce((s,r)=>s+Number(r.subtotal||0),0); },
