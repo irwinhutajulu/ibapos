@@ -395,7 +395,7 @@
             <div x-show="showCheckoutModal" x-transition class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
               <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
                 <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 rounded-t-2xl">
-                  <div class="flex items-center justify-between >
+                  <div class="flex items-center justify-between">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Checkout</h3>
                     <button @click="showCheckoutModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -703,6 +703,9 @@
                 subtotal: this.itemSubtotal(it), 
                 source_location_id: it.source_location_id || window.appActiveLocationId || null 
               })),
+              // Include additional fee and sale-level discount so backend can persist them
+              additional_fee: parseFloat(this.additional_fee) || 0,
+              discount: parseFloat(this.discount) || 0,
               payments: this.payments,
               status: status
             };
@@ -744,54 +747,43 @@
         printStruk() {
           // Open receipt window
           const receiptWindow = window.open(window.appBaseUrl + '/pos/print-receipt', '_blank', 'width=400,height=600');
-          
-          // Get store info from current location or fallback to defaults
+
+          // Build centralized payload
+          const payload = window.buildSalePayload({
+            status: 'posted',
+            cart: this.cart,
+            payments: this.payments,
+            additional_fee: this.additional_fee,
+            discount: this.discount,
+            trxNo: this.trxNo,
+            buyerName: this.buyerName,
+            currentLocation: this.currentLocation || {}
+          });
+
+          // Construct receiptData from payload (human friendly)
           const currentLoc = this.currentLocation || {};
           const storeName = currentLoc.name || 'IBA POS - Istana Batu Alam';
           const storeAddress = currentLoc.address || 'Jl. Raya Batu Alam No. 123';
           const storePhone = currentLoc.phone || 'Telp: 021-7654321';
-          
-          // Calculate subtotal from cart items
-          const subtotal = this.cart.reduce((sum, item) => sum + this.itemSubtotal(item), 0);
-          
-          // Prepare receipt data
+
           const receiptData = {
-            store: {
-              name: storeName,
-              address: storeAddress,
-              phone: storePhone,
-            },
-            trx: {
-              date: new Date().toLocaleDateString('id-ID') + ' ' + new Date().toLocaleTimeString('id-ID'),
-              no: this.trxNo || ('TRX' + Date.now()),
-              buyer: this.buyerName || 'Customer',
-            },
-            products: this.cart.map(item => ({
-              name: item.name || 'Unknown Product',
-              qty: item.qty || 1,
-              price: Number(item.price) || 0,
-              subtotal: this.itemSubtotal(item)
-            })),
-            total: this.total(),
+            store: { name: storeName, address: storeAddress, phone: storePhone },
+            trx: { date: new Date().toLocaleDateString('id-ID') + ' ' + new Date().toLocaleTimeString('id-ID'), no: payload.invoice_no, buyer: this.buyerName || 'Customer' },
+            products: payload.items.map(i => ({ name: (this.cart.find(c => c.id === i.product_id) || {}).name || 'Unknown Product', qty: i.qty, price: i.price, subtotal: i.subtotal, discount: i.discount || 0 })),
+            subtotal: payload.meta.subtotal,
+            additional_fee: payload.additional_fee,
+            discount: payload.discount,
+            total: (payload.meta.subtotal + payload.additional_fee - payload.discount),
             payment: this.payTotal(),
-            change: Math.max(0, this.payTotal() - this.total()),
-            additional_fee: parseFloat(this.additional_fee) || 0,
-            discount: parseFloat(this.discount) || 0,
-            subtotal: subtotal,
+            change: Math.max(0, this.payTotal() - (payload.meta.subtotal + payload.additional_fee - payload.discount)),
             note: 'Terima kasih atas pembelian Anda!'
           };
-          
-          console.log('Sending receipt data with location:', {
-            locationId: this.activeLocationId,
-            locationName: storeName,
-            receiptData: receiptData
-          });
-          
+
           // Send data to receipt window when it's loaded
           const sendData = () => {
             receiptWindow.postMessage({ type: 'RECEIPT_DATA', data: receiptData }, '*');
           };
-          
+
           // Wait for window to load before sending data
           const timer = setInterval(() => {
             if (receiptWindow && receiptWindow.document && receiptWindow.document.readyState === 'complete') {
@@ -799,11 +791,9 @@
               sendData();
             }
           }, 300);
-          
+
           // Fallback - send data after 1 second regardless
-          setTimeout(() => {
-            sendData();
-          }, 1000);
+          setTimeout(() => { sendData(); }, 1000);
         },
         
         async loadDraftSales() {
@@ -961,8 +951,38 @@
             console.log('Store info reset to default values');
           }
         }
-      }
+      };
+
     }
+
+    // Shared payload builder used by processTransaction() and printStruk()
+    // Exposed on window so partials can use it too.
+    window.buildSalePayload = function ({ status = 'posted', cart = [], payments = [], additional_fee = 0, discount = 0, trxNo = null, buyerName = null, currentLocation = {} } = {}) {
+      const subtotal = (cart || []).reduce((sum, item) => sum + ((Number(item.price) - Number(item.discount || 0)) * Number(item.qty || 0)), 0);
+      return {
+        invoice_no: (status === 'draft' ? 'DR-' : 'INV-') + Date.now(),
+        date: new Date().toISOString(),
+        items: (cart || []).map(it => ({
+          product_id: it.id,
+          qty: it.qty,
+          price: it.price,
+          discount: it.discount || 0,
+          subtotal: (Number(it.price) - Number(it.discount || 0)) * Number(it.qty || 0),
+          source_location_id: it.source_location_id || window.appActiveLocationId || null
+        })),
+        payments: payments || [],
+        additional_fee: parseFloat(additional_fee) || 0,
+        discount: parseFloat(discount) || 0,
+        status: status,
+        // Helpful for print preview
+        meta: {
+          subtotal: subtotal,
+          trxNo: trxNo,
+          buyerName: buyerName,
+          location: currentLocation
+        }
+      };
+    };
     </script>
 </body>
 </html>

@@ -15,48 +15,63 @@
   payTotal() {
     return this.payments.reduce((acc, p) => acc + (parseFloat(p.amount) || 0), 0);
   },
-  printStruk() {
-    // Open receipt window
-    const receiptWindow = window.open('/pos/print-receipt', '_blank', 'width=400,height=600');
-    
-    // Prepare receipt data
-    const receiptData = {
-      store: {
-        name: document.getElementById('store-name') ? document.getElementById('store-name').textContent : 'NAMA TOKO',
-        address: document.getElementById('store-address') ? document.getElementById('store-address').textContent : 'Alamat Toko',
-        phone: document.getElementById('store-phone') ? document.getElementById('store-phone').textContent : 'Telp: 08xxxxxxxxxx',
-      },
-      trx: {
-        date: new Date().toLocaleString('id-ID'),
-        no: this.trxNo || ('TRX' + Date.now()),
-        buyer: this.buyerName || '-',
-      },
-      products: this.getCart().map(item => ({
-        name: item.name,
-        qty: item.qty,
-        price: item.price,
-        subtotal: (Number(item.price) - Number(item.discount || 0)) * Number(item.qty || 0)
-      })),
-      total: this.total(),
-      payment: this.payTotal(),
-      change: (this.payTotal() - this.total()),
-      additional_fee: this.additional_fee,
-      note: 'Terima kasih atas pembelian Anda!'
-    };
-    
-    // Send data to receipt window when it's loaded
-    const sendData = () => {
-      receiptWindow.postMessage({ type: 'RECEIPT_DATA', data: receiptData }, '*');
-    };
-    
-    // Wait for window to load before sending data
-    const timer = setInterval(() => {
-      if (receiptWindow && receiptWindow.document && receiptWindow.document.readyState === 'complete') {
-        clearInterval(timer);
-        sendData();
-      }
-    }, 300);
-  }
+    printStruk() {
+      // Open receipt window
+      const receiptWindow = window.open('/pos/print-receipt', '_blank', 'width=400,height=600');
+
+      // Build a centralized payload using the shared builder
+      const payload = window.buildSalePayload({
+        status: 'posted',
+        cart: this.getCart(),
+        payments: this.payments,
+        additional_fee: this.additional_fee,
+        discount: this.discount,
+        trxNo: this.trxNo,
+        buyerName: this.buyerName,
+        currentLocation: this.currentLocation || {}
+      });
+
+      // Enrich payload for receipt display (store & trx human-friendly fields)
+      const receiptData = {
+        store: {
+          name: document.getElementById('store-name') ? document.getElementById('store-name').textContent : 'NAMA TOKO',
+          address: document.getElementById('store-address') ? document.getElementById('store-address').textContent : 'Alamat Toko',
+          phone: document.getElementById('store-phone') ? document.getElementById('store-phone').textContent : 'Telp: 08xxxxxxxxxx',
+        },
+        trx: {
+          date: new Date().toLocaleString('id-ID'),
+          no: payload.invoice_no || (this.trxNo || ('TRX' + Date.now())),
+          buyer: this.buyerName || '-',
+        },
+        products: payload.items.map(i => ({
+          name: (this.getCart().find(c => c.id === i.product_id) || {}).name || 'Unknown Product',
+          qty: i.qty,
+          price: i.price,
+          subtotal: i.subtotal,
+          discount: i.discount || 0
+        })),
+        subtotal: payload.meta.subtotal,
+        total: payload.discount !== undefined ? (payload.meta.subtotal + payload.additional_fee - payload.discount) : payload.meta.subtotal,
+        payment: this.payTotal(),
+        change: (this.payTotal() - (payload.meta.subtotal + payload.additional_fee - payload.discount)),
+        additional_fee: payload.additional_fee,
+        discount: payload.discount,
+        note: 'Terima kasih atas pembelian Anda!'
+      };
+
+      // Send data to receipt window when it's loaded
+      const sendData = () => {
+        receiptWindow.postMessage({ type: 'RECEIPT_DATA', data: receiptData }, '*');
+      };
+
+      // Wait for window to load before sending data
+      const timer = setInterval(() => {
+        if (receiptWindow && receiptWindow.document && receiptWindow.document.readyState === 'complete') {
+          clearInterval(timer);
+          sendData();
+        }
+      }, 300);
+    }
 }">
   <div class="card-header">
     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Payment & Checkout</h3>

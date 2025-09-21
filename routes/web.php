@@ -98,6 +98,78 @@ Route::get('/api/products/search', function (Request $request) {
 // Receipt template (no auth required for printing)
 Route::view('/pos/print-receipt', 'pos.receipt-template')->name('pos.print-receipt');
 
+// Receipt preview - server-rendered sample data for development (no auto-print)
+Route::get('/pos/receipt-preview', function() {
+    $sample = [
+        'store' => [
+            'name' => config('app.name', 'IBA POS') . ' - Demo Store',
+            'address' => 'Jl. Contoh No.123, Demo City',
+            'phone' => '0812-3456-7890',
+        ],
+        'trx' => [
+            'date' => now()->format('Y-m-d H:i:s'),
+            'no' => 'PRV-' . now()->format('YmdHis'),
+            'buyer' => 'Walk-in Customer',
+        ],
+        'products' => [
+            ['name' => 'Produk A', 'qty' => 2, 'price' => 15000, 'subtotal' => 30000],
+            ['name' => 'Produk B', 'qty' => 1, 'price' => 25000, 'subtotal' => 25000, 'discount' => 2000],
+        ],
+        'subtotal' => 55000,
+        'additional_fee' => 2000,
+        'discount' => 2000, // sale-level discount
+        'total' => 55000 + 2000 - 2000,
+        'payment' => 60000,
+        'change' => 5000,
+    ];
+
+    return view('pos.receipt-template', ['preview' => true, 'previewData' => $sample]);
+})->name('pos.receipt-preview');
+
+    // Receipt preview for a real sale row (authenticated, requires sales.read)
+    Route::get('/pos/receipt-preview/{sale}', function(\App\Models\Sale $sale) {
+        $sale->load(['items.product','payments','location','user','customer']);
+
+        $products = $sale->items->map(function($item) {
+            return [
+                'name' => $item->product->name ?? ($item->product_name ?? 'Unknown'),
+                'qty' => (float)$item->qty,
+                'price' => (float)$item->price,
+                'discount' => (float)($item->discount ?? 0),
+                'subtotal' => (float)$item->subtotal,
+            ];
+        })->toArray();
+
+        $subtotal = (float)$sale->items->sum(fn($i) => (float)$i->subtotal);
+        $additionalFee = (float)($sale->additional_fee ?? 0);
+        $saleLevelDiscount = (float)($sale->discount ?? 0);
+        $total = (float)$sale->total;
+        $payment = (float)($sale->payment ?? $sale->payments->sum('amount'));
+        $change = (float)($sale->change ?? max(0, $payment - $total));
+
+        $preview = [
+            'store' => [
+                'name' => ($sale->location->name ?? config('app.name')), 
+                'address' => $sale->location->address ?? '',
+                'phone' => $sale->location->phone ?? '',
+            ],
+            'trx' => [
+                'date' => $sale->date?->format('Y-m-d H:i:s') ?? now()->format('Y-m-d H:i:s'),
+                'no' => $sale->invoice_no,
+                'buyer' => $sale->customer->name ?? 'Walk-in Customer',
+            ],
+            'products' => $products,
+            'subtotal' => $subtotal,
+            'additional_fee' => $additionalFee,
+            'discount' => $saleLevelDiscount,
+            'total' => $total,
+            'payment' => $payment,
+            'change' => $change,
+        ];
+
+        return view('pos.receipt-template', ['preview' => true, 'previewData' => $preview]);
+    })->middleware(['auth','permission:sales.read'])->name('pos.receipt-preview.sale');
+
 Route::get('/login', [\App\Http\Controllers\AuthController::class, 'showLogin'])->name('login')->middleware('guest');
 Route::post('/login', [\App\Http\Controllers\AuthController::class, 'login'])->name('login.post')->middleware('guest');
 Route::post('/logout', [\App\Http\Controllers\AuthController::class, 'logout'])->name('logout')->middleware('auth');

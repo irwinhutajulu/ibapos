@@ -84,12 +84,44 @@
         .item-name {
             font-weight: bold;
             margin-bottom: 0.5mm;
+            /* Allow truncation when name is too long for the thermal width */
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            display: block;
         }
-        
+
+        /* Name row wraps the product name and subtotal on one line */
+        .name-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .item-name {
+            flex: 1 1 auto;
+            margin-right: 6px;
+            min-width: 0; /* allow flex items to shrink so ellipsis works */
+        }
+
+        .item-subtotal {
+            flex: 0 0 auto;
+            margin-left: 6px;
+        }
+
         .item-details {
             display: flex;
             justify-content: space-between;
             font-size: 9px;
+        }
+
+        /* Sub-lines under the product name (qty x price, discount) */
+        .item-subline {
+            display: flex;
+            justify-content: space-between;
+            padding-left: 8px;
+            font-size: 9px;
+            color: #000;
         }
         
         .payment-summary {
@@ -98,9 +130,13 @@
         }
         
         .payment-summary .row {
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: 80px 10px 1fr;
             margin-bottom: 1mm;
+        }
+
+        .payment-summary .row span:nth-child(3) {
+            text-align: right;
         }
         
         .total-row {
@@ -175,24 +211,12 @@
         </div>
         
         <!-- Transaction Information -->
-        <div class="transaction-info">
-            <div class="row">
-                <span>Tanggal:</span>
-                <span id="trx-date">Loading...</span>
-            </div>
-            <div class="row">
-                <span>No. Transaksi:</span>
-                <span id="trx-no">Loading...</span>
-            </div>
-            <div class="row">
-                <span>Kasir:</span>
-                <span id="cashier">Loading...</span>
-            </div>
-            <div class="row">
-                <span>Pembeli:</span>
-                <span id="buyer-name">Loading...</span>
-            </div>
-        </div>
+        <table class="transaction-info">
+            <tr><td>Tanggal</td><td>:</td><td id="trx-date">Loading...</td></tr>
+            <tr><td>No. Inv</td><td>:</td><td id="trx-no">Loading...</td></tr>
+            <tr><td>Kasir</td><td>:</td><td id="cashier">Loading...</td></tr>
+            <tr><td>Pembeli</td><td>:</td><td id="buyer-name">Loading...</td></tr>
+            </table>
         
         <!-- Items Section -->
         <div class="items-section">
@@ -211,27 +235,33 @@
         <!-- Payment Summary -->
         <div class="payment-summary">
             <div class="row">
-                <span>Subtotal:</span>
+                <span>Subtotal</span>
+                <span>: </span>
                 <span id="subtotal">Loading...</span>
             </div>
             <div class="row" id="discount-row" style="display: none;">
-                <span>Diskon:</span>
-                <span id="discount">Rp 0</span>
+                <span>Diskon</span>
+                <span>: </span>
+                <span id="discount">Loading...</span>
             </div>
             <div class="row" id="fee-row" style="display: none;">
-                <span>Biaya Tambahan:</span>
-                <span id="additional-fee">Rp 0</span>
+                <span>Biaya Lain</span>
+                <span>: </span>
+                <span id="additional-fee">Loading...</span>
             </div>
             <div class="row total-row">
-                <span>TOTAL:</span>
+                <span>TOTAL</span>
+                <span>: </span>
                 <span id="total">Loading...</span>
             </div>
             <div class="row">
-                <span>Bayar:</span>
+                <span>Bayar</span>
+                <span>: </span>
                 <span id="payment">Loading...</span>
             </div>
             <div class="row">
-                <span>Kembalian:</span>
+                <span>Kembalian</span>
+                <span>: </span>
                 <span id="change">Loading...</span>
             </div>
         </div>
@@ -246,24 +276,57 @@
     <script>
         // Format currency for Indonesian Rupiah
         function formatRupiah(amount) {
+            // Ensure we display whole rupiah without any decimal places
+            const rounded = Math.round(Number(amount) || 0);
             return new Intl.NumberFormat('id-ID', {
                 style: 'currency',
-                currency: 'IDR'
-            }).format(amount || 0);
+                currency: 'IDR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(rounded);
         }
 
-        // Listen for data from parent window
-        window.addEventListener('message', function(event) {
-            if (event.data.type === 'RECEIPT_DATA') {
-                const data = event.data.data;
-                populateReceipt(data);
-                
-                // Auto print after data is loaded
-                setTimeout(() => {
-                    window.print();
-                }, 500);
+        // Escape HTML to avoid XSS when inserting product names
+        function escapeHtml(unsafe) {
+            return String(unsafe)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // Truncate text to a maximum length and add ellipsis.
+        // Defaults to 32 characters which fits typical 58mm thermal widths.
+        function truncateText(text, maxLen = 32) {
+            if (!text) return '';
+            const s = String(text);
+            if (s.length <= maxLen) return s;
+            return s.slice(0, maxLen - 1) + '…';
+        }
+
+        // If this view is used as a preview (server-side), the server will pass `previewData` into JS via inline JSON.
+        const serverPreview = {!! json_encode(isset($preview) && $preview ? true : false) !!};
+        const serverPreviewData = {!! json_encode($previewData ?? null) !!};
+
+        // If not preview, listen for data from parent window (pos) and auto-print
+        if (!serverPreview) {
+            window.addEventListener('message', function(event) {
+                if (event.data.type === 'RECEIPT_DATA') {
+                    const data = event.data.data;
+                    populateReceipt(data);
+                    // Auto print after data is loaded
+                    setTimeout(() => {
+                        window.print();
+                    }, 500);
+                }
+            });
+        } else {
+            // Populate immediately with preview data but do not auto-print
+            if (serverPreviewData) {
+                populateReceipt(serverPreviewData);
             }
-        });
+        }
 
         function populateReceipt(data) {
             console.log('Populating receipt with data:', data);
@@ -294,13 +357,51 @@
                 data.products.forEach(product => {
                     const itemDiv = document.createElement('div');
                     itemDiv.className = 'item';
-                    itemDiv.innerHTML = `
-                        <div class="item-name">${product.name || 'Unknown Product'}</div>
-                        <div class="item-details">
-                            <span>${product.qty || 1} x ${formatRupiah(product.price || 0)}</span>
-                            <span>${formatRupiah(product.subtotal || 0)}</span>
-                        </div>
-                    `;
+                    // Create a header row with name (left) and subtotal (right)
+                    const nameRow = document.createElement('div');
+                    nameRow.className = 'name-row';
+
+                    const nameDiv = document.createElement('div');
+                    nameDiv.className = 'item-name';
+                    const fullName = product.name || 'Unknown Product';
+                    // set truncated text for display, but keep full name in title for hover/preview
+                    nameDiv.textContent = truncateText(fullName, 32);
+                    nameDiv.title = fullName;
+
+                    const subtotalDiv = document.createElement('div');
+                    subtotalDiv.className = 'item-subtotal';
+                    subtotalDiv.textContent = formatRupiah(product.subtotal || 0);
+
+                    nameRow.appendChild(nameDiv);
+                    nameRow.appendChild(subtotalDiv);
+
+                    // Quantity row (indented): "{qty} x Rp {price}"
+                    const qtyRow = document.createElement('div');
+                    qtyRow.className = 'item-subline';
+                    const qtyLabel = document.createElement('span');
+                    qtyLabel.textContent = `${product.qty || 1} x ${formatRupiah(product.price || 0)}`;
+                    const qtyEmpty = document.createElement('span');
+                    qtyEmpty.textContent = '';
+                    qtyRow.appendChild(qtyLabel);
+                    qtyRow.appendChild(qtyEmpty);
+
+                    itemDiv.appendChild(nameRow);
+                    itemDiv.appendChild(qtyRow);
+
+                    // Per-item discount row: show "Disc. {qty} x {perUnitDiscount}" on left and the total discount (qty * discount) on the right
+                    const perUnitDiscount = Number(product.discount || 0);
+                    const qty = Number(product.qty || 1);
+                    const totalDiscount = perUnitDiscount * qty;
+                    if (perUnitDiscount > 0) {
+                        const discRow = document.createElement('div');
+                        discRow.className = 'item-subline';
+                        const discLabel = document.createElement('span');
+                        discLabel.textContent = `Disc. (${qty} x ${formatRupiah(perUnitDiscount)})`;
+                        const discValue = document.createElement('span');
+                        discRow.appendChild(discLabel);
+                        discRow.appendChild(discValue);
+                        itemDiv.appendChild(discRow);
+                    }
                     itemsList.appendChild(itemDiv);
                 });
             } else {
@@ -325,7 +426,8 @@
             // Handle discount row
             const discountRow = document.getElementById('discount-row');
             if (discount > 0) {
-                discountRow.style.display = 'flex';
+                // Use 'grid' to match .payment-summary .row layout so alignment stays consistent
+                discountRow.style.display = 'grid';
                 document.getElementById('discount').textContent = formatRupiah(discount);
             } else {
                 discountRow.style.display = 'none';
@@ -334,19 +436,42 @@
             // Handle additional fee row
             const feeRow = document.getElementById('fee-row');
             if (additionalFee > 0) {
-                feeRow.style.display = 'flex';
+                // Use 'grid' to match .payment-summary .row layout so alignment stays consistent
+                feeRow.style.display = 'grid';
                 document.getElementById('additional-fee').textContent = formatRupiah(additionalFee);
             } else {
                 feeRow.style.display = 'none';
             }
         }
 
-        // Auto-close window after printing
-        window.addEventListener('afterprint', function() {
-            setTimeout(() => {
+        // Auto-close window after printing (only when not preview)
+        if (!serverPreview) {
+            window.addEventListener('afterprint', function() {
+                setTimeout(() => {
+                    window.close();
+                }, 1000);
+            });
+        }
+        
+        // Preview mode: show simple controls to print or close
+        if (serverPreview) {
+            const controls = document.createElement('div');
+            controls.style.position = 'fixed';
+            controls.style.top = '8px';
+            controls.style.right = '8px';
+            controls.style.zIndex = 9999;
+            controls.innerHTML = `
+                <button id="preview-print" style="margin-right:8px;padding:6px 10px;background:#1f8ef1;border:none;color:#fff;border-radius:6px;">Print</button>
+                <button id="preview-close" style="padding:6px 10px;background:#6b7280;border:none;color:#fff;border-radius:6px;">Close</button>
+            `;
+            document.body.appendChild(controls);
+            document.getElementById('preview-print').addEventListener('click', function() {
+                window.print();
+            });
+            document.getElementById('preview-close').addEventListener('click', function() {
                 window.close();
-            }, 1000);
-        });
+            });
+        }
     </script>
 </body>
 </html>
