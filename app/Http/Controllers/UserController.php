@@ -66,7 +66,8 @@ class UserController extends Controller
         ]);
 
         if (!empty($data['roles'])) {
-            $user->syncRoles($data['roles']);
+            $roles = Role::whereIn('id', $data['roles'])->get();
+            $user->syncRoles($roles);
         }
         // sync direct permissions if provided
         if (!empty($data['permissions'])) {
@@ -102,7 +103,12 @@ class UserController extends Controller
         }
         $user->save();
 
-    $user->syncRoles($data['roles'] ?? []);
+    if (!empty($data['roles'])) {
+        $roles = Role::whereIn('id', $data['roles'])->get();
+        $user->syncRoles($roles);
+    } else {
+        $user->syncRoles([]);
+    }
     // sync direct permissions
     $user->syncPermissions($data['permissions'] ?? []);
 

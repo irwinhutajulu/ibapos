@@ -29,7 +29,7 @@ php artisan dev:toggle
 
 ### Refresh Config (setelah toggle)
 ```bash
-php artisan config:clear
+php -S localhost:8001 -t .
 ```
 
 ## Konfigurasi

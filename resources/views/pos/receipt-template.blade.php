@@ -234,7 +234,7 @@
         
         <!-- Payment Summary -->
         <div class="payment-summary">
-            <div class="row">
+            <div class="row" id="subtotal-row" style="display: none;">
                 <span>Subtotal</span>
                 <span>: </span>
                 <span id="subtotal">Loading...</span>
@@ -259,7 +259,7 @@
                 <span>: </span>
                 <span id="payment">Loading...</span>
             </div>
-            <div class="row">
+            <div class="row" id="change-row" style="display: none;">
                 <span>Kembalian</span>
                 <span>: </span>
                 <span id="change">Loading...</span>
@@ -423,6 +423,16 @@
             document.getElementById('payment').textContent = formatRupiah(payment);
             document.getElementById('change').textContent = formatRupiah(change);
             
+            // Handle subtotal row
+            const subtotalRow = document.getElementById('subtotal-row');
+            if (discount > 0 || additionalFee > 0) {
+                subtotalRow.style.display = 'grid';
+                document.getElementById('subtotal').textContent = formatRupiah(subtotal);
+            } else {
+                subtotalRow.style.display = 'none';
+            }
+
+
             // Handle discount row
             const discountRow = document.getElementById('discount-row');
             if (discount > 0) {
@@ -442,6 +452,16 @@
             } else {
                 feeRow.style.display = 'none';
             }
+            
+            // Handle change row
+            const changeRow = document.getElementById('change-row');
+            if (change > 0) {
+                changeRow.style.display = 'grid';
+                document.getElementById('change').textContent = formatRupiah(change);
+            } else {
+                changeRow.style.display = 'none';
+            }
+
         }
 
         // Auto-close window after printing (only when not preview)

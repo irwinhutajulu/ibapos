@@ -267,6 +267,11 @@ Route::middleware(['web','auth'])->group(function () {
 
     // Stock mutations
     Route::get('/stock-mutations', [\App\Http\Controllers\StockMutationsController::class, 'index'])->middleware('permission:stock_mutations.request')->name('stock-mutations.index');
+    Route::get('/stock-mutations/create', [\App\Http\Controllers\StockMutationsController::class, 'create'])->middleware('permission:stock_mutations.request')->name('stock-mutations.create');
+    Route::post('/stock-mutations', [\App\Http\Controllers\StockMutationsController::class, 'store'])->middleware('permission:stock_mutations.request')->name('stock-mutations.store');
+    Route::get('/stock-mutations/{mutation}', [\App\Http\Controllers\StockMutationsController::class, 'show'])->middleware('permission:stock_mutations.request')->name('stock-mutations.show');
+    Route::get('/stock-mutations/{mutation}/edit', [\App\Http\Controllers\StockMutationsController::class, 'edit'])->middleware('permission:stock_mutations.request')->name('stock-mutations.edit');
+    Route::put('/stock-mutations/{mutation}', [\App\Http\Controllers\StockMutationsController::class, 'update'])->middleware('permission:stock_mutations.request')->name('stock-mutations.update');
     Route::post('/stock-mutations/{mutation}/confirm', [\App\Http\Controllers\StockMutationsController::class, 'confirm'])->middleware('permission:stock_mutations.confirm')->name('stock-mutations.confirm');
     Route::post('/stock-mutations/{mutation}/reject', [\App\Http\Controllers\StockMutationsController::class, 'reject'])->middleware('permission:stock_mutations.reject')->name('stock-mutations.reject');
 
