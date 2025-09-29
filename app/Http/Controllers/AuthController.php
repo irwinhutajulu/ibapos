@@ -24,6 +24,21 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
+            // Ensure we have an active location set in session for the dashboard and APIs.
+            // If the user has one or more locations, pick the first alphabetically (A..Z).
+            try {
+                $user = Auth::user();
+                if ($user) {
+                    $firstLoc = $user->locations()->orderBy('name', 'asc')->first();
+                    if ($firstLoc) {
+                        $request->session()->put('active_location_id', (int) $firstLoc->id);
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Be defensive: if anything fails here, don't block login. Log for debugging.
+                \Log::warning('Failed setting active_location_id on login: ' . $e->getMessage());
+            }
+
             return redirect()->intended('/');
         }
 
