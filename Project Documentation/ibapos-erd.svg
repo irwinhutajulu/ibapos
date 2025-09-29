@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900">
+  <style>
+    .box { fill:#ffffff; stroke:#2b6cb0; stroke-width:2; rx:6; }
+    .title { font: bold 16px sans-serif; fill:#2b6cb0 }
+    .field { font: 13px monospace; fill:#1a202c }
+    .rel { stroke:#718096; stroke-width:2; marker-end: url(#arrow); }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="10" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#718096" />
+    </marker>
+  </defs>
+
+  <!-- Users -->
+  <g transform="translate(40,40)">
+    <rect class="box" width="260" height="110" />
+    <text class="title" x="12" y="26">users</text>
+    <text class="field" x="12" y="52">id</text>
+    <text class="field" x="12" y="72">name, email (unique), password</text>
+    <text class="field" x="12" y="92">email_verified_at, remember_token, timestamps</text>
+  </g>
+
+  <!-- Roles/Permissions -->
+  <g transform="translate(340,40)">
+    <rect class="box" width="260" height="120" />
+    <text class="title" x="12" y="26">roles / permissions</text>
+    <text class="field" x="12" y="52">roles(id,name)</text>
+    <text class="field" x="12" y="72">permissions(id,name)</text>
+    <text class="field" x="12" y="92">model_has_roles / model_has_permissions</text>
+  </g>
+
+  <!-- Locations -->
+  <g transform="translate(640,40)">
+    <rect class="box" width="300" height="120" />
+    <text class="title" x="12" y="26">locations</text>
+    <text class="field" x="12" y="52">id, name, address</text>
+    <text class="field" x="12" y="72">phone (nullable, added in migration)</text>
+    <text class="field" x="12" y="92">...user assignments (location_user pivot)</text>
+  </g>
+
+  <!-- Products -->
+  <g transform="translate(40,200)">
+    <rect class="box" width="340" height="150" />
+    <text class="title" x="12" y="26">products</text>
+    <text class="field" x="12" y="52">id, name, category_id (nullable), barcode (unique, nullable)</text>
+    <text class="field" x="12" y="72">price, weight (nullable), unit (nullable)</text>
+    <text class="field" x="12" y="92">timestamps, deleted_at (softDeletes)</text>
+    <text class="field" x="12" y="112">foreign key: category_id -> categories.id (nullOnDelete)</text>
+  </g>
+
+  <!-- Stocks -->
+  <g transform="translate(420,200)">
+    <rect class="box" width="320" height="120" />
+    <text class="title" x="12" y="26">stocks</text>
+    <text class="field" x="12" y="52">id, product_id, location_id</text>
+    <text class="field" x="12" y="72">qty (decimal, unsigned), avg_cost (decimal)</text>
+    <text class="field" x="12" y="92">unique(product_id, location_id), foreign keys -> products, locations</text>
+  </g>
+
+  <!-- Stock Ledger -->
+  <g transform="translate(760,200)">
+    <rect class="box" width="360" height="160" />
+    <text class="title" x="12" y="26">stock_ledger</text>
+    <text class="field" x="12" y="52">id, product_id, location_id</text>
+    <text class="field" x="12" y="72">ref_type (string), ref_id (uint)</text>
+    <text class="field" x="12" y="92">qty_change (decimal), balance_after (decimal)</text>
+    <text class="field" x="12" y="112">cost_per_unit_at_time, total_cost_effect, user_id, note, created_at</text>
+    <text class="field" x="12" y="132">indexes: [product_id,location_id], [ref_type,ref_id], [created_at]</text>
+  </g>
+
+  <!-- Stock Adjustments -->
+  <g transform="translate(760,380)">
+    <rect class="box" width="360" height="160" />
+    <text class="title" x="12" y="26">stock_adjustments</text>
+    <text class="field" x="12" y="52">id, code (nullable, unique per location), date, location_id, user_id</text>
+    <text class="field" x="12" y="72">reason (nullable), note, status (draft/posted/void)</text>
+    <text class="field" x="12" y="92">posted_at, posted_by, voided_at, voided_by, timestamps</text>
+    <text class="field" x="12" y="112">stock_adjustment_items -> (product_id, qty_change, unit_cost, note)</text>
+  </g>
+
+  <!-- Stock Reservations -->
+  <g transform="translate(760,560)">
+    <rect class="box" width="360" height="170" />
+    <text class="title" x="12" y="26">stock_reservations</text>
+    <text class="field" x="12" y="52">id, product_id, location_id, sale_id, sale_item_id (nullable)</text>
+    <text class="field" x="12" y="72">qty_reserved (decimal), status (active/consumed/released/expired)</text>
+    <text class="field" x="12" y="92">expires_at, created_by, released_at/released_by, consumed_at/consumed_by, created_at</text>
+    <text class="field" x="12" y="112">indexes: [product_id,location_id], [sale_id,sale_item_id]</text>
+  </g>
+
+  <!-- Invoice Counters -->
+  <g transform="translate(760,80)">
+    <rect class="box" width="320" height="100" />
+    <text class="title" x="12" y="26">invoice_counters</text>
+    <text class="field" x="12" y="52">id, type (string), location_id (nullable)</text>
+    <text class="field" x="12" y="72">last_number (uint), date (nullable), timestamps</text>
+    <text class="field" x="12" y="92">unique(type, location_id, date) — used for sequential invoice generation</text>
+  </g>
+
+  <!-- Sales -->
+  <g transform="translate(40,380)">
+    <rect class="box" width="360" height="160" />
+    <text class="title" x="12" y="26">sales</text>
+    <text class="field" x="12" y="52">id, invoice_no, date, user_id, location_id</text>
+    <text class="field" x="12" y="72">total, status (draft/posted/void)</text>
+    <text class="field" x="12" y="92">posted_at, voided_at</text>
+
+    <rect x="12" y="110" width="330" height="36" fill="#f7fafc" stroke="#cbd5e0" rx="4" />
+    <text class="field" x="18" y="133">sale_items -> sale_items table (1:N)</text>
+  </g>
+
+  <!-- Sale Items -->
+  <g transform="translate(440,380)">
+    <rect class="box" width="320" height="120" />
+    <text class="title" x="12" y="26">sale_items</text>
+    <text class="field" x="12" y="52">id, sale_id, product_id, qty, price</text>
+    <text class="field" x="12" y="72">discount, subtotal, source_location_id</text>
+  </g>
+
+  <!-- Purchases -->
+  <g transform="translate(40,580)">
+    <rect class="box" width="360" height="140" />
+    <text class="title" x="12" y="26">purchases</text>
+    <text class="field" x="12" y="52">id, invoice_no, date, supplier_id, location_id</text>
+    <text class="field" x="12" y="72">total, freight_cost, status</text>
+    <text class="field" x="12" y="92">loading_cost, unloading_cost</text>
+  </g>
+
+  <!-- Purchase Items -->
+  <g transform="translate(440,580)">
+    <rect class="box" width="320" height="120" />
+    <text class="title" x="12" y="26">purchase_items</text>
+    <text class="field" x="12" y="52">id, purchase_id, product_id, qty, price</text>
+    <text class="field" x="12" y="72">subtotal</text>
+  </g>
+
+  <!-- Categories -->
+  <g transform="translate(400,160)">
+    <rect class="box" width="220" height="80" />
+    <text class="title" x="12" y="26">categories</text>
+    <text class="field" x="12" y="52">id, name (unique), timestamps</text>
+  </g>
+
+  <!-- Customers -->
+  <g transform="translate(40,740)">
+    <rect class="box" width="300" height="100" />
+    <text class="title" x="12" y="26">customers</text>
+    <text class="field" x="12" y="52">id, name, phone (nullable), address (nullable)</text>
+    <text class="field" x="12" y="72">timestamps, deleted_at (softDeletes), indexes on name & phone</text>
+  </g>
+
+  <!-- Suppliers -->
+  <g transform="translate(360,740)">
+    <rect class="box" width="300" height="100" />
+    <text class="title" x="12" y="26">suppliers</text>
+    <text class="field" x="12" y="52">id, name, phone (nullable), address (nullable)</text>
+    <text class="field" x="12" y="72">timestamps, deleted_at (softDeletes), indexes on name & phone</text>
+  </g>
+
+  <!-- Location-User pivot -->
+  <g transform="translate(640,160)">
+    <rect class="box" width="260" height="80" />
+    <text class="title" x="12" y="26">location_user (pivot)</text>
+    <text class="field" x="12" y="52">location_id, user_id (primary composite)</text>
+    <text class="field" x="12" y="72">cascadeOnDelete FKs -> locations, users</text>
+  </g>
+
+  <!-- Stock Mutations -->
+  <g transform="translate(40,860)">
+    <rect class="box" width="520" height="120" />
+    <text class="title" x="12" y="26">stock_mutations</text>
+    <text class="field" x="12" y="52">id, product_id, from_location_id, to_location_id, qty (decimal), date</text>
+    <text class="field" x="12" y="72">status (pending/confirmed/rejected), requested_by, confirmed_by, confirmed_at</text>
+    <text class="field" x="12" y="92">indexes on product & locations, CHECK(from <> to) when supported</text>
+  </g>
+
+  <!-- Deliveries -->
+  <g transform="translate(600,860)">
+    <rect class="box" width="360" height="120" />
+    <text class="title" x="12" y="26">deliveries</text>
+    <text class="field" x="12" y="52">id, code (unique), date, location_id, sale_id (nullable)</text>
+    <text class="field" x="12" y="72">status, assigned_to (user), assigned_at, delivered_at, note, timestamps</text>
+  </g>
+
+  <!-- Expenses -->
+  <g transform="translate(40,1000)">
+    <rect class="box" width="420" height="120" />
+    <text class="title" x="12" y="26">expense_categories / expenses</text>
+    <text class="field" x="12" y="52">expense_categories: id, name (unique), description, timestamps</text>
+    <text class="field" x="12" y="72">expenses: id, category_id, location_id, user_id, date, amount, description</text>
+    <text class="field" x="12" y="92">indexes & FKs -> categories, locations, users</text>
+  </g>
+
+  <!-- Kasbons -->
+  <g transform="translate(500,1000)">
+    <rect class="box" width="360" height="120" />
+    <text class="title" x="12" y="26">kasbons</text>
+    <text class="field" x="12" y="52">id, code (unique), user_id, location_id, date, amount</text>
+    <text class="field" x="12" y="72">status, approved_by, approved_at, note, timestamps</text>
+  </g>
+
+  <!-- Notifications -->
+  <g transform="translate(900,560)">
+    <rect class="box" width="320" height="120" />
+    <text class="title" x="12" y="26">notifications / notification_settings</text>
+    <text class="field" x="12" y="52">notifications: uuid id, type, notifiable (morph), data, read_at</text>
+    <text class="field" x="12" y="72">notification_settings: id, user_id, channel, type, enabled (unique per user/channel/type)</text>
+  </g>
+
+  <!-- Permissions (Spatie) -->
+  <g transform="translate(900,740)">
+    <rect class="box" width="320" height="120" />
+    <text class="title" x="12" y="26">spatie_permission tables</text>
+    <text class="field" x="12" y="52">permissions, roles, model_has_permissions, model_has_roles, role_has_permissions</text>
+    <text class="field" x="12" y="72">standard Spatie schema with unique/index constraints (see config/permission.php)</text>
+  </g>
+
+  <!-- Relations arrows -->
+  <line class="rel" x1="300" y1="90" x2="340" y2="90" /> <!-- users -> roles (conceptual) -->
+  <line class="rel" x1="600" y1="100" x2="640" y2="100" />
+  <line class="rel" x1="240" y1="200" x2="420" y2="200" /> <!-- products -> stocks -->
+  <line class="rel" x1="540" y1="260" x2="760" y2="260" /> <!-- stocks -> ledger -->
+  <line class="rel" x1="220" y1="420" x2="440" y2="420" /> <!-- sales -> sale_items -->
+  <line class="rel" x1="240" y1="640" x2="440" y2="640" /> <!-- purchases -> purchase_items -->
+  <line class="rel" x1="700" y1="200" x2="760" y2="240" />
+
+  <!-- Legend -->
+  <g transform="translate(760,740)">
+    <rect x="0" y="0" width="420" height="120" rx="6" fill="#fff8db" stroke="#f6ad55" />
+    <text x="12" y="22" font-family="sans-serif" font-size="14" fill="#744210"><tspan font-weight="bold">IBA POS - Simplified ERD</tspan></text>
+    <text x="12" y="44" font-family="monospace" font-size="12" fill="#744210">This diagram is a simplified overview. See `Project Documentation/09-DATABASE-ERD.md` for the full ERD and details.</text>
+  </g>
+</svg>
