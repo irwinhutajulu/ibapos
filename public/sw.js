@@ -8,6 +8,9 @@ const ASSETS = [
   // If you use Vite-built assets, consider adding them here or using runtime caching.
 ];
 
+// Include offline fallback in the precache
+if (!ASSETS.includes('/offline.html')) ASSETS.push('/offline.html');
+
 self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
@@ -34,7 +37,8 @@ self.addEventListener('fetch', (event) => {
         return resp;
       }).catch(() => {
         if (event.request.mode === 'navigate') {
-          return caches.match('/');
+          // Return offline fallback page for navigations when network fails
+          return caches.match('/offline.html');
         }
       });
     })
