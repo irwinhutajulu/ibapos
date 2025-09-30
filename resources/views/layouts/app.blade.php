@@ -30,6 +30,12 @@
             window._notifyQueue.push({ msg, type, ttl });
         };
     </script>
+    <!-- PWA: manifest and theme -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
 </head>
 <body class="h-full bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-gray-100 antialiased">
     <div class="min-h-screen flex">
@@ -503,3 +509,16 @@
 
 </body>
 </html>
+
+@env('production')
+    <script>
+        // Register service worker in production and on secure contexts only
+        if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(reg) { console.log('ServiceWorker registered with scope:', reg.scope); })
+                    .catch(function(err) { console.warn('ServiceWorker registration failed:', err); });
+            });
+        }
+    </script>
+@endenv
