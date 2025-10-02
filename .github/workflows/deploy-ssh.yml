@@ -1,0 +1,79 @@
+name: Build and Deploy (SSH)
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node (optional)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install and build (optional)
+        run: |
+          npm ci
+          npm run build
+
+      - name: Prepare deploy artifact
+        run: |
+          # Create a zip of the repo (exclude dev files)
+          zip -r build_deploy.zip . -x "*.git*" "node_modules/*" ".github/*" "tests/*" ".vscode/*" "*.env" || true
+
+      - name: Setup SSH key and known_hosts
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+          KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$DEPLOY_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          # write known hosts from secret (so ssh will trust the host)
+          echo "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Upload artifact via scp
+        env:
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          # fallback path if DEPLOY_PATH not set
+          if [ -z "$DEPLOY_PATH" ]; then DEPLOY_PATH="/home/$DEPLOY_USER/public_html"; fi
+          echo "Uploading to ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH} (port ${DEPLOY_PORT:-22})"
+          scp -o StrictHostKeyChecking=yes -i ~/.ssh/deploy_key -P ${DEPLOY_PORT:-22} build_deploy.zip ${DEPLOY_USER}@${DEPLOY_HOST}:$DEPLOY_PATH
+
+      - name: Remote deploy commands (extract & post-deploy)
+        env:
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          if [ -z "$DEPLOY_PATH" ]; then DEPLOY_PATH="/home/$DEPLOY_USER/public_html"; fi
+          ssh -o StrictHostKeyChecking=yes -i ~/.ssh/deploy_key -p ${DEPLOY_PORT:-22} ${DEPLOY_USER}@${DEPLOY_HOST} << 'EOF'
+            set -e
+            cd "$DEPLOY_PATH"
+            # unzip the uploaded artifact
+            unzip -o build_deploy.zip -d ./
+            # If vendor dir not included, run composer (uncomment if needed):
+            # composer install --no-dev --optimize-autoloader --no-interaction
+            # Run Laravel post-deploy commands (adjust as needed):
+            if command -v php >/dev/null 2>&1; then
+              php artisan key:generate --force || true
+              php artisan migrate --force || true
+              php artisan config:cache || true
+              php artisan route:cache || true
+              php artisan view:cache || true
+            fi
+            # ensure storage & bootstrap/cache are writable
+            chmod -R ug+rw storage bootstrap/cache || true
+          EOF
